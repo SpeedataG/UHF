@@ -11,7 +11,7 @@ public class UHFManager {
 
     private final static String FACTORY_FEILIXIN = "1";
     private final static String FACTORY_XINLIAN = "2";
-    private final static String FACTORY_R2000 = "3";
+    private final static String FACTORY_R2000 = "3  ";
 
     public static IUHFService getUHFService() {
         //  判断模块   返回不同的模块接口对象
