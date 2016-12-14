@@ -7,6 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.speedata.libuhf.IUHFService;
 import com.speedata.libuhf.UHFManager;
+import com.speedata.libuhf.XinLianQilian;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,7 +24,8 @@ public class MainActivity extends AppCompatActivity {
         iuhfService.inventory_start(new Handler() {
             @Override
             public void handleMessage(Message msg) {
-                System.out.println("===handleMessage==");
+                ArrayList<XinLianQilian.Tag_Data> cx = (ArrayList<XinLianQilian.Tag_Data>) msg.obj;
+//                System.out.println("===handleMessage==");
                 super.handleMessage(msg);
             }
         });
