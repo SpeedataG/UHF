@@ -60,7 +60,7 @@ public class R2K implements IUHFService {
             }
             lk.Inventory(1);
             Log.d("r2000_kt45", "inventory thread is " +
-					"stoped************************************************");
+                    "stoped************************************************");
         }
     }
 
@@ -78,7 +78,7 @@ public class R2K implements IUHFService {
                 }
             }
             Log.d("r2000_kt45", "get data thread is " +
-					"interrupted*************************************");
+                    "interrupted*************************************");
         }
     }
 
@@ -109,7 +109,6 @@ public class R2K implements IUHFService {
         fd = lk.open_serial(SERIALPORT);
         if (fd != Result.RFID_STATUS_OK.getValue()) {
             Log.e("r2000_kt45", "open serial port returns null");
-            //lk.DestroyRadioFuncIntegration();
             pw.PowerOffDevice();
         }
         Log.d("r2000_kt45", "serial ok");
@@ -126,10 +125,7 @@ public class R2K implements IUHFService {
         return (a < 0 ? a + 256 : a);
     }
 
-    public static final int FAST_MODE = 0;
-    public static final int SMART_MODE = 1;
-    public static final int LOW_POWER_MODE = 2;
-    public static final int USER_MODE = 3;
+
 
     public int set_inventory_mode(int m) {
         int res = Result.RFID_ERROR_FAILURE.getValue();
@@ -158,24 +154,16 @@ public class R2K implements IUHFService {
     public int get_inventory_mode() {
         Rfid_Value res = new Rfid_Value();
         int m = lk.Radio_GetInvMode(res);
-//		if(res.value != Result.RFID_STATUS_OK.getValue())
         if (m != Result.RFID_STATUS_OK.getValue()) {
             return -1;
         }
-//		if(m == InvMode.HighSpeedMode.getValue())
         if (res.value == InvMode.HighSpeedMode.getValue()) {
             return FAST_MODE;
-        }
-//		else if(m == InvMode.IntelligentMode.getValue())
-        else if (res.value == InvMode.IntelligentMode.getValue()) {
+        } else if (res.value == InvMode.IntelligentMode.getValue()) {
             return SMART_MODE;
-        }
-//		else if(m == InvMode.LowPowerMode.getValue())
-        else if (res.value == InvMode.LowPowerMode.getValue()) {
+        } else if (res.value == InvMode.LowPowerMode.getValue()) {
             return LOW_POWER_MODE;
-        }
-//		else if(m == InvMode.UserDefined.getValue())
-        else if (res.value == InvMode.UserDefined.getValue()) {
+        } else if (res.value == InvMode.UserDefined.getValue()) {
             return USER_MODE;
         } else {
             return -1;
@@ -221,13 +209,13 @@ public class R2K implements IUHFService {
     public static final int P_LOCK = 3;
 
     private static final int vp[] = {RFID_18K6C_TAG_PWD_PERM.ACCESSIBLE.getValue(),
-			RFID_18K6C_TAG_PWD_PERM.SECURED_ACCESSIBLE.getValue(), RFID_18K6C_TAG_PWD_PERM
-			.ALWAYS_ACCESSIBLE.getValue(), RFID_18K6C_TAG_PWD_PERM.ALWAYS_NOT_ACCESSIBLE.getValue
-			(),};
+            RFID_18K6C_TAG_PWD_PERM.SECURED_ACCESSIBLE.getValue(), RFID_18K6C_TAG_PWD_PERM
+            .ALWAYS_ACCESSIBLE.getValue(), RFID_18K6C_TAG_PWD_PERM.ALWAYS_NOT_ACCESSIBLE.getValue
+            (),};
     private static final int va[] = {RFID_18K6C_TAG_MEM_PERM.WRITEABLE.getValue(),
-			RFID_18K6C_TAG_MEM_PERM.SECURED_WRITEABLE.getValue(), RFID_18K6C_TAG_MEM_PERM
-			.ALWAYS_WRITEABLE.getValue(), RFID_18K6C_TAG_MEM_PERM.ALWAYS_NOT_WRITEABLE.getValue
-			(),};
+            RFID_18K6C_TAG_MEM_PERM.SECURED_WRITEABLE.getValue(), RFID_18K6C_TAG_MEM_PERM
+            .ALWAYS_WRITEABLE.getValue(), RFID_18K6C_TAG_MEM_PERM.ALWAYS_NOT_WRITEABLE.getValue
+            (),};
 
     public int setlock(int type, int area, int passwd) {
         int kp = RFID_18K6C_TAG_PWD_PERM.NO_CHANGE.getValue();
@@ -271,15 +259,6 @@ public class R2K implements IUHFService {
         return 0;
     }
 
-    public class Tag_Data {
-        Tag_Data(byte[] n_tid, byte[] n_epc) {
-            tid = n_tid;
-            epc = n_epc;
-        }
-
-        public byte[] tid;
-        public byte[] epc;
-    }
 
     private ArrayList<Tag_Data> get_inventory_data() {
         ArrayList<Tag_Data> cx = new ArrayList<Tag_Data>();
@@ -287,10 +266,10 @@ public class R2K implements IUHFService {
         int sn = lk.GetInvData(arg0);
         if ((sn > 0) && (arg0 != null)) {
             Log.d("r2000_kt45", "get " + sn + " cards " +
-					"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+                    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
             for (int i = 0; i < sn; i++) {
                 Log.e("r2000_kt45", "epc leng is " + arg0[i].nLength + " tid leng is " + arg0[i]
-						.tidLength);
+                        .tidLength);
                 if ((arg0[i].nLength > 0) && (arg0[i].nLength < 66)) {
                     byte[] n_epc = new byte[arg0[i].nLength];
                     byte[] n_tid;
@@ -331,15 +310,6 @@ public class R2K implements IUHFService {
         return 0;
     }
 
-    public class INV_TIME {
-        INV_TIME(int wt, int rt) {
-            work_t = wt;
-            rest_t = rt;
-        }
-
-        public int work_t;
-        public int rest_t;
-    }
 
     public INV_TIME get_inventory_time() {
         Single_Inventory_Time_Config t = new Single_Inventory_Time_Config();
@@ -350,10 +320,7 @@ public class R2K implements IUHFService {
         return new INV_TIME(t.iWorkTime, t.iRestTime);
     }
 
-    public static final int RESERVED_A = 0;
-    public static final int EPC_A = 1;
-    public static final int TID_A = 2;
-    public static final int USER_A = 3;
+
 
     public byte[] read_area(int area, int addr, int count, int passwd) {
         Rfid_Value res = new Rfid_Value();
@@ -388,9 +355,6 @@ public class R2K implements IUHFService {
         return null;
     }
 
-    public static final int REGION_CHINA_840_845 = 0;
-    public static final int REGION_CHINA_920_925 = 1;
-    public static final int REGION_CHINA_902_928 = 2;
 
     public int set_fix_freq(double freq, int region) {
         int res = Result.RFID_ERROR_FAILURE.getValue();
@@ -408,7 +372,7 @@ public class R2K implements IUHFService {
             case REGION_CHINA_902_928:
                 if ((freq >= 902) && (freq <= 928)) {
                     res = lk.Radio_SetSingleFrequency(freq, RFID_18K6C_COUNTRY_REGION
-							.Open_Area902_928);
+                            .Open_Area902_928);
                 }
                 break;
         }
@@ -447,6 +411,8 @@ public class R2K implements IUHFService {
             case REGION_CHINA_902_928:
                 res = lk.Radio_MacSetRegion(RFID_18K6C_COUNTRY_REGION.Open_Area902_928);
                 break;
+            case REGION_EURO_865_868:
+                return -1;
         }
         if (res != Result.RFID_STATUS_OK.getValue()) {
             return -1;
@@ -641,127 +607,5 @@ public class R2K implements IUHFService {
             return status;
         return status;
     }
-
-	/*public ArrayList<byte[]> GetEpcList()
-	{
-		invs = new inv_thread();
-		invs.start();
-		try {
-			Thread.sleep(300);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-		}
-		
-		ArrayList<byte[]> ns = null;
-		ArrayList<Tag_Data> tg = get_inventory_data();
-		for(int i = 0; i < 10000; i++)
-		{
-			if(tg != null)
-			{
-				Log.i("r2000_kt45", "in " + i + " times");
-				break;
-			}
-			else
-			{
-				tg = get_inventory_data();
-			}
-		}
-		if(tg != null)
-		{
-			ns = new ArrayList<byte[]>();
-			for(int ss = 0; ss < tg.size(); ss++)
-			{
-				ns.add(tg.get(ss).epc);
-			}
-		}
-		invs.interrupt();
-		lk.CancelOperation();
-		return ns;
-	}
-	
-	public byte[] ReadEpc(byte[] epc, int position, int length, byte[] password)
-	{
-		if(password.length != 4)
-		{
-			Log.e("r2000", "password length is wrong");
-			return null;
-		}
-		
-		if(select_card(epc) < 0)
-		{
-			Log.e("r2000", "select card failed");
-			return null;
-		}
-
-		try {
-			Thread.sleep(50);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-		}
-
-		int pswd = (int)(((long)btoi(password[0])) << 24 + btoi(password[1]) << 16 + btoi(password[2]) << 8 + btoi(password[3]));
-		
-		return read_area(EPC_A, position, length, pswd);
-	}
-	
-	
-	public byte[] ReadUser(byte[] epc, int position, int length, byte[] password)
-	{
-		if(password.length != 4)
-		{
-			Log.e("r2000", "password length is wrong");
-			return null;
-		}
-		
-		if(select_card(epc) < 0)
-		{
-			Log.e("r2000", "select card failed");
-			return null;
-		}
-
-		try {
-			Thread.sleep(50);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-		}
-
-		int pswd = (int)(((long)btoi(password[0])) << 24 + btoi(password[1]) << 16 + btoi(password[2]) << 8 + btoi(password[3]));
-		
-		return read_area(USER_A, position, length, pswd);
-	}
-	
-	public int WriteUser(byte[] epc, int position, int length, byte[] password, byte[] content)
-	{
-		if(password.length != 4)
-		{
-			Log.e("r2000", "password length is wrong");
-			return -1;
-		}
-		
-		if(content.length < length)
-		{
-			Log.e("r2000", "input content is shorter than input length");
-			return -1;
-		}
-		
-		if(select_card(epc) < 0)
-		{
-			Log.e("r2000", "select card failed");
-			return -1;
-		}
-
-		try {
-			Thread.sleep(50);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-		}
-		
-		byte[] cnt = new byte[length];
-		System.arraycopy(content, 0, cnt, 0, cnt.length);
-
-		int pswd = (int)(((long)btoi(password[0])) << 24 + btoi(password[1]) << 16 + btoi(password[2]) << 8 + btoi(password[3]));
-		
-		return write_area(r2000_native.USER_A, position, pswd, cnt);
-	}*/
 
 }

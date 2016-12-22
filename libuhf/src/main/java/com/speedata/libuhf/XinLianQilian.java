@@ -26,7 +26,6 @@ public class XinLianQilian implements IUHFService {
     private Handler handler = new Handler();
     public boolean nostop = false;
     Reader.TagFilter_ST g2tf = null;
-    public static String TID;
 
 
     //初始化模块
@@ -75,18 +74,20 @@ public class XinLianQilian implements IUHFService {
     //从标签 area 区的 addr 位置（以 word 计算）读取 count 个值（以 byte 计算）
     // passwd 是访问密码，如果区域没被锁就给 0 值。
     public byte[] read_area(int area, int addr, int count, int passwd) {
+        if ((area > 3) || (area < 0) || ((count % 2) != 0)) {
+            return null;
+        }
         try {
-            byte[] rdata = new byte[count * 2];
+            byte[] rdata = new byte[count];
             byte[] rpaswd = new byte[4];
-            String pwd = String.valueOf(passwd);
-            if (!pwd.equals("")) {
-                Mreader.Str2Hex(pwd, pwd.length(), rpaswd);
+            for (int i = 0; i < 4; i++) {
+                rpaswd[i] = (byte) (passwd >>> (24 - i * 8));
             }
             Reader.READER_ERR er = Reader.READER_ERR.MT_OK_ERR;
             int trycount = 3;
             do {
                 er = Mreader.GetTagData(Rparams.opant,
-                        (char) area, addr, count,
+                        (char) area, addr, count / 2,
                         rdata, rpaswd, (short) Rparams.optime);
 
                 trycount--;
@@ -107,9 +108,8 @@ public class XinLianQilian implements IUHFService {
     public int write_area(int area, int addr, int passwd, byte[] content) {
         try {
             byte[] rpaswd = new byte[4];
-            String pwd = String.valueOf(passwd);
-            if (!pwd.equals("")) {
-                Mreader.Str2Hex(pwd, pwd.length(), rpaswd);
+            for (int i = 0; i < 4; i++) {
+                rpaswd[i] = (byte) (passwd >>> (24 - i * 8));
             }
             Reader.READER_ERR er = Reader.READER_ERR.MT_OK_ERR;
             int trycount = 3;
@@ -150,16 +150,25 @@ public class XinLianQilian implements IUHFService {
     public int set_antenna_power(int power) {
         Reader.AntPowerConf apcf = Mreader.new AntPowerConf();
         apcf.antcnt = antportc;
-        Reader.AntPower jaap = Mreader.new AntPower();
-        jaap.antid = 1;
-        jaap.readPower = (short) (power * 100);
-        jaap.writePower = (short) (power * 100);
-        apcf.Powers[0] = jaap;
+        int[] rpow = new int[apcf.antcnt];
+        int[] wpow = new int[apcf.antcnt];
+        for (int i = 0; i < apcf.antcnt; i++) {
+            Reader.AntPower jaap = Mreader.new AntPower();
+            jaap.antid = i + 1;
+            jaap.readPower = (short) (power * 100);
+            rpow[i] = jaap.readPower;
+            jaap.writePower = (short) (power * 100);
+            wpow[i] = jaap.writePower;
+            apcf.Powers[i] = jaap;
+        }
         try {
             Reader.READER_ERR er = Mreader.ParamSet(
                     Reader.Mtr_Param.MTR_PARAM_RF_ANTPOWER, apcf);
             if (er != Reader.READER_ERR.MT_OK_ERR) {
                 return -1;
+            } else {
+                Rparams.rpow = rpow;
+                Rparams.wpow = wpow;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -202,7 +211,10 @@ public class XinLianQilian implements IUHFService {
                 else if (type == 1)
                     ltyp = Reader.Lock_Type.ACCESS_PASSWD_LOCK;
                 else if (type == 2)
+                    return -1;
+                else if (type==3){
                     ltyp = Reader.Lock_Type.ACCESS_PASSWD_PERM_LOCK;
+                }
 
             } else if (area == 1) {
                 lobj = Reader.Lock_Obj.LOCK_OBJECT_KILL_PASSWORD;
@@ -211,7 +223,10 @@ public class XinLianQilian implements IUHFService {
                 else if (type == 1)
                     ltyp = Reader.Lock_Type.KILL_PASSWORD_LOCK;
                 else if (type == 2)
+                    return -1;
+                else if (type==3){
                     ltyp = Reader.Lock_Type.KILL_PASSWORD_PERM_LOCK;
+                }
             } else if (area == 2) {
                 lobj = Reader.Lock_Obj.LOCK_OBJECT_BANK1;
                 if (type == 0)
@@ -219,6 +234,8 @@ public class XinLianQilian implements IUHFService {
                 else if (type == 1)
                     ltyp = Reader.Lock_Type.BANK1_LOCK;
                 else if (type == 2)
+                    return -1;
+                else if (type==3)
                     ltyp = Reader.Lock_Type.BANK1_PERM_LOCK;
             } else if (area == 3) {
                 lobj = Reader.Lock_Obj.LOCK_OBJECT_BANK2;
@@ -227,6 +244,8 @@ public class XinLianQilian implements IUHFService {
                 else if (type == 1)
                     ltyp = Reader.Lock_Type.BANK2_LOCK;
                 else if (type == 2)
+                    return -1;
+                else if (type==3)
                     ltyp = Reader.Lock_Type.BANK2_PERM_LOCK;
             } else if (area == 4) {
                 lobj = Reader.Lock_Obj.LOCK_OBJECT_BANK3;
@@ -235,12 +254,13 @@ public class XinLianQilian implements IUHFService {
                 else if (type == 1)
                     ltyp = Reader.Lock_Type.BANK3_LOCK;
                 else if (type == 2)
+                    return -1;
+                else if (type==3)
                     ltyp = Reader.Lock_Type.BANK3_PERM_LOCK;
             }
             byte[] rpaswd = new byte[4];
-            String pwd = String.valueOf(passwd);
-            if (!pwd.equals("")) {
-                Mreader.Str2Hex(pwd, pwd.length(), rpaswd);
+            for (int i = 0; i < 4; i++) {
+                rpaswd[i] = (byte) (passwd >>> (24 - i * 8));
             }
             Reader.READER_ERR er = Mreader.LockTag(Rparams.opant,
                     (byte) lobj.value(), (short) ltyp.value(),
@@ -264,27 +284,14 @@ public class XinLianQilian implements IUHFService {
                     rre = Reader.Region_Conf.RG_PRC;
                     break;
                 case 1:
-                    rre = Reader.Region_Conf.RG_NA;
-                    break;
-                case 2:
                     rre = Reader.Region_Conf.RG_NONE;
                     break;
+                case 2:
+                    rre = Reader.Region_Conf.RG_NA;
+                    break;
                 case 3:
-                    rre = Reader.Region_Conf.RG_KR;
-                    break;
-                case 4:
-                    rre = Reader.Region_Conf.RG_EU;
-                    break;
-                case 5:
-                    rre = Reader.Region_Conf.RG_EU2;
-                    break;
-                case 6:
                     rre = Reader.Region_Conf.RG_EU3;
                     break;
-                case 7:
-                case 8:
-                case 9:
-                case 10:
                 default:
                     rre = Reader.Region_Conf.RG_NONE;
                     break;
@@ -313,18 +320,12 @@ public class XinLianQilian implements IUHFService {
                 switch (rcf2[0]) {
                     case RG_PRC:
                         return 0;
-                    case RG_EU:
-                        return 4;
-                    case RG_EU2:
-                        return 5;
-                    case RG_EU3:
-                        return 6;
-                    case RG_KR:
-                        return 3;
                     case RG_NA:
-                        return 1;
+                        return 2;
+                    case RG_EU3:
+                        return 3;
                     default:
-                        return 7;
+                        return -1;
                 }
             } else {
                 return -1;
@@ -335,25 +336,41 @@ public class XinLianQilian implements IUHFService {
         }
     }
 
+    //设置模式
+    public int set_inventory_mode(int m) {
+//        int[] val = new int[]{m};
+//        Reader.READER_ERR er = Mreader.ParamSet(
+//                Reader.Mtr_Param.MTR_PARAM_TAG_SEARCH_MODE, val);
+//        if (er != Reader.READER_ERR.MT_OK_ERR) {
+//            return -1;
+//        }
+        return -1;
+    }
+
+    //获得模式
+    public int get_inventory_mode() {
+//        int[] val = new int[]{-1};
+//        Reader.READER_ERR er = Mreader.ParamGet(
+//                Reader.Mtr_Param.MTR_PARAM_TAG_SEARCH_MODE, val);
+//        if (er == Reader.READER_ERR.MT_OK_ERR) {
+//            return val[0];
+//        }
+        return -1;
+    }
+
 
     private Runnable inv_thread = new Runnable() {
         public void run() {
-            String[] tag = null;
             int[] tagcnt = new int[1];
             tagcnt[0] = 0;
             synchronized (this) {
                 Reader.READER_ERR er;
-                if (nostop) {
-                    er = Mreader.AsyncGetTagCount(tagcnt);
-                } else {
-                    int[] uants = Rparams.uants;
-                    er = Mreader.TagInventory_Raw(uants,
-                            Rparams.uants.length,
-                            (short) Rparams.readtime, tagcnt);
-                }
+                int[] uants = Rparams.uants;
+                er = Mreader.TagInventory_Raw(uants,
+                        Rparams.uants.length,
+                        (short) Rparams.readtime, tagcnt);
                 if (er == Reader.READER_ERR.MT_OK_ERR) {
                     if (tagcnt[0] > 0) {
-                        tag = new String[tagcnt[0]];
                         for (int i = 0; i < tagcnt[0]; i++) {
                             Reader.TAGINFO tfs = Mreader.new TAGINFO();
                             if (Rpower.GetType() == RfidPower.PDATYPE.SCAN_ALPS_ANDROID_CUIUS2) {
@@ -370,8 +387,9 @@ public class XinLianQilian implements IUHFService {
                                 er = Mreader.GetNextTag(tfs);
 
                             if (er == Reader.READER_ERR.MT_OK_ERR) {
-                                tag[i] = Reader.bytes_Hexstr(tfs.EpcId);
-                                byte[] n_epc = tag[i].getBytes();
+//                                tag[i] = Reader.bytes_Hexstr(tfs.EpcId);
+                                byte[] n_epc = tfs.EpcId;
+//                                byte[] n_epc = tag[i].getBytes();
                                 ArrayList<Tag_Data> cx = new ArrayList<Tag_Data>();
                                 cx.add(new Tag_Data(null, n_epc));
                                 Message msg = new Message();
@@ -399,15 +417,6 @@ public class XinLianQilian implements IUHFService {
         }
     };
 
-    public class Tag_Data {
-        Tag_Data(byte[] n_tid, byte[] n_epc) {
-            tid = n_tid;
-            epc = n_epc;
-        }
-
-        public byte[] tid;
-        public byte[] epc;
-    }
 
     //用户需要自己实现一个 Handler，然后用些函数向 API 注册，然后才可以 开始盘点。
     // 盘点到的 EPC 等数据会通过向注册的 Handler 发消息 （Message）的方式来实现。
@@ -417,6 +426,21 @@ public class XinLianQilian implements IUHFService {
     // 代表对应的值不存在。
     public void reg_handler(Handler hd) {
         handler_inventer = hd;
+    }
+
+    @Override
+    public INV_TIME get_inventory_time() {
+        return null;
+    }
+
+    @Override
+    public int set_inventory_time(int work_t, int rest_t) {
+        return 0;
+    }
+
+    @Override
+    public int MakeSetValid() {
+        return 0;
     }
 
 

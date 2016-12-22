@@ -1,23 +1,25 @@
-package com.speedata.libuhf;
+package com.speedata.libuhf.service;
 
-
-import android.content.Context;
+import android.app.Service;
+import android.content.Intent;
+import android.os.IBinder;
 import android.serialport.SerialPort;
-import android.text.TextUtils;
+import android.support.annotation.Nullable;
+import android.util.Log;
 
+import com.speedata.libuhf.DeviceControl;
 import com.speedata.libuhf.utils.SharedXmlUtil;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 /**
- * Created by brxu on 2016/12/13.
+ * Created by 张明_ on 2016/12/19.
  */
 
-public class UHFManager {
-    private static IUHFService iuhfService;
+public class GetModleService extends Service {
     //飞利信读取制造商指令
-    private static byte[] feilixin_cmd = {(byte) 0xbb, 0x00, 0x03, 0x00, 0x01, 0x02, 0x06, 0x7e};
+    private static byte[] feilixin_cmd = {(byte) 0xbb, 0x00, 0x03,0x00,0x01, 0x02, 0x06, 0x7e};
     //R2000获取版本号
     private static byte[] r2000_cmd = {(byte) 0xC0, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     //芯联
@@ -27,54 +29,34 @@ public class UHFManager {
     private final static String FACTORY_R2000 = "R2000";
     private static int fd;
     private static DeviceControl pw94;
-    public static Context mContext;
-
-    public static IUHFService getUHFService(Context context) {
-        //  判断模块   返回不同的模块接口对象
-        mContext = context;
-        if (iuhfService == null) {
-            if (!judgeModle())
-                return null;
-        }
-        return iuhfService;
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
-    private static boolean judgeModle() {
-        String factory = SharedXmlUtil.getInstance(mContext).read("modle", "");
-        if (TextUtils.isEmpty(factory)) {
-            powerOn("/sys/class/misc/mtgpio/pin", 94);
-            factory = getModle();
-            SharedXmlUtil.getInstance(mContext).write("modle", factory);
-        }
-        boolean initResult = true;
-        switch (factory) {
-            case FACTORY_FEILIXIN:
-                iuhfService = new FLX_QiLian();
-                break;
-            case FACTORY_XINLIAN:
-                iuhfService = new XinLianQilian();
-                break;
-            case FACTORY_R2000:
-                iuhfService = new R2K();
-                break;
-            default:
-                initResult = false;
-                break;
-        }
-        return initResult;
-    }
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        powerOn("/sys/class/misc/mtgpio/pin",94);
+        String modle = getModle();
+        SharedXmlUtil.getInstance(this).write("modle", modle);
 
-    private static void powerOn(String POWERCTL, int PW_GPIO) {
+        Intent myIntent = new Intent();
+        myIntent.setAction("com.speedata.libuhf.service.GetModleService");
+        myIntent.setClass(this,GetModleService.class);
+        stopService(myIntent);
+    }
+    private static void powerOn(String POWERCTL,int PW_GPIO) {
         pw94 = new DeviceControl(POWERCTL, PW_GPIO);
         pw94.PowerOnDevice();
     }
-
-
     /**
      * @return 返回厂家信息
      */
     private static String getModle() {
         String factory = "";
+        Log.d("getModle_start", String.valueOf(System.currentTimeMillis()));
         SerialPort serialPort = new SerialPort();
         try {
             serialPort.OpenSerial("/dev/ttyMT2", 115200);
@@ -109,7 +91,7 @@ public class UHFManager {
             }
             if (bytes != null) {
                 factory = bytesToHexString(bytes);
-                if (factory.equals("BB0103000A025261794D6174726978B17E")) {
+                if (factory.equals("BB01030008024D616769635266A77E")) {
                     return FACTORY_FEILIXIN;
                 }
             }
@@ -121,10 +103,10 @@ public class UHFManager {
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            int length = 0;
+            int length=0;
             if (bytes != null) {
                 length = bytes.length;
-                if (length == 27) {
+                if (length ==27) {
                     return FACTORY_XINLIAN;
                 }
             }
@@ -132,6 +114,7 @@ public class UHFManager {
 
         serialPort.CloseSerial(fd);
         pw94.PowerOffDevice();
+        Log.d("getModle_end", String.valueOf(System.currentTimeMillis()));
         return factory;
     }
 
