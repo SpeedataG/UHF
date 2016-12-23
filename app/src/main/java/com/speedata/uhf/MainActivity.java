@@ -15,11 +15,18 @@ public class MainActivity extends AppCompatActivity {
 
     private IUHFService iuhfService;
 
-    
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+//        testUHF();
+    }
+
+
+
+    private void testUHF() {
         iuhfService = UHFManager.getUHFService();
         iuhfService.OpenDev();
         iuhfService.inventory_start(new Handler() {

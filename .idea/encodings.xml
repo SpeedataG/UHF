@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/libid2/libs/HS_CVR100U.jar" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/libid2/libs/sdtapi.jar" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/libid2/src/main/java/com/guoguang/jni/JniCall.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/libid2/src/main/jniLibs" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/libid2/src/main/jniLibs/armeabi/libserial_port.so" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/libid2/src/main/res/raw" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/libutils/src/main/java/com/speedata/libutils/DataConversionUtils.java" charset="UTF-8" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

@@ -1,1 +1,3 @@
-include ':app', ':libuhf'
+include ':app', ':libuhf', ':libid2', ':libutils'
+//include ':libid2', ':libutils'
+//
