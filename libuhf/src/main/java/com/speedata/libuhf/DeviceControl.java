@@ -10,7 +10,7 @@ public class DeviceControl
 	private String dev = null;
 	private int gpio = -1;
 	
-	DeviceControl(String path, int p) { dev = path; gpio = p; }
+	public DeviceControl(String path, int p) { dev = path; gpio = p; }
 	
 	public int PowerOnDevice()
 	{

@@ -119,6 +119,7 @@ dependencies {
     compile files('libs/XinLian_ModuleAPI_Android_3.0.0.0.jar')
     compile files('libs/XinLianModule_Android_DemoPower_1.7.5.1.jar')
     compile files('libs/R2K.jar')
+    compile files('libs/Qilian_Feilixin_uhf.jar')
 }
 
 

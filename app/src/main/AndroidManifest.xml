@@ -16,6 +16,8 @@
 
         </activity>
         <activity android:name=".SmallScreenActivity">
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        <activity android:name=".R2000demoISO6C">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

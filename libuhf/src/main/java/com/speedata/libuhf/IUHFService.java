@@ -8,6 +8,20 @@ import android.os.Handler;
  */
 
 public interface IUHFService {
+
+    public static final int REGION_CHINA_840_845 = 0;
+    public static final int REGION_CHINA_920_925 = 1;
+    public static final int REGION_CHINA_902_928 = 2;
+    public static final int REGION_EURO_865_868 = 3;
+    public static final int RESERVED_A = 0;
+    public static final int EPC_A = 1;
+    public static final int TID_A = 2;
+    public static final int USER_A = 3;
+    public static final int FAST_MODE = 0;
+    public static final int SMART_MODE = 1;
+    public static final int LOW_POWER_MODE = 2;
+    public static final int USER_MODE = 3;
+
     //默认参数初始化模块
     public int OpenDev();
 
@@ -55,4 +69,11 @@ public interface IUHFService {
     //设置盘点的handler
     public void reg_handler(Handler hd);
 
+
+    public INV_TIME get_inventory_time();
+    public int set_inventory_time(int work_t, int rest_t);
+    public int MakeSetValid();
+    public int setlock(int type, int area, int passwd);
+    public int get_inventory_mode();
+    public int set_inventory_mode(int m);
 }
