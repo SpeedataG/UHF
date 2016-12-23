@@ -26,12 +26,11 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.0.1'
     testCompile 'junit:junit:4.12'
-    compile project(path: ':libuhf')
-    //    compile project(path: ':libid2')
-    //    compile 'com.speedata:libid2:1.1'
-    compile 'com.speedata:libid2:1.2.4'
+//    compile project(path: ':libuhf')
+//    compile 'com.speedata:libid2:1.2.4'
     //
     compile files('libs/smallscreen.jar')
+    compile 'com.speedata:libuhf:1.0.1'
 }
 
 

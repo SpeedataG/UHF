@@ -10,17 +10,12 @@
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity">
         </activity>
-        <activity
-            android:name=".IDTestActivity"
-            android:screenOrientation="portrait">
 
-        </activity>
-        <activity android:name=".SmallScreenActivity">
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".R2000demoISO6C">
+        <activity android:name=".SmallScreenActivity"></activity>
+        <activity android:name=".R2000demoISO6C"
+                  android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
