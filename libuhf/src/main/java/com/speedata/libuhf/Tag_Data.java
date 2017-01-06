@@ -5,7 +5,7 @@ package com.speedata.libuhf;
  */
 
 public class Tag_Data {
-    Tag_Data(byte[] n_tid, byte[] n_epc) {
+    public Tag_Data(byte[] n_tid, byte[] n_epc) {
         tid = n_tid;
         epc = n_epc;
     }

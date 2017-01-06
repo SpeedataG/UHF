@@ -26,6 +26,7 @@ import com.uhf.structures.St_Inv_Data;
 import com.uhf.structures.TagGroup;
 
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 //R2000 接口实现
 
@@ -33,16 +34,10 @@ public class R2K implements IUHFService {
 
     private static final String TAG = "r2000_native";
     private Linkage lk = new Linkage();
-
     private Handler h = null;
     private boolean inSearch = false;
     private inv_thread invs = null;
-    private get_invdata gd;// = new get_invdata();
-
-
-    private static final String SERIALPORT = "/dev/ttyMT2";
-    private static final String POWERCTL = "/sys/class/misc/mtgpio/pin";
-    private static final int PW_GPIO = 94;
+    private get_invdata gd;
     private DeviceControl pw = new DeviceControl(POWERCTL, PW_GPIO);
 
     private class inv_thread extends Thread {
@@ -354,7 +349,32 @@ public class R2K implements IUHFService {
         Log.e("r2000_kt45", "reval is " + res.value);
         return null;
     }
-
+    public String read_area(int area, String str_addr
+            , String str_count, String str_passwd){
+        int num_addr;
+        int num_count;
+        long passwd;
+        try {
+            num_addr = Integer.parseInt(str_addr, 16);
+            num_count = Integer.parseInt(str_count, 10);
+            passwd = Long.parseLong(str_passwd, 16);
+        }catch (NumberFormatException p) {
+            return null;
+        }
+        String res = read_card(area, num_addr, num_count * 2, (int) passwd);
+        return res;
+    }
+    private String read_card(int area, int addr, int count, int passwd) {
+        byte[] v = read_area(area, addr, count, passwd);
+        if (v == null) {
+            return null;
+        }
+        String j = new String();
+        for (byte i : v) {
+            j += String.format("%02x ", i);
+        }
+        return j;
+    }
 
     public int set_fix_freq(double freq, int region) {
         int res = Result.RFID_ERROR_FAILURE.getValue();
@@ -469,6 +489,43 @@ public class R2K implements IUHFService {
         }
         return 0;
     }
+    public int write_area(int area, String addr, String pwd, String count, String content){
+        int num_addr;
+        int num_count;
+        long passwd;
+        try {
+            num_addr = Integer.parseInt(addr, 16);
+            num_count = Integer.parseInt(count, 10);
+            passwd = Long.parseLong(pwd, 16);
+        }catch (NumberFormatException p) {
+            return -3;
+        }
+        int rev = write_card(area, num_addr, num_count * 2,
+                (int) passwd, content);
+        return rev;
+    }
+    public int write_card(int area, int addr, int count, int passwd, String cnt) {
+        byte[] cf;
+        StringTokenizer cn = new StringTokenizer(cnt);
+        if (cn.countTokens() < count) {
+            return -2;
+        }
+        cf = new byte[count];
+        int index = 0;
+        while (cn.hasMoreTokens() && (index < count)) {
+            try {
+                int k = Integer.parseInt(cn.nextToken(), 16);
+                if (k > 0xff) {
+                    throw new NumberFormatException("can't bigger than 0xff");
+                }
+                cf[index++] = (byte) k;
+            } catch (NumberFormatException p) {
+                return -3;
+            }
+        }
+        return write_area(area, addr, passwd, cf);
+    }
+
 
     public static final int ANTENNA_P_MIN = 0;
     public static final int ANTENNA_P_MAX = 30;
@@ -530,6 +587,49 @@ public class R2K implements IUHFService {
             return -1;
         }
         return 0;
+    }
+    public int select_card(String epc) {
+        byte[] eepc;
+        StringTokenizer sepc = new StringTokenizer(epc);
+        eepc = new byte[sepc.countTokens()];
+        int index = 0;
+        while (sepc.hasMoreTokens()) {
+            try {
+                eepc[index++] = (byte) Integer.parseInt(sepc.nextToken(), 16);
+            } catch (NumberFormatException p) {
+                return -1;
+            }
+        }
+        if (select_card(eepc) != 0) {
+            return -1;
+        }
+        return 0;
+    }
+
+    //设置密码
+    public int set_Password(int which, String cur_pass, String new_pass){
+        if (which > 1 || which < 0) {
+            return -1;
+        }
+        try {
+            long cp = Long.parseLong(cur_pass, 16);
+            if ((cp > 0xffffffffL) || (cp < 0)) {
+                throw new NumberFormatException("can't bigger than 0xffffffff");
+            }
+            long np = Long.parseLong(new_pass, 16);
+            if ((np > 0xffffffffL) || (np < 0)) {
+                throw new NumberFormatException("can't bigger than 0xffffffff");
+            }
+
+            byte[] nps = new byte[4];
+            nps[3] = (byte) ((np >> 0) & 0xff);
+            nps[2] = (byte) ((np >> 8) & 0xff);
+            nps[1] = (byte) ((np >> 16) & 0xff);
+            nps[0] = (byte) ((np >> 24) & 0xff);
+            return write_area(0, which * 2, (int) cp, nps);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 
     private int SetMask(Linkage link, byte[] bytetemp, int length) {

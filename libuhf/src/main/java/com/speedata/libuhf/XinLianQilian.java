@@ -9,6 +9,7 @@ import com.uhf.api.cls.Reader;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * 旗连芯片  芯联方案
@@ -34,7 +35,7 @@ public class XinLianQilian implements IUHFService {
             boolean blen = Rpower.PowerUp();
             if (!blen)
                 return -1;
-            Reader.READER_ERR er = Mreader.InitReader_Notype("/dev/ttyMT2", 1);
+            Reader.READER_ERR er = Mreader.InitReader_Notype(SERIALPORT, 1);
             if (er == Reader.READER_ERR.MT_OK_ERR) {
                 antportc = 1;
             } else {
@@ -103,6 +104,34 @@ public class XinLianQilian implements IUHFService {
         }
         return null;
     }
+    public String read_area(int area, String str_addr
+            , String str_count, String str_passwd){
+        int num_addr;
+        int num_count;
+        long passwd;
+        try {
+            num_addr = Integer.parseInt(str_addr, 16);
+            num_count = Integer.parseInt(str_count, 10);
+            passwd = Long.parseLong(str_passwd, 16);
+        }catch (NumberFormatException p) {
+            return null;
+        }
+        String res = read_card(area, num_addr, num_count * 2, (int) passwd);
+        return res;
+    }
+    private String read_card(int area, int addr, int count, int passwd) {
+        byte[] v = read_area(area, addr, count, passwd);
+        if (v == null) {
+            return null;
+        }
+        String j = new String();
+        for (byte i : v) {
+            j += String.format("%02x ", i);
+        }
+        return j;
+    }
+
+
 
     //把 content 中的数据写到标签 area 区中 addr（以 word 计算）开始的位 置。
     public int write_area(int area, int addr, int passwd, byte[] content) {
@@ -130,6 +159,43 @@ public class XinLianQilian implements IUHFService {
         }
         return 0;
     }
+    public int write_area(int area, String addr, String pwd, String count, String content){
+        int num_addr;
+        int num_count;
+        long passwd;
+        try {
+            num_addr = Integer.parseInt(addr, 16);
+            num_count = Integer.parseInt(count, 10);
+            passwd = Long.parseLong(pwd, 16);
+        }catch (NumberFormatException p) {
+            return -3;
+        }
+        int rev = write_card(area, num_addr, num_count * 2,
+                (int) passwd, content);
+        return rev;
+    }
+    public int write_card(int area, int addr, int count, int passwd, String cnt) {
+        byte[] cf;
+        StringTokenizer cn = new StringTokenizer(cnt);
+        if (cn.countTokens() < count) {
+            return -2;
+        }
+        cf = new byte[count];
+        int index = 0;
+        while (cn.hasMoreTokens() && (index < count)) {
+            try {
+                int k = Integer.parseInt(cn.nextToken(), 16);
+                if (k > 0xff) {
+                    throw new NumberFormatException("can't bigger than 0xff");
+                }
+                cf[index++] = (byte) k;
+            } catch (NumberFormatException p) {
+                return -3;
+            }
+        }
+        return write_area(area, addr, passwd, cf);
+    }
+
 
     //选中要进行操作的 epc 标签
     public int select_card(byte[] epc) {
@@ -145,6 +211,24 @@ public class XinLianQilian implements IUHFService {
         }
         return 0;
     }
+    public int select_card(String epc) {
+        byte[] eepc;
+        StringTokenizer sepc = new StringTokenizer(epc);
+        eepc = new byte[sepc.countTokens()];
+        int index = 0;
+        while (sepc.hasMoreTokens()) {
+            try {
+                eepc[index++] = (byte) Integer.parseInt(sepc.nextToken(), 16);
+            } catch (NumberFormatException p) {
+                return -1;
+            }
+        }
+        if (select_card(eepc) != 0) {
+            return -1;
+        }
+        return 0;
+    }
+
 
     //设置天线功率
     public int set_antenna_power(int power) {
@@ -274,6 +358,33 @@ public class XinLianQilian implements IUHFService {
         }
         return 0;
     }
+
+    //设置密码
+    public int set_Password(int which, String cur_pass, String new_pass){
+        if (which > 1 || which < 0) {
+            return -1;
+        }
+        try {
+            long cp = Long.parseLong(cur_pass, 16);
+            if ((cp > 0xffffffffL) || (cp < 0)) {
+                throw new NumberFormatException("can't bigger than 0xffffffff");
+            }
+            long np = Long.parseLong(new_pass, 16);
+            if ((np > 0xffffffffL) || (np < 0)) {
+                throw new NumberFormatException("can't bigger than 0xffffffff");
+            }
+
+            byte[] nps = new byte[4];
+            nps[3] = (byte) ((np >> 0) & 0xff);
+            nps[2] = (byte) ((np >> 8) & 0xff);
+            nps[1] = (byte) ((np >> 16) & 0xff);
+            nps[0] = (byte) ((np >> 24) & 0xff);
+            return write_area(0, which * 2, (int) cp, nps);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
 
     //设置频率区域
     public int set_freq_region(int region) {

@@ -4,9 +4,7 @@ package com.speedata.libuhf;
 import android.content.Context;
 import android.serialport.SerialPort;
 import android.text.TextUtils;
-
 import com.speedata.libuhf.utils.SharedXmlUtil;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
@@ -25,6 +23,7 @@ public class UHFManager {
     private final static String FACTORY_FEILIXIN = "FEILIXIN";
     private final static String FACTORY_XINLIAN = "XINLIAN";
     private final static String FACTORY_R2000 = "R2000";
+    private final static String FACTORY_3992 = "3992";
     private static int fd;
     private static DeviceControl pw94;
     public static Context mContext;
@@ -42,7 +41,7 @@ public class UHFManager {
     private static boolean judgeModle() {
         String factory = SharedXmlUtil.getInstance(mContext).read("modle", "");
         if (TextUtils.isEmpty(factory)) {
-            powerOn("/sys/class/misc/mtgpio/pin", 94);
+            powerOn("/sys/class/misc/mtgpio/pin", 64);
             factory = getModle();
             SharedXmlUtil.getInstance(mContext).write("modle", factory);
         }
@@ -56,6 +55,9 @@ public class UHFManager {
                 break;
             case FACTORY_R2000:
                 iuhfService = new R2K();
+                break;
+            case FACTORY_3992:
+                iuhfService=new com.android.uhflibs.as3992_native();
                 break;
             default:
                 initResult = false;
@@ -83,56 +85,53 @@ public class UHFManager {
         }
         fd = serialPort.getFd();
         byte[] bytes = new byte[1024];
-        boolean daWhile = true;
-        while (daWhile) {
-            //判断是不是R2000
-            serialPort.WriteSerialByte(fd, r2000_cmd);
-            try {
-                bytes = serialPort.ReadSerial(fd, 1024 * 2);
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-            if (bytes != null) {
-                factory = bytesToHexString(bytes);
-            }
-            if (factory.equals("240349006D00700069006E006A00530065007200690061006C004E0075006D0030003100")) {
-                return FACTORY_R2000;
-            }
+        //判断是不是R2000
+        serialPort.WriteSerialByte(fd, r2000_cmd);
+        try {
+            bytes = serialPort.ReadSerial(fd, 1024 * 2);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        if (bytes != null) {
+            factory = bytesToHexString(bytes);
+        }
+        if (factory.equals("240349006D00700069006E006A00530065007200690061006C004E0075006D0030003100")) {
+            return FACTORY_R2000;
+        }
 
 
-            //判断是不是旗联-飞利信
-            serialPort.WriteSerialByte(fd, feilixin_cmd);
-            try {
-                bytes = serialPort.ReadSerial(fd, 1024 * 2);
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+        //判断是不是旗联-飞利信
+        serialPort.WriteSerialByte(fd, feilixin_cmd);
+        try {
+            bytes = serialPort.ReadSerial(fd, 1024 * 2);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        if (bytes != null) {
+            factory = bytesToHexString(bytes);
+            if (factory.equals("BB0103000A025261794D6174726978B17E")) {
+                return FACTORY_FEILIXIN;
             }
-            if (bytes != null) {
-                factory = bytesToHexString(bytes);
-                if (factory.equals("BB0103000A025261794D6174726978B17E")) {
-                    return FACTORY_FEILIXIN;
-                }
-            }
+        }
 
-            //判断是不是旗联-芯联
-            serialPort.WriteSerialByte(fd, xinlian_cmd);
-            try {
-                bytes = serialPort.ReadSerial(fd, 1024 * 2);
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-            int length = 0;
-            if (bytes != null) {
-                length = bytes.length;
-                if (length == 27) {
-                    return FACTORY_XINLIAN;
-                }
+        //判断是不是旗联-芯联
+        serialPort.WriteSerialByte(fd, xinlian_cmd);
+        try {
+            bytes = serialPort.ReadSerial(fd, 1024 * 2);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        int length = 0;
+        if (bytes != null) {
+            length = bytes.length;
+            if (length == 27) {
+                return FACTORY_XINLIAN;
             }
         }
 
         serialPort.CloseSerial(fd);
         pw94.PowerOffDevice();
-        return factory;
+        return FACTORY_3992;
     }
 
     public static final String bytesToHexString(byte[] bArray) {

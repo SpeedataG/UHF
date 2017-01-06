@@ -21,6 +21,9 @@ public interface IUHFService {
     public static final int SMART_MODE = 1;
     public static final int LOW_POWER_MODE = 2;
     public static final int USER_MODE = 3;
+    public static final String SERIALPORT = "/dev/ttyMT2";
+    public static final String POWERCTL = "/sys/class/misc/mtgpio/pin";
+    public static final int PW_GPIO = 64;
 
     //默认参数初始化模块
     public int OpenDev();
@@ -33,7 +36,8 @@ public interface IUHFService {
 
     // Handler用于处理返回的盘点数据
     public void inventory_start(Handler hd);
-
+    //设置密码
+    public int set_Password(int which, String cur_pass, String new_pass);
      //停止盘点
     public void inventory_stop();
 
@@ -48,12 +52,19 @@ public interface IUHFService {
      * @return
      */
     public byte[] read_area(int area, int addr, int count, int passwd);
+    public String read_area(int area, String str_addr
+            , String str_count, String str_passwd);
+
 
     //把 content 中的数据写到标签 area 区中 addr（以 word 计算）开始的位 置。
     public int write_area(int area, int addr, int passwd, byte[] content);
+    public int write_area(int area, String addr, String pwd, String count, String content);
+
 
     //选中要进行操作的 epc 标签
     public int select_card(byte[] epc);
+    public int select_card(String epc);
+
 
     //设置天线功率
     public int set_antenna_power(int power);
