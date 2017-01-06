@@ -41,7 +41,7 @@ public class UHFManager {
     private static boolean judgeModle() {
         String factory = SharedXmlUtil.getInstance(mContext).read("modle", "");
         if (TextUtils.isEmpty(factory)) {
-            powerOn("/sys/class/misc/mtgpio/pin", 64);
+            powerOn("/sys/class/misc/mtgpio/pin", 94);
             factory = getModle();
             SharedXmlUtil.getInstance(mContext).write("modle", factory);
         }
