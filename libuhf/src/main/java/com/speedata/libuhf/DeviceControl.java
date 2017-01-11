@@ -18,7 +18,6 @@ public class DeviceControl
 			File DeviceName = new File(dev);
 			BufferedWriter CtrlFile = new BufferedWriter(new FileWriter(DeviceName, false));
 			CtrlFile.write("-wdout" + gpio + " 1");
-			//CtrlFile.write("-wdout64 1");
 			CtrlFile.flush();
 			CtrlFile.close();
 		} catch (IOException e) {
@@ -33,7 +32,6 @@ public class DeviceControl
 			File DeviceName = new File(dev);
 			BufferedWriter CtrlFile = new BufferedWriter(new FileWriter(DeviceName, false));
 			CtrlFile.write("-wdout" + gpio + " 0");
-			//CtrlFile.write("-wdout64 0");
 			CtrlFile.flush();
 			CtrlFile.close();
 		} catch (IOException e) {

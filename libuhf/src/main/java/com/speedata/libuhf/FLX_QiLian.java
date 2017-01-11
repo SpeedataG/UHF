@@ -27,11 +27,7 @@ public class FLX_QiLian implements IUHFService {
     private static String TAG = "FLX_QiLian";
     private Handler mHandler = null;
     private boolean isChecking = false;
-
-//    private static final String SERIALPORT = "/dev/ttyMT2";
-//    private static final String POWERCTL = "/sys/class/misc/mtgpio/pin";
-//    private static final int PW_GPIO = 94;
-    private static UhfPowaer sUhfPowaer = new UhfPowaer(POWERCTL, PW_GPIO);
+    private static UhfPowaer sUhfPowaer;
 
     //全局的串口句柄，底层通过句柄操作模块
     public static int open_Com = 0;
@@ -73,6 +69,11 @@ public class FLX_QiLian implements IUHFService {
      */
     @Override
     public int OpenDev() {
+        if (android.os.Build.VERSION.RELEASE.equals("4.4.2")) {
+            sUhfPowaer = new UhfPowaer(POWERCTL, 64);
+        }else if (android.os.Build.VERSION.RELEASE.equals("5.1")){
+            sUhfPowaer = new UhfPowaer(POWERCTL, 94);
+        }
         try {
             //初始化模块，为模块上电，为保证上电成功，建议先下电，在上电
             sUhfPowaer.PowerOffDevice();

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
@@ -63,12 +64,12 @@ public class R2000demoISO6C extends Activity implements OnClickListener {
         super.onCreate(savedInstanceState);
         iuhfService = UHFManager.getUHFService(R2000demoISO6C.this);
         if (iuhfService == null) {
-            Toast.makeText(mContext,"模块不识别",Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, "模块不识别", Toast.LENGTH_SHORT).show();
             return;
         }
         modle = SharedXmlUtil.getInstance(mContext).read("modle", "");
         initUI();
-        if (openDev()) return;
+
         newWakeLock();
         EventBus.getDefault().register(this);
         Set_Tag.setEnabled(true);
@@ -82,6 +83,20 @@ public class R2000demoISO6C extends Activity implements OnClickListener {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (openDev()) return;
+//        iuhfService.OpenDev();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d("r2000_kt45", "called ondestory");
+        iuhfService.CloseDev();
+    }
+
     @org.greenrobot.eventbus.Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(MsgEvent mEvent) {
         String type = mEvent.getType();
@@ -90,26 +105,26 @@ public class R2000demoISO6C extends Activity implements OnClickListener {
             R2000demoISO6C.this.Status
                     .setText(R.string.Status_Write_Card_Ok);
         }
-        if (type.equals("set_current_tag_epc")){
+        if (type.equals("set_current_tag_epc")) {
             current_tag_epc = msg;
             Cur_Tag_Info.setText(msg);
             R2000demoISO6C.this.Status
                     .setText(R.string.Status_Select_Card_Ok);
         }
-        if (type.equals("read_Status")){
+        if (type.equals("read_Status")) {
             Tag_Content.setText(msg);
             R2000demoISO6C.this.Status
                     .setText(R.string.Status_Read_Card_Ok);
         }
-        if (type.equals("setPWD_Status")){
+        if (type.equals("setPWD_Status")) {
             R2000demoISO6C.this.Status
                     .setText(R.string.Status_Write_Card_Ok);
         }
-        if (type.equals("lock_Status")){
+        if (type.equals("lock_Status")) {
             R2000demoISO6C.this.Status
                     .setText("设置成功");
         }
-        if (type.equals("SetEPC_Status")){
+        if (type.equals("SetEPC_Status")) {
             R2000demoISO6C.this.Status
                     .setText(R.string.Status_Write_Card_Ok);
         }
@@ -185,19 +200,11 @@ public class R2000demoISO6C extends Activity implements OnClickListener {
         Area_Select.setEnabled(false);
     }
 
+
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d("r2000_kt45", "called ondestory");
-        switch (init_progress) {
-            case 2:
-                wK.release();
-            case 1:
-                iuhfService.CloseDev();
-            case 0:
-            default:
-                init_progress = 0;
-        }
+        wK.release();
     }
 
     @Override
@@ -208,8 +215,8 @@ public class R2000demoISO6C extends Activity implements OnClickListener {
                 Status.setText(R.string.Status_No_Card_Select);
                 return;
             }
-            ReadTagDialog readTag = new ReadTagDialog(this,iuhfService
-                    ,Area_Select.getSelectedItemPosition(),current_tag_epc,modle);
+            ReadTagDialog readTag = new ReadTagDialog(this, iuhfService
+                    , Area_Select.getSelectedItemPosition(), current_tag_epc, modle);
             readTag.setTitle(R.string.Item_Read);
             readTag.show();
         } else if (arg0 == Write_Tag) {
@@ -217,19 +224,19 @@ public class R2000demoISO6C extends Activity implements OnClickListener {
                 Status.setText(R.string.Status_No_Card_Select);
                 return;
             }
-            WriteTagDialog writeTag = new WriteTagDialog(this,iuhfService,
-                    Tag_Content.getText().toString(),Area_Select.getSelectedItemPosition()
-                    ,current_tag_epc,modle);
+            WriteTagDialog writeTag = new WriteTagDialog(this, iuhfService,
+                    Tag_Content.getText().toString(), Area_Select.getSelectedItemPosition()
+                    , current_tag_epc, modle);
             writeTag.setTitle(R.string.Item_Write);
             writeTag.show();
         } else if (arg0 == Search_Tag) {
 
-            SearchTagDialog searchTag = new SearchTagDialog(this,iuhfService,modle);
+            SearchTagDialog searchTag = new SearchTagDialog(this, iuhfService, modle);
             searchTag.setTitle(R.string.Item_Choose);
             searchTag.show();
 
         } else if (arg0 == Set_Tag) {
-            SetModuleDialog setDialog = new SetModuleDialog(this,iuhfService,modle);
+            SetModuleDialog setDialog = new SetModuleDialog(this, iuhfService, modle);
             setDialog.setTitle(R.string.Item_Set_Title);
             setDialog.show();
 
@@ -239,7 +246,7 @@ public class R2000demoISO6C extends Activity implements OnClickListener {
                 return;
             }
             SetPasswordDialog setPasswordDialog = new SetPasswordDialog(this
-                    ,iuhfService,current_tag_epc,modle);
+                    , iuhfService, current_tag_epc, modle);
             setPasswordDialog.setTitle(R.string.SetPasswd_Btn);
             setPasswordDialog.show();
         } else if (arg0 == Set_EPC) {
@@ -247,7 +254,7 @@ public class R2000demoISO6C extends Activity implements OnClickListener {
                 Status.setText(R.string.Status_No_Card_Select);
                 return;
             }
-            SetEPCDialog setEPCDialog = new SetEPCDialog(this,iuhfService,current_tag_epc);
+            SetEPCDialog setEPCDialog = new SetEPCDialog(this, iuhfService, current_tag_epc);
             setEPCDialog.setTitle(R.string.SetEPC_Btn);
             setEPCDialog.show();
         } else if (arg0 == Lock_Tag) {
@@ -255,14 +262,36 @@ public class R2000demoISO6C extends Activity implements OnClickListener {
                 Status.setText(R.string.Status_No_Card_Select);
                 return;
             }
-            LockTagDialog lockTagDialog = new LockTagDialog(this,iuhfService
-                    ,current_tag_epc,modle);
+            LockTagDialog lockTagDialog = new LockTagDialog(this, iuhfService
+                    , current_tag_epc, modle);
             lockTagDialog.setTitle(R.string.Lock_Btn);
             lockTagDialog.show();
         } else if (arg0 == Speedt) {
-            SpeedTestDialog sptd = new SpeedTestDialog(this,iuhfService);
+            SpeedTestDialog sptd = new SpeedTestDialog(this, iuhfService);
             sptd.setTitle("Speed Test");
             sptd.show();
         }
+    }
+
+    private long mkeyTime = 0;
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+            case KeyEvent.ACTION_DOWN:
+                if ((System.currentTimeMillis() - mkeyTime) > 2000) {
+                    mkeyTime = System.currentTimeMillis();
+                    Toast.makeText(mContext, "再按一次退出", Toast.LENGTH_SHORT).show();
+                } else {
+                    try {
+                        finish();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                return false;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

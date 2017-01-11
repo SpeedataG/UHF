@@ -3,10 +3,8 @@ package com.speedata.libuhf;
 
 import android.os.Handler;
 import android.os.Message;
-
 import com.pow.api.cls.RfidPower;
 import com.uhf.api.cls.Reader;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -19,8 +17,8 @@ public class XinLianQilian implements IUHFService {
 
     private static Reader Mreader = new Reader();
     private static int antportc;
-    private static RfidPower.PDATYPE PT = RfidPower.PDATYPE.valueOf(19);
-    private static RfidPower Rpower = new RfidPower(PT);
+    private static RfidPower.PDATYPE PT;
+    private static RfidPower Rpower ;
     private Handler handler_inventer = null;
     private ReaderParams Rparams = new ReaderParams();
     private int ThreadMODE = 0;
@@ -31,6 +29,12 @@ public class XinLianQilian implements IUHFService {
 
     //初始化模块
     public int OpenDev() {
+        if (android.os.Build.VERSION.RELEASE.equals("4.4.2")) {
+            PT = RfidPower.PDATYPE.valueOf(4);
+        }else if (android.os.Build.VERSION.RELEASE.equals("5.1")){
+            PT = RfidPower.PDATYPE.valueOf(19);
+        }
+        Rpower = new RfidPower(PT);
         try {
             boolean blen = Rpower.PowerUp();
             if (!blen)

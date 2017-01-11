@@ -14,8 +14,6 @@ import com.speedata.uhf.R;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.StringTokenizer;
-
 /**
  * Created by 张明_ on 2016/12/27.
  */
@@ -118,42 +116,42 @@ public class WriteTagDialog extends Dialog implements
     }
 
 
-    private int write_card(int area, int addr, int count, int passwd, String cnt) {
-        byte[] cf;
-        if (model.equals("FEILIXIN")) {
-            cf = getBytes(cnt);
-        } else {
-            StringTokenizer cn = new StringTokenizer(cnt);
-            if (cn.countTokens() < count) {
-                return -3;
-            }
-            cf = new byte[count];
-            int index = 0;
-            while (cn.hasMoreTokens() && (index < count)) {
-                try {
-                    int k = Integer.parseInt(cn.nextToken(), 16);
-                    if (k > 0xff) {
-                        throw new NumberFormatException("can't bigger than 0xff");
-                    }
-                    cf[index++] = (byte) k;
-                } catch (NumberFormatException p) {
-                    return -4;
-                }
-            }
-        }
-        return iuhfService.write_area(area, addr, passwd, cf);
-    }
+//    private int write_card(int area, int addr, int count, int passwd, String cnt) {
+//        byte[] cf;
+//        if (model.equals("FEILIXIN")) {
+//            cf = getBytes(cnt);
+//        } else {
+//            StringTokenizer cn = new StringTokenizer(cnt);
+//            if (cn.countTokens() < count) {
+//                return -3;
+//            }
+//            cf = new byte[count];
+//            int index = 0;
+//            while (cn.hasMoreTokens() && (index < count)) {
+//                try {
+//                    int k = Integer.parseInt(cn.nextToken(), 16);
+//                    if (k > 0xff) {
+//                        throw new NumberFormatException("can't bigger than 0xff");
+//                    }
+//                    cf[index++] = (byte) k;
+//                } catch (NumberFormatException p) {
+//                    return -4;
+//                }
+//            }
+//        }
+//        return iuhfService.write_area(area, addr, passwd, cf);
+//    }
 
     /**
      * 将一个可能带空格的字符串，以Byte.parseByte的方法转化为byte数组
      */
-    private byte[] getBytes(String data) {
-        String newData = data.trim().replace(" ", "");
-        byte[] datas = new byte[newData.length()];
-        int i;
-        for (i = 0; i < datas.length; ++i) {
-            datas[i] = Byte.parseByte(newData.substring(i, i + 1), 16);
-        }
-        return datas;
-    }
+//    private byte[] getBytes(String data) {
+//        String newData = data.trim().replace(" ", "");
+//        byte[] datas = new byte[newData.length()];
+//        int i;
+//        for (i = 0; i < datas.length; ++i) {
+//            datas[i] = Byte.parseByte(newData.substring(i, i + 1), 16);
+//        }
+//        return datas;
+//    }
 }

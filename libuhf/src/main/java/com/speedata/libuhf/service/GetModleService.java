@@ -40,7 +40,11 @@ public class GetModleService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        powerOn("/sys/class/misc/mtgpio/pin", 94);
+        if (android.os.Build.VERSION.RELEASE.equals("4.4.2")) {
+            powerOn("/sys/class/misc/mtgpio/pin", 64);
+        }else if (android.os.Build.VERSION.RELEASE.equals("5.1")){
+            powerOn("/sys/class/misc/mtgpio/pin", 94);
+        }
         String modle = getModle();
         SharedXmlUtil.getInstance(this).write("modle", modle);
 

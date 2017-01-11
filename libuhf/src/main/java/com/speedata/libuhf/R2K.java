@@ -38,7 +38,7 @@ public class R2K implements IUHFService {
     private boolean inSearch = false;
     private inv_thread invs = null;
     private get_invdata gd;
-    private DeviceControl pw = new DeviceControl(POWERCTL, PW_GPIO);
+    private DeviceControl pw ;
 
     private class inv_thread extends Thread {
         public void run() {
@@ -82,6 +82,11 @@ public class R2K implements IUHFService {
     }
 
     public int OpenDev() {
+        if (android.os.Build.VERSION.RELEASE.equals("4.4.2")) {
+            pw = new DeviceControl(POWERCTL, 64);
+        }else if (android.os.Build.VERSION.RELEASE.equals("5.1")){
+            pw = new DeviceControl(POWERCTL, 94);
+        }
         int fd;
         pw.PowerOffDevice();
         fd = pw.PowerOnDevice();

@@ -25,12 +25,17 @@ public class as3992_native implements IUHFService {
     private Handler mHandler = null;
     private static final String TAG = "as3992_native";
     private get_inventoryData_thread mGetInventoryDataThread;
-    private DeviceControl deviceControl = new DeviceControl(POWERCTL, PW_GPIO);
+    private DeviceControl deviceControl;
     private ReadThread rthread;
     private byte[] mEpc;
 
     @Override
     public int OpenDev() {
+        if (android.os.Build.VERSION.RELEASE.equals("4.4.2")) {
+            deviceControl = new DeviceControl(POWERCTL, 64);
+        }else if (android.os.Build.VERSION.RELEASE.equals("5.1")){
+            deviceControl = new DeviceControl(POWERCTL, 94);
+        }
         if (OpenComPort(SERIALPORT) != 0) {
             return -1;
         }
@@ -40,7 +45,7 @@ public class as3992_native implements IUHFService {
             e.printStackTrace();
             return -1;
         }
-//        String version = String.valueOf(get_version(0));
+//        String version = String.valueOf(get_version(1));
         return 0;
     }
 

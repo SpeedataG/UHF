@@ -23,7 +23,6 @@ public interface IUHFService {
     public static final int USER_MODE = 3;
     public static final String SERIALPORT = "/dev/ttyMT2";
     public static final String POWERCTL = "/sys/class/misc/mtgpio/pin";
-    public static final int PW_GPIO = 94;
 
     //默认参数初始化模块
     public int OpenDev();
