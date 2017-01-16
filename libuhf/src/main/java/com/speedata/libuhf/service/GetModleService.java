@@ -2,6 +2,7 @@ package com.speedata.libuhf.service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Build;
 import android.os.IBinder;
 import android.serialport.SerialPort;
 import android.support.annotation.Nullable;
@@ -43,7 +44,12 @@ public class GetModleService extends Service {
         if (android.os.Build.VERSION.RELEASE.equals("4.4.2")) {
             powerOn("/sys/class/misc/mtgpio/pin", 64);
         }else if (android.os.Build.VERSION.RELEASE.equals("5.1")){
-            powerOn("/sys/class/misc/mtgpio/pin", 94);
+            String xinghao = Build.MODEL;
+            if (xinghao.equals("KT80")||xinghao.equals("W6")||xinghao.equals("N80")){
+                powerOn("/sys/class/misc/mtgpio/pin", 119);
+            }else {
+                powerOn("/sys/class/misc/mtgpio/pin", 94);
+            }
         }
         String modle = getModle();
         SharedXmlUtil.getInstance(this).write("modle", modle);
@@ -73,6 +79,12 @@ public class GetModleService extends Service {
         }
         fd = serialPort.getFd();
         byte[] bytes = new byte[1024];
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         //判断是不是R2000
         serialPort.WriteSerialByte(fd, r2000_cmd);
         try {

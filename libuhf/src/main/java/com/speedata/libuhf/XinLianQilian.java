@@ -62,6 +62,7 @@ public class XinLianQilian implements IUHFService {
 
     //注册过 Handler 后调用此函数开始盘点过程
     public void inventory_start() {
+        cancelSelect();
         handler.postDelayed(inv_thread, 0);
     }
 
@@ -531,6 +532,12 @@ public class XinLianQilian implements IUHFService {
             handler.postDelayed(this, Rparams.sleep);
         }
     };
+
+    private void cancelSelect() {
+        Reader.TagFilter_ST tfst = Mreader.new TagFilter_ST();
+        tfst = null;
+        Reader.READER_ERR filter_er = Mreader.ParamSet(Reader.Mtr_Param.MTR_PARAM_TAG_FILTER, tfst);
+    }
 
 
     //用户需要自己实现一个 Handler，然后用些函数向 API 注册，然后才可以 开始盘点。

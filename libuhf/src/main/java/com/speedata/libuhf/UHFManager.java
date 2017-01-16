@@ -2,9 +2,13 @@ package com.speedata.libuhf;
 
 
 import android.content.Context;
+import android.os.Build;
 import android.serialport.SerialPort;
 import android.text.TextUtils;
+import android.util.Log;
+
 import com.speedata.libuhf.utils.SharedXmlUtil;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
@@ -41,13 +45,20 @@ public class UHFManager {
     private static boolean judgeModle() {
         String factory = SharedXmlUtil.getInstance(mContext).read("modle", "");
         if (TextUtils.isEmpty(factory)) {
+            Log.d("getModle_start", String.valueOf(System.currentTimeMillis()));
             if (android.os.Build.VERSION.RELEASE.equals("4.4.2")) {
                 powerOn("/sys/class/misc/mtgpio/pin", 64);
-            }else if (android.os.Build.VERSION.RELEASE.equals("5.1")){
-                powerOn("/sys/class/misc/mtgpio/pin", 94);
+            } else if (android.os.Build.VERSION.RELEASE.equals("5.1")) {
+                String xinghao = Build.MODEL;
+                if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")) {
+                    powerOn("/sys/class/misc/mtgpio/pin", 119);
+                } else {
+                    powerOn("/sys/class/misc/mtgpio/pin", 94);
+                }
             }
             factory = getModle();
             SharedXmlUtil.getInstance(mContext).write("modle", factory);
+            Log.d("getModle_end", String.valueOf(System.currentTimeMillis()));
         }
         boolean initResult = true;
         switch (factory) {
@@ -61,7 +72,7 @@ public class UHFManager {
                 iuhfService = new R2K();
                 break;
             case FACTORY_3992:
-                iuhfService=new com.android.uhflibs.as3992_native();
+                iuhfService = new com.android.uhflibs.as3992_native();
                 break;
             default:
                 initResult = false;
@@ -89,6 +100,12 @@ public class UHFManager {
         }
         fd = serialPort.getFd();
         byte[] bytes = new byte[1024];
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         //判断是不是R2000
         serialPort.WriteSerialByte(fd, r2000_cmd);
         try {

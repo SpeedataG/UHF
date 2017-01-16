@@ -20,20 +20,14 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:25.0.1'
     testCompile 'junit:junit:4.12'
-//    compile project(path: ':libuhf')
-//    compile 'com.speedata:libid2:1.2.4'
-    //
-    compile files('libs/smallscreen.jar')
-    compile 'com.speedata:libuhf:1.0.1'
+    compile project(path: ':libuhf')
+//    compile 'com.speedata:libuhf:+'
+    compile 'org.greenrobot:eventbus:3.0.0'
+
 }
-
-
-
-
-

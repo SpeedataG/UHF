@@ -62,7 +62,7 @@ public class as3992_native implements IUHFService {
 
     @Override
     public void CloseDev() {
-//        rthread.interrupt();
+        rthread.interrupt();
         CloseComPort();
         deviceControl.PowerOffDevice();
     }
@@ -560,7 +560,13 @@ public class as3992_native implements IUHFService {
 
     @Override
     public int set_antenna_power(int power) {
-        return -1;
+        int i;
+        if (power==0){
+            i = set_antenna_power(false);
+        }else {
+            i=set_antenna_power(true);
+        }
+        return i;
     }
 
     public int set_antenna_power(boolean power) {
@@ -776,7 +782,6 @@ public class as3992_native implements IUHFService {
         return 0;
     }
 
-    //public int setlock(byte type, byte area, byte[] passwd)
     //以前3992接口定义
     public int setlock(byte type, byte area, byte[] passwd) {
         byte[] cmd = new byte[8];
