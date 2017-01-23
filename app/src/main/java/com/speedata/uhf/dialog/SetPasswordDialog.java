@@ -36,13 +36,13 @@ public class SetPasswordDialog extends Dialog implements
     private String current_tag_epc;
     private String model;
 
-    public SetPasswordDialog(Context context,IUHFService iuhfService
-            ,String current_tag_epc,String model) {
+    public SetPasswordDialog(Context context, IUHFService iuhfService
+            , String current_tag_epc, String model) {
         super(context);
         // TODO Auto-generated constructor stub
-        this.iuhfService=iuhfService;
-        this.current_tag_epc=current_tag_epc;
-        this.model=model;
+        this.iuhfService = iuhfService;
+        this.current_tag_epc = current_tag_epc;
+        this.model = model;
     }
 
     @Override
@@ -80,20 +80,19 @@ public class SetPasswordDialog extends Dialog implements
             int reval = iuhfService.set_Password(which, cur_pass,
                     new_pass);
             if (reval == 0) {
-                EventBus.getDefault().post(new MsgEvent("setPWD_Status",""));
+                EventBus.getDefault().post(new MsgEvent("setPWD_Status", ""));
                 dismiss();
             } else if (reval == -1) {
                 Status.setText(R.string.Status_Write_Error);
+            } else if (reval == -2) {
+                Status.setText(R.string.Status_Passwd_Length_Error);
+            } else if (reval == -3) {
+                Status.setText(R.string.Status_Content_Length_Error);
+            } else if (reval == -4) {
+                Status.setText(R.string.Status_InvalidNumber);
+            } else if (reval == -5) {
+                Status.setText(R.string.Status_Wrong_Password_Type);
             }
-//            else if (reval == -2) {
-//                Status.setText(R.string.Status_Passwd_Length_Error);
-//            } else if (reval == -3) {
-//                Status.setText(R.string.Status_Content_Length_Error);
-//            } else if (reval == -4) {
-//                Status.setText(R.string.Status_InvalidNumber);
-//            } else if (reval == -5) {
-//                Status.setText(R.string.Status_Wrong_Password_Type);
-//            }
         } else if (v == Cancle) {
             dismiss();
         }

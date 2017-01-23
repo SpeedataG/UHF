@@ -56,6 +56,13 @@ public class UHFManager {
                     powerOn("/sys/class/misc/mtgpio/pin", 94);
                 }
             }
+
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             factory = getModle();
             SharedXmlUtil.getInstance(mContext).write("modle", factory);
             Log.d("getModle_end", String.valueOf(System.currentTimeMillis()));
@@ -100,11 +107,11 @@ public class UHFManager {
         }
         fd = serialPort.getFd();
         byte[] bytes = new byte[1024];
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Thread.sleep(2000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
         //判断是不是R2000
         serialPort.WriteSerialByte(fd, r2000_cmd);
@@ -117,6 +124,8 @@ public class UHFManager {
             factory = bytesToHexString(bytes);
         }
         if (factory.equals("240349006D00700069006E006A00530065007200690061006C004E0075006D0030003100")) {
+            serialPort.CloseSerial(fd);
+            pw94.PowerOffDevice();
             return FACTORY_R2000;
         }
 
@@ -131,6 +140,8 @@ public class UHFManager {
         if (bytes != null) {
             factory = bytesToHexString(bytes);
             if (factory.equals("BB0103000A025261794D6174726978B17E")) {
+                serialPort.CloseSerial(fd);
+                pw94.PowerOffDevice();
                 return FACTORY_FEILIXIN;
             }
         }
@@ -146,6 +157,8 @@ public class UHFManager {
         if (bytes != null) {
             length = bytes.length;
             if (length == 27) {
+                serialPort.CloseSerial(fd);
+                pw94.PowerOffDevice();
                 return FACTORY_XINLIAN;
             }
         }

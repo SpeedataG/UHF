@@ -43,13 +43,18 @@ public class GetModleService extends Service {
         super.onCreate();
         if (android.os.Build.VERSION.RELEASE.equals("4.4.2")) {
             powerOn("/sys/class/misc/mtgpio/pin", 64);
-        }else if (android.os.Build.VERSION.RELEASE.equals("5.1")){
+        } else if (android.os.Build.VERSION.RELEASE.equals("5.1")) {
             String xinghao = Build.MODEL;
-            if (xinghao.equals("KT80")||xinghao.equals("W6")||xinghao.equals("N80")){
+            if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")) {
                 powerOn("/sys/class/misc/mtgpio/pin", 119);
-            }else {
+            } else {
                 powerOn("/sys/class/misc/mtgpio/pin", 94);
             }
+        }
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         String modle = getModle();
         SharedXmlUtil.getInstance(this).write("modle", modle);
@@ -68,7 +73,7 @@ public class GetModleService extends Service {
     /**
      * @return 返回厂家信息
      */
-    private static String getModle() {
+    private String getModle() {
         String factory = "";
         Log.d("getModle_start", String.valueOf(System.currentTimeMillis()));
         SerialPort serialPort = new SerialPort();
@@ -79,55 +84,62 @@ public class GetModleService extends Service {
         }
         fd = serialPort.getFd();
         byte[] bytes = new byte[1024];
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        int i = 0;
+        do {
+            i++;
 
-        //判断是不是R2000
-        serialPort.WriteSerialByte(fd, r2000_cmd);
-        try {
-            bytes = serialPort.ReadSerial(fd, 1024 * 2);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        if (bytes != null) {
-            factory = bytesToHexString(bytes);
-        }
-        if (factory.equals("240349006D00700069006E006A00530065007200690061006C004E0075006D0030003100")) {
-            return FACTORY_R2000;
-        }
-
-
-        //判断是不是旗联-飞利信
-        serialPort.WriteSerialByte(fd, feilixin_cmd);
-        try {
-            bytes = serialPort.ReadSerial(fd, 1024 * 2);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        if (bytes != null) {
-            factory = bytesToHexString(bytes);
-            if (factory.equals("BB01030008024D616769635266A77E")) {
-                return FACTORY_FEILIXIN;
+            //判断是不是R2000
+            serialPort.WriteSerialByte(fd, r2000_cmd);
+            try {
+                bytes = serialPort.ReadSerial(fd, 1024 * 2);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
             }
-        }
-
-        //判断是不是旗联-芯联
-        serialPort.WriteSerialByte(fd, xinlian_cmd);
-        try {
-            bytes = serialPort.ReadSerial(fd, 1024 * 2);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        int length = 0;
-        if (bytes != null) {
-            length = bytes.length;
-            if (length == 27) {
-                return FACTORY_XINLIAN;
+            if (bytes != null) {
+                factory = bytesToHexString(bytes);
+                SharedXmlUtil.getInstance(this).write("factory-r2000", factory);
             }
-        }
+            if (factory.equals("240349006D00700069006E006A00530065007200690061006C004E0075006D0030003100")) {
+                serialPort.CloseSerial(fd);
+                pw94.PowerOffDevice();
+                return FACTORY_R2000;
+            }
+
+
+            //判断是不是旗联-飞利信
+            serialPort.WriteSerialByte(fd, feilixin_cmd);
+            try {
+                bytes = serialPort.ReadSerial(fd, 1024 * 2);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            if (bytes != null) {
+                factory = bytesToHexString(bytes);
+                if (factory.equals("BB0103000A025261794D6174726978B17E")) {
+                    serialPort.CloseSerial(fd);
+                    pw94.PowerOffDevice();
+                    return FACTORY_FEILIXIN;
+                }
+            }
+
+            //判断是不是旗联-芯联
+            serialPort.WriteSerialByte(fd, xinlian_cmd);
+            try {
+                bytes = serialPort.ReadSerial(fd, 1024 * 2);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            int length = 0;
+            if (bytes != null) {
+                length = bytes.length;
+                if (length == 27) {
+                    serialPort.CloseSerial(fd);
+                    pw94.PowerOffDevice();
+                    return FACTORY_XINLIAN;
+                }
+            }
+        } while (i < 3);
+
 
         serialPort.CloseSerial(fd);
         pw94.PowerOffDevice();

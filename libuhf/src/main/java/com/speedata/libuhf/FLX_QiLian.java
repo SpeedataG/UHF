@@ -4,6 +4,7 @@
 
 package com.speedata.libuhf;
 
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -72,7 +73,12 @@ public class FLX_QiLian implements IUHFService {
         if (android.os.Build.VERSION.RELEASE.equals("4.4.2")) {
             sUhfPowaer = new UhfPowaer(POWERCTL, 64);
         }else if (android.os.Build.VERSION.RELEASE.equals("5.1")){
-            sUhfPowaer = new UhfPowaer(POWERCTL, 94);
+            String xinghao = Build.MODEL;
+            if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")) {
+                sUhfPowaer = new UhfPowaer(POWERCTL, 119);
+            } else {
+                sUhfPowaer = new UhfPowaer(POWERCTL, 94);
+            }
         }
         try {
             //初始化模块，为模块上电，为保证上电成功，建议先下电，在上电
@@ -258,12 +264,16 @@ public class FLX_QiLian implements IUHFService {
      */
     @Override
     public int write_area(int area, int addr, int passwd, byte[] content) {
-
+        if ((content.length % 2) != 0){
+            return -3;
+        }
         int result = -1;
 
         if ((area >= 0) && (area <= 3)) {
             char[] access_password = getCharsPassword(passwd);
-
+            if ((access_password.length%2) !=0){
+                return -2;
+            }
             result = Linkage.write_Label(open_Com, area, addr, (content.length / 4), byteToChar(content, content.length),
                     access_password);
         }
@@ -434,7 +444,7 @@ public class FLX_QiLian implements IUHFService {
     //没有获取频率区域的函数？
     @Override
     public int get_freq_region() {
-        return 0;
+        return -1;
     }
 
     @Override

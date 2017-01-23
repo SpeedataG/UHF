@@ -89,6 +89,9 @@ public class SetModuleDialog extends Dialog implements android.view.View.OnClick
         if (model.equals("XINLIAN")) {
             setm.setEnabled(false);
         }
+        if (model.equals("3992")){
+            setm.setEnabled(false);
+        }
         lm.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @Override
@@ -161,6 +164,10 @@ public class SetModuleDialog extends Dialog implements android.view.View.OnClick
         if (ivp > 0) {
             setp.setEnabled(true);
             pv.setText("" + ivp);
+        }
+        if (model.equals("3992")){
+            pv.setHint("0关天线1开天线");
+            setp.setEnabled(true);
         }
     }
 
