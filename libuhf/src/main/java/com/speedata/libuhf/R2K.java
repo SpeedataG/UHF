@@ -4,6 +4,7 @@ package com.speedata.libuhf;
 1.3	fix set antenna power and cancel wait on inventory
 */
 
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -85,7 +86,12 @@ public class R2K implements IUHFService {
         if (android.os.Build.VERSION.RELEASE.equals("4.4.2")) {
             pw = new DeviceControl(POWERCTL, 64);
         }else if (android.os.Build.VERSION.RELEASE.equals("5.1")){
-            pw = new DeviceControl(POWERCTL, 94);
+            String xinghao = Build.MODEL;
+            if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")) {
+                pw = new DeviceControl(POWERCTL, 119);
+            } else {
+                pw = new DeviceControl(POWERCTL, 94);
+            }
         }
         int fd;
         pw.PowerOffDevice();

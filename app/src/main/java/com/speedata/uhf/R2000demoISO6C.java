@@ -87,7 +87,6 @@ public class R2000demoISO6C extends Activity implements OnClickListener {
     protected void onResume() {
         super.onResume();
         if (openDev()) return;
-//        iuhfService.OpenDev();
     }
 
     @Override

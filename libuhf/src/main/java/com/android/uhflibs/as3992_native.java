@@ -1,5 +1,6 @@
 package com.android.uhflibs;
 
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -8,6 +9,7 @@ import com.speedata.libuhf.DeviceControl;
 import com.speedata.libuhf.INV_TIME;
 import com.speedata.libuhf.IUHFService;
 import com.speedata.libuhf.Tag_Data;
+import com.uhf_sdk.uhfpower.UhfPowaer;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;
@@ -33,8 +35,13 @@ public class as3992_native implements IUHFService {
     public int OpenDev() {
         if (android.os.Build.VERSION.RELEASE.equals("4.4.2")) {
             deviceControl = new DeviceControl(POWERCTL, 64);
-        }else if (android.os.Build.VERSION.RELEASE.equals("5.1")){
-            deviceControl = new DeviceControl(POWERCTL, 94);
+        } else if (android.os.Build.VERSION.RELEASE.equals("5.1")) {
+            String xinghao = Build.MODEL;
+            if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")) {
+                deviceControl = new DeviceControl(POWERCTL, 119);
+            } else {
+                deviceControl = new DeviceControl(POWERCTL, 94);
+            }
         }
         if (OpenComPort(SERIALPORT) != 0) {
             return -1;
@@ -45,7 +52,8 @@ public class as3992_native implements IUHFService {
             e.printStackTrace();
             return -1;
         }
-//        String version = String.valueOf(get_version(1));
+//        String version = String.valueOf(get_version(0));
+//        Log.d(TAG, "OpenDev: "+version);
         return 0;
     }
 
@@ -62,7 +70,7 @@ public class as3992_native implements IUHFService {
 
     @Override
     public void CloseDev() {
-        rthread.interrupt();
+//        rthread.interrupt();
         CloseComPort();
         deviceControl.PowerOffDevice();
     }
@@ -525,7 +533,14 @@ public class as3992_native implements IUHFService {
                 return -1;
             }
         }
-        if (select_card(eepc) != 0) {
+        int select_card;
+        int i = 0;
+        do {
+            i++;
+            select_card = select_card(eepc);
+        } while (select_card != 0 && i < 5);
+
+        if (select_card != 0) {
             return -1;
         }
         return 0;
@@ -561,10 +576,10 @@ public class as3992_native implements IUHFService {
     @Override
     public int set_antenna_power(int power) {
         int i;
-        if (power==0){
+        if (power == 0) {
             i = set_antenna_power(false);
-        }else {
-            i=set_antenna_power(true);
+        } else {
+            i = set_antenna_power(true);
         }
         return i;
     }
@@ -750,6 +765,9 @@ public class as3992_native implements IUHFService {
     @Override
     public int get_freq_region() {
         Freq_Msg res = get_freq();
+        if (res==null){
+            return -1;
+        }
         if (res.start == 840125) {
             return REGION_CHINA_840_845;
         } else if (res.start == 920625) {
