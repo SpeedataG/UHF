@@ -18,6 +18,13 @@ android {
         }
     }
 }
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        }
+    }
+}
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -26,8 +33,9 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:23.4.0'
     testCompile 'junit:junit:4.12'
-//    compile project(path: ':libuhf')
-    compile 'com.speedata:libuhf:5.2'
+    compile project(path: ':libuhf')
+    compile 'com.speedata:deivice:1.0'
+//    compile 'com.speedata:libuhf:5.2'
     compile 'org.greenrobot:eventbus:3.0.0'
 
 }

@@ -107,11 +107,6 @@ public class UHFManager {
         }
         fd = serialPort.getFd();
         byte[] bytes = new byte[1024];
-//        try {
-//            Thread.sleep(2000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
 
         //判断是不是R2000
         serialPort.WriteSerialByte(fd, r2000_cmd);
