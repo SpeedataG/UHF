@@ -109,9 +109,15 @@ public class UHFManager {
         byte[] bytes = new byte[1024];
 
         //判断是不是R2000
+        serialPort.clearPortBuf(fd);
         serialPort.WriteSerialByte(fd, r2000_cmd);
         try {
-            bytes = serialPort.ReadSerial(fd, 1024 * 2);
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        try {
+            bytes = serialPort.ReadSerial(fd, 1024);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -126,9 +132,15 @@ public class UHFManager {
 
 
         //判断是不是旗联-飞利信
+        serialPort.clearPortBuf(fd);
         serialPort.WriteSerialByte(fd, feilixin_cmd);
         try {
-            bytes = serialPort.ReadSerial(fd, 1024 * 2);
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        try {
+            bytes = serialPort.ReadSerial(fd, 1024);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -142,9 +154,15 @@ public class UHFManager {
         }
 
         //判断是不是旗联-芯联
+        serialPort.clearPortBuf(fd);
         serialPort.WriteSerialByte(fd, xinlian_cmd);
         try {
-            bytes = serialPort.ReadSerial(fd, 1024 * 2);
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        try {
+            bytes = serialPort.ReadSerial(fd, 1024);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
