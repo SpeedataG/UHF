@@ -76,6 +76,8 @@ public class FLX_QiLian implements IUHFService {
             String xinghao = Build.MODEL;
             if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")) {
                 sUhfPowaer = new UhfPowaer(POWERCTL, 119);
+            } else if (xinghao.equals("KT55")){
+                sUhfPowaer = new UhfPowaer(POWERCTL, 88);
             } else {
                 sUhfPowaer = new UhfPowaer(POWERCTL, 94);
             }

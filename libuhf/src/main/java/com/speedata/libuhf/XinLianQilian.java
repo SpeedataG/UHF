@@ -1,6 +1,7 @@
 package com.speedata.libuhf;
 
 
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 
@@ -28,6 +29,8 @@ public class XinLianQilian implements IUHFService {
     public boolean nostop = false;
     Reader.TagFilter_ST g2tf = null;
     private DeviceControl deviceControl;
+    private DeviceControl deviceControl55;
+    private DeviceControl deviceControl80;
 
 
     //初始化模块
@@ -47,6 +50,36 @@ public class XinLianQilian implements IUHFService {
             }
             return 0;
         } else if (android.os.Build.VERSION.RELEASE.equals("5.1")) {
+            String xinghao = Build.MODEL;
+            if (xinghao.equals("KT55")){
+                deviceControl55 = new DeviceControl("/sys/class/misc/mtgpio/pin", 88);
+                int i = deviceControl55.PowerOnDevice();
+                if (i==0){
+                    Reader.READER_ERR er = Mreader.InitReader_Notype(SERIALPORT, 1);
+                    if (er == Reader.READER_ERR.MT_OK_ERR) {
+                        antportc = 1;
+                    } else {
+                        return -1;
+                    }
+                }else {
+                    return -1;
+                }
+                return 0;
+            }else if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")){
+                deviceControl80 = new DeviceControl("/sys/class/misc/mtgpio/pin", 119);
+                int i = deviceControl80.PowerOnDevice();
+                if (i==0){
+                    Reader.READER_ERR er = Mreader.InitReader_Notype(SERIALPORT, 1);
+                    if (er == Reader.READER_ERR.MT_OK_ERR) {
+                        antportc = 1;
+                    } else {
+                        return -1;
+                    }
+                }else {
+                    return -1;
+                }
+                return 0;
+            }
             PT = RfidPower.PDATYPE.valueOf(19);
         }
         Rpower = new RfidPower(PT);
@@ -74,8 +107,15 @@ public class XinLianQilian implements IUHFService {
             Mreader.CloseReader();
         if (android.os.Build.VERSION.RELEASE.equals("4.4.2")) {
             deviceControl.PowerOffDevice();
-        }else {
-            Rpower.PowerDown();
+        }else if (android.os.Build.VERSION.RELEASE.equals("5.1")){
+            String xinghao = Build.MODEL;
+            if (xinghao.equals("KT55")){
+                deviceControl55.PowerOffDevice();
+            }else if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")){
+                deviceControl80.PowerOffDevice();
+            } else {
+                Rpower.PowerDown();
+            }
         }
     }
 

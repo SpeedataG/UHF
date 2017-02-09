@@ -30,7 +30,7 @@ public class UHFManager {
     private final static String FACTORY_3992 = "3992";
     private static int fd;
     private static DeviceControl pw94;
-    public static Context mContext;
+    private static Context mContext;
 
     public static IUHFService getUHFService(Context context) {
         //  判断模块   返回不同的模块接口对象
@@ -42,6 +42,10 @@ public class UHFManager {
         return iuhfService;
     }
 
+//    public static Context getmContext(){
+//        return mContext;
+//    }
+
     private static boolean judgeModle() {
         String factory = SharedXmlUtil.getInstance(mContext).read("modle", "");
         if (TextUtils.isEmpty(factory)) {
@@ -52,6 +56,8 @@ public class UHFManager {
                 String xinghao = Build.MODEL;
                 if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")) {
                     powerOn("/sys/class/misc/mtgpio/pin", 119);
+                } else if (xinghao.equals("KT55")){
+                    powerOn("/sys/class/misc/mtgpio/pin", 88);
                 } else {
                     powerOn("/sys/class/misc/mtgpio/pin", 94);
                 }

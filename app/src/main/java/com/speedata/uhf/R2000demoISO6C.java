@@ -32,8 +32,6 @@ import com.speedata.uhf.dialog.WriteTagDialog;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.ThreadMode;
 
-import static com.speedata.libuhf.UHFManager.mContext;
-
 public class R2000demoISO6C extends Activity implements OnClickListener {
     /**
      * Called when the activity is first created.
@@ -64,10 +62,10 @@ public class R2000demoISO6C extends Activity implements OnClickListener {
         super.onCreate(savedInstanceState);
         iuhfService = UHFManager.getUHFService(R2000demoISO6C.this);
         if (iuhfService == null) {
-            Toast.makeText(mContext, "模块不识别", Toast.LENGTH_SHORT).show();
+            Toast.makeText(R2000demoISO6C.this, "模块不识别", Toast.LENGTH_SHORT).show();
             return;
         }
-        modle = SharedXmlUtil.getInstance(mContext).read("modle", "");
+        modle = SharedXmlUtil.getInstance(R2000demoISO6C.this).read("modle", "");
         initUI();
 
         newWakeLock();
@@ -281,7 +279,7 @@ public class R2000demoISO6C extends Activity implements OnClickListener {
             case KeyEvent.ACTION_DOWN:
                 if ((System.currentTimeMillis() - mkeyTime) > 2000) {
                     mkeyTime = System.currentTimeMillis();
-                    Toast.makeText(mContext, "再按一次退出", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(R2000demoISO6C.this, "再按一次退出", Toast.LENGTH_SHORT).show();
                 } else {
                     try {
                         finish();

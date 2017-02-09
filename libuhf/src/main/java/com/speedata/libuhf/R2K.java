@@ -89,6 +89,8 @@ public class R2K implements IUHFService {
             String xinghao = Build.MODEL;
             if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")) {
                 pw = new DeviceControl(POWERCTL, 119);
+            } else if (xinghao.equals("KT55")){
+                pw = new DeviceControl(POWERCTL, 88);
             } else {
                 pw = new DeviceControl(POWERCTL, 94);
             }
