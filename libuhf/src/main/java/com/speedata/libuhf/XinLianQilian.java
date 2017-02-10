@@ -552,16 +552,16 @@ public class XinLianQilian implements IUHFService {
                     if (tagcnt[0] > 0) {
                         for (int i = 0; i < tagcnt[0]; i++) {
                             Reader.TAGINFO tfs = Mreader.new TAGINFO();
-                            if (android.os.Build.VERSION.RELEASE.equals("5.1")) {
-                                if (Rpower.GetType() == RfidPower.PDATYPE.SCAN_ALPS_ANDROID_CUIUS2) {
-                                    try {
-                                        Thread.sleep(10);
-                                    } catch (InterruptedException e) {
-                                        // TODO Auto-generated catch block
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
+//                            if (android.os.Build.VERSION.RELEASE.equals("5.1")) {
+//                                if (Rpower.GetType() == RfidPower.PDATYPE.SCAN_ALPS_ANDROID_CUIUS2) {
+//                                    try {
+//                                        Thread.sleep(10);
+//                                    } catch (InterruptedException e) {
+//                                        // TODO Auto-generated catch block
+//                                        e.printStackTrace();
+//                                    }
+//                                }
+//                            }
 
                             if (nostop)
                                 er = Mreader.AsyncGetNextTag(tfs);
