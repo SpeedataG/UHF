@@ -3,6 +3,8 @@ package com.speedata.uhf.dialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -70,45 +72,21 @@ public class WriteTagDialog extends Dialog implements
     public void onClick(View v) {
         // TODO Auto-generated method stub
         if (v == Ok) {
-            String str_addr = Write_Addr.getText().toString();
-            String str_count = Write_Count.getText().toString();
-            String str_passwd = Write_Passwd.getText().toString();
-
-//            int num_addr;
-//            int num_count;
-//            long passwd;
-//            try {
-//                num_addr = Integer.parseInt(str_addr, 16);
-//                num_count = Integer.parseInt(str_count, 10);
-//                if (model.equals("FEILIXIN")) {
-//                    passwd = Long.parseLong(str_passwd);
-//                } else {
-//                    passwd = Long.parseLong(str_passwd, 16);
-//                }
-//
-//            } catch (NumberFormatException p) {
-//                Status.setText(R.string.Status_InvalidNumber);
-//                return;
-//            }
-//            int rev = write_card(which_choose, num_addr, num_count * 2,
-//                    (int) passwd, str_content);
-
-
-            int rev=iuhfService.write_area(which_choose,str_addr,str_passwd,str_count
-                    ,str_content);
-
-            if (rev == 0) {
-                EventBus.getDefault().post(new MsgEvent("write_Status","" ));
-                dismiss();
-            } else if (rev == -1) {
-                Status.setText(R.string.Status_Write_Error);
-            } else if (rev == -2) {
-                Status.setText(R.string.Status_Content_Length_Error);
-            } else if (rev == -3) {
-                Status.setText(R.string.Status_InvalidNumber);
-            }else {
-                Status.setText(R.string.Status_Write_Error);
-            }
+            final String str_addr = Write_Addr.getText().toString();
+            final String str_count = Write_Count.getText().toString();
+            final String str_passwd = Write_Passwd.getText().toString();
+            Status.setText("正在写卡中....");
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    int rev=iuhfService.write_area(which_choose,str_addr,str_passwd,str_count
+                            ,str_content);
+                    Message message=new Message();
+                    message.what=1;
+                    message.obj=rev;
+                    handler.sendMessage(message);
+                }
+            }).start();
 
         } else if (v == Cancle) {
             dismiss();
@@ -116,42 +94,25 @@ public class WriteTagDialog extends Dialog implements
     }
 
 
-//    private int write_card(int area, int addr, int count, int passwd, String cnt) {
-//        byte[] cf;
-//        if (model.equals("FEILIXIN")) {
-//            cf = getBytes(cnt);
-//        } else {
-//            StringTokenizer cn = new StringTokenizer(cnt);
-//            if (cn.countTokens() < count) {
-//                return -3;
-//            }
-//            cf = new byte[count];
-//            int index = 0;
-//            while (cn.hasMoreTokens() && (index < count)) {
-//                try {
-//                    int k = Integer.parseInt(cn.nextToken(), 16);
-//                    if (k > 0xff) {
-//                        throw new NumberFormatException("can't bigger than 0xff");
-//                    }
-//                    cf[index++] = (byte) k;
-//                } catch (NumberFormatException p) {
-//                    return -4;
-//                }
-//            }
-//        }
-//        return iuhfService.write_area(area, addr, passwd, cf);
-//    }
-
-    /**
-     * 将一个可能带空格的字符串，以Byte.parseByte的方法转化为byte数组
-     */
-//    private byte[] getBytes(String data) {
-//        String newData = data.trim().replace(" ", "");
-//        byte[] datas = new byte[newData.length()];
-//        int i;
-//        for (i = 0; i < datas.length; ++i) {
-//            datas[i] = Byte.parseByte(newData.substring(i, i + 1), 16);
-//        }
-//        return datas;
-//    }
+    Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.what==1){
+                int rev= (int) msg.obj;
+                if (rev == 0) {
+                    EventBus.getDefault().post(new MsgEvent("write_Status","" ));
+                    dismiss();
+                } else if (rev == -1) {
+                    Status.setText(R.string.Status_Write_Error);
+                } else if (rev == -2) {
+                    Status.setText(R.string.Status_Content_Length_Error);
+                } else if (rev == -3) {
+                    Status.setText(R.string.Status_InvalidNumber);
+                }else {
+                    Status.setText(R.string.Status_Write_Error);
+                }
+            }
+        }
+    };
 }

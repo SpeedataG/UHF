@@ -3,6 +3,8 @@ package com.speedata.uhf.dialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,6 +34,7 @@ public class ReadTagDialog extends Dialog implements
     private String current_tag_epc;
     private int which_choose;
     private String model;
+    private Context mContext;
 
     public ReadTagDialog(Context context,IUHFService iuhfService
             ,int which_choose,String current_tag_epc,String model) {
@@ -41,6 +44,7 @@ public class ReadTagDialog extends Dialog implements
         this.current_tag_epc=current_tag_epc;
         this.which_choose=which_choose;
         this.model=model;
+        this.mContext=context;
     }
 
     @Override
@@ -66,47 +70,45 @@ public class ReadTagDialog extends Dialog implements
     public void onClick(View v) {
         // TODO Auto-generated method stub
         if (v == Ok) {
-            String str_addr = Read_Addr.getText().toString();
-            String str_count = Read_Count.getText().toString();
-            String str_passwd = Password.getText().toString();
-//            int num_addr;
-//            int num_count;
-//            long passwd;
-//            try {
-//                num_addr = Integer.parseInt(str_addr, 16);
-//                num_count = Integer.parseInt(str_count, 10);
-//                if (model.equals("FEILIXIN")) {
-//                    passwd = Long.parseLong(str_passwd);
-//                } else {
-//                    passwd = Long.parseLong(str_passwd, 16);
-//                }
-//            } catch (NumberFormatException p) {
-//                Status.setText(R.string.Status_InvalidNumber);
-//                return;
-//            }
-//            String res = read_card(which_choose, num_addr, num_count * 2, (int) passwd);
+            final String str_addr = Read_Addr.getText().toString();
+            final String str_count = Read_Count.getText().toString();
+            final String str_passwd = Password.getText().toString();
+            Status.setText("正在读卡中....");
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String res = iuhfService.read_area(which_choose,str_addr,str_count,str_passwd);
+                    Message message=new Message();
+                    if (res == null) {
+                        message.what=1;
+                        handler.sendMessage(message);
+                    } else {
+                        message.what=2;
+                        message.obj=res;
+                        handler.sendMessage(message);
+                    }
+                }
 
-            String res = iuhfService.read_area(which_choose,str_addr,str_count,str_passwd);
-            if (res == null) {
-                Status.setText(R.string.Status_Read_Card_Faild);
-            } else {
-                EventBus.getDefault().post(new MsgEvent("read_Status",res));
-                dismiss();
-            }
+            }).start();
+
         } else if (v == Cancle) {
             dismiss();
         }
     }
 
-//    private String read_card(int area, int addr, int count, int passwd) {
-//        byte[] v = iuhfService.read_area(area, addr, count, passwd);
-//        if (v == null) {
-//            return null;
-//        }
-//        String j = new String();
-//        for (byte i : v) {
-//            j += String.format("%02x ", i);
-//        }
-//        return j;
-//    }
+    Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case 1:
+                    Status.setText(R.string.Status_Read_Card_Faild);
+                    break;
+                case 2:
+                    EventBus.getDefault().post(new MsgEvent("read_Status",msg.obj.toString()));
+                    dismiss();
+                    break;
+            }
+        }
+    };
 }

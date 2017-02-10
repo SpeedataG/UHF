@@ -3,6 +3,8 @@ package com.speedata.uhf.dialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -64,10 +66,10 @@ public class SetEPCDialog extends Dialog implements
     public void onClick(View v) {
         // TODO Auto-generated method stub
         if (v == Ok) {
-            String password = passwd.getText().toString();
+            final String password = passwd.getText().toString();
             String epc_str = newepc.getText().toString();
             String count_str = newepclength.getText().toString();
-            int epcl;
+            final int epcl;
             try {
                 epcl = Integer.parseInt(count_str, 10);
             } catch (NumberFormatException e) {
@@ -81,7 +83,7 @@ public class SetEPCDialog extends Dialog implements
                 return;
             }
 
-            byte[] eepc = new byte[sepc.countTokens()];
+            final byte[] eepc = new byte[sepc.countTokens()];
 
             int index = 0;
             while (sepc.hasMoreTokens()) {
@@ -97,28 +99,48 @@ public class SetEPCDialog extends Dialog implements
                     return;
                 }
             }
+            Status.setText("正在写卡中....");
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    int reval = set_EPC(epcl, password, eepc);
+                    Message message=new Message();
+                    message.what=1;
+                    message.obj=reval;
+                    handler.sendMessage(message);
+                }
+            }).start();
 
-            int reval = set_EPC(epcl, password, eepc);
 
-            if (reval == 0) {
-                EventBus.getDefault().post(new MsgEvent("SetEPC_Status",""));
-                dismiss();
-            } else if (reval == -1) {
-                Status.setText(R.string.Status_Write_Error);
-            } else if (reval == -2) {
-                Status.setText(R.string.Status_Passwd_Length_Error);
-            } else if (reval == -3) {
-                Status.setText(R.string.Status_Content_Length_Error);
-            } else if (reval == -4) {
-                Status.setText(R.string.Status_InvalidNumber);
-            } else if (reval == -5) {
-                Status.setText(R.string.Status_Read_Pc_Error);
-            }
+
         } else if (v == Cancle) {
             dismiss();
         }
     }
 
+    Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.what==1){
+                int reval= (int) msg.obj;
+                if (reval == 0) {
+                    EventBus.getDefault().post(new MsgEvent("SetEPC_Status",""));
+                    dismiss();
+                } else if (reval == -1) {
+                    Status.setText(R.string.Status_Write_Error);
+                } else if (reval == -2) {
+                    Status.setText(R.string.Status_Passwd_Length_Error);
+                } else if (reval == -3) {
+                    Status.setText(R.string.Status_Content_Length_Error);
+                } else if (reval == -4) {
+                    Status.setText(R.string.Status_InvalidNumber);
+                } else if (reval == -5) {
+                    Status.setText(R.string.Status_Read_Pc_Error);
+                }
+            }
+        }
+    };
     int set_EPC(int epclength, String passwd, byte[] EPC) {
         byte[] res;
         long pss = 0;
@@ -139,8 +161,13 @@ public class SetEPCDialog extends Dialog implements
         }
         res[0] = (byte) ((res[0] & 0x7) | (epclength << 3));
         byte[] f = new byte[2 + epclength * 2];
-        System.arraycopy(res, 0, f, 0, 2);
-        System.arraycopy(EPC, 0, f, 2, epclength * 2);
+        try {
+            System.arraycopy(res, 0, f, 0, 2);
+            System.arraycopy(EPC, 0, f, 2, epclength * 2);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
         return iuhfService.write_area(iuhfService.EPC_A, 1, (int) pss, f);
     }
 }
