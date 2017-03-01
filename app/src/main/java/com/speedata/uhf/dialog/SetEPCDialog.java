@@ -78,7 +78,8 @@ public class SetEPCDialog extends Dialog implements
             }
 
             StringTokenizer sepc = new StringTokenizer(epc_str);
-            if (epcl > sepc.countTokens()) {
+            int countTokens = sepc.countTokens();
+            if (epcl > countTokens) {
                 Status.setText(R.string.Status_Content_Length_Error);
                 return;
             }

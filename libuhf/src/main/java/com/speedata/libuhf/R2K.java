@@ -124,9 +124,11 @@ public class R2K implements IUHFService {
     }
 
     public void CloseDev() {
+//        Log.d("s_start", String.valueOf(System.currentTimeMillis()));
+        pw.PowerOffDevice();
         lk.close_serial();
         lk.DestroyRadioFuncIntegration();
-        pw.PowerOffDevice();
+//        Log.d("s_end", String.valueOf(System.currentTimeMillis()));
     }
 
     private int btoi(byte a) {

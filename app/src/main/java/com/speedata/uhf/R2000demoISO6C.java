@@ -67,7 +67,7 @@ public class R2000demoISO6C extends Activity implements OnClickListener {
         }
         modle = SharedXmlUtil.getInstance(R2000demoISO6C.this).read("modle", "");
         initUI();
-
+        if (openDev()) return;
         newWakeLock();
         EventBus.getDefault().register(this);
         Set_Tag.setEnabled(true);
@@ -84,14 +84,14 @@ public class R2000demoISO6C extends Activity implements OnClickListener {
     @Override
     protected void onResume() {
         super.onResume();
-        if (openDev()) return;
+//        if (openDev()) return;
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d("r2000_kt45", "called ondestory");
-        iuhfService.CloseDev();
+//        Log.d("r2000_kt45", "called ondestory");
+//        iuhfService.CloseDev();
     }
 
     @org.greenrobot.eventbus.Subscribe(threadMode = ThreadMode.MAIN)
@@ -201,6 +201,7 @@ public class R2000demoISO6C extends Activity implements OnClickListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        iuhfService.CloseDev();
         wK.release();
     }
 
