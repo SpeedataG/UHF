@@ -88,7 +88,7 @@ public class SearchTagDialog extends Dialog implements
                 if (msg.what == 1) {
                     scant++;
                     if (!cbb.isChecked()) {
-                        if (scant % 50 == 0) {
+                        if (scant % 10 == 0) {
                             soundPool.play(soundId, 1, 1, 0, 0, 1);
                         }
                     }

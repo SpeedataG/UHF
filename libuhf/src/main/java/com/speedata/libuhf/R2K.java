@@ -447,7 +447,8 @@ public class R2K implements IUHFService {
                 res = lk.Radio_MacSetRegion(RFID_18K6C_COUNTRY_REGION.Open_Area902_928);
                 break;
             case REGION_EURO_865_868:
-                return -1;
+                res = lk.Radio_MacSetRegion(RFID_18K6C_COUNTRY_REGION.Europe_Area);
+                break;
         }
         if (res != Result.RFID_STATUS_OK.getValue()) {
             return -1;
@@ -467,7 +468,9 @@ public class R2K implements IUHFService {
             return REGION_CHINA_920_925;
         } else if (rv.value == RFID_18K6C_COUNTRY_REGION.Open_Area902_928.getValue()) {
             return REGION_CHINA_902_928;
-        } else {
+        } else if (rv.value == RFID_18K6C_COUNTRY_REGION.Europe_Area.getValue()){
+            return REGION_EURO_865_868;
+        }else {
             return -1;
         }
     }
