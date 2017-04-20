@@ -1,11 +1,15 @@
 package com.speedata.libuhf;
 
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.serialport.SerialPort;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.speedata.libuhf.utils.SharedXmlUtil;
 
@@ -31,10 +35,17 @@ public class UHFManager {
     private static int fd;
     private static DeviceControl pw94;
     private static Context mContext;
+    private static BatteryReceiver batteryReceiver;
 
     public static IUHFService getUHFService(Context context) {
         //  判断模块   返回不同的模块接口对象
         mContext = context;
+        //注册广播接受者java代码
+        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        //创建广播接受者对象
+        batteryReceiver = new BatteryReceiver();
+        //注册receiver
+        context.registerReceiver(batteryReceiver,intentFilter);
         if (iuhfService == null) {
             if (!judgeModle())
                 return null;
@@ -42,10 +53,30 @@ public class UHFManager {
         return iuhfService;
     }
 
-//    public static Context getmContext(){
-//        return mContext;
-//    }
+    public static void closeUHFService() {
+        iuhfService = null;
+        mContext.unregisterReceiver(batteryReceiver);
+    }
+    /**
+     * 广播接受者
+     */
+    static class BatteryReceiver extends BroadcastReceiver {
 
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // TODO Auto-generated method stub
+            //判断它是否是为电量变化的Broadcast Action
+            if(Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())){
+                //获取当前电量
+                int level = intent.getIntExtra("level", 0);
+                if (level<20){
+                    iuhfService.CloseDev();
+                    Toast.makeText(mContext,"电量低禁用超高频",Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+
+    }
     private static boolean judgeModle() {
         String factory = SharedXmlUtil.getInstance(mContext).read("modle", "");
         if (TextUtils.isEmpty(factory)) {
