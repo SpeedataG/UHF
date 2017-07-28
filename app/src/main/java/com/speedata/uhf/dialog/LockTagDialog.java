@@ -91,7 +91,7 @@ public class LockTagDialog extends Dialog implements
             int reval = -1;
             try {
                 long passwd;
-                if (model.equals("FEILIXIN")) {
+                if (model.equals("feilixin")) {
                     passwd = Long.parseLong(ps);
                 } else {
                     passwd = Long.parseLong(ps, 16);

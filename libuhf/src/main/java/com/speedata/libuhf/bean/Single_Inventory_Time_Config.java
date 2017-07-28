@@ -1,4 +1,4 @@
-package com.speedata.libuhf;
+package com.speedata.libuhf.bean;
 
 /**
  * Created by 张明_ on 2016/12/16.

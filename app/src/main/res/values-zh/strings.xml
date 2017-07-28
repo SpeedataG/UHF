@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">uhf</string>
 
-    <string name="Search_Btn_T">选择</string>
+    <string name="Search_Btn_T">选卡</string>
     <string name="Read_Btn_T">读</string>
     <string name="Write_Btn_T">写</string>
     <string name="Name_item">Current Card(by EPC):</string>
@@ -90,4 +90,5 @@
     <string name="antenna_p">天线功率</string>
     <string name="spt">速度\n测试</string>
     <string name="sptss">开始</string>
+    <string name="inv_set">盘点内容设置</string>
 </resources>

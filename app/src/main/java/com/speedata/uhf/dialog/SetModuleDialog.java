@@ -14,7 +14,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.speedata.libuhf.INV_TIME;
+import com.speedata.libuhf.bean.INV_TIME;
 import com.speedata.libuhf.IUHFService;
 import com.speedata.uhf.R;
 
@@ -83,13 +83,13 @@ public class SetModuleDialog extends Dialog implements android.view.View.OnClick
         tmp.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         lm.setAdapter(tmp);
 
-        if (model.equals("FEILIXIN")) {
+        if (model.equals("feilixin")) {
             setm.setEnabled(false);
         }
-        if (model.equals("XINLIAN")) {
+        if (model.equals("xinlian")) {
             setm.setEnabled(false);
         }
-        if (model.equals("3992")){
+        if (model.equals("as3992")){
             setm.setEnabled(false);
         }
         lm.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -141,31 +141,31 @@ public class SetModuleDialog extends Dialog implements android.view.View.OnClick
             Log.e("r2000_kt45", "read region setting read failed");
         }
 
-        re = iuhfService.get_inventory_mode();
-        if (re == iuhfService.FAST_MODE) {
-            lm.setSelection(0, true);
-            Log.i("r2000_kt45", "fast");
-        } else if (re == iuhfService.SMART_MODE) {
-            lm.setSelection(1, true);
-            Log.i("r2000_kt45", "smart");
-        } else if (re == iuhfService.LOW_POWER_MODE) {
-            lm.setSelection(2, true);
-            Log.i("r2000_kt45", "low");
-        } else if (re == iuhfService.USER_MODE) {
-            Log.i("r2000_kt45", "custom");
-            lm.setSelection(3, true);
-        } else {
-            lm.setSelection(4, true);
-            status.setText("inv mode setting read failed");
-            Log.e("r2000_kt45", "inv mode setting read failed");
-        }
+//        re = iuhfService.get_inventory_mode();
+//        if (re == iuhfService.FAST_MODE) {
+//            lm.setSelection(0, true);
+//            Log.i("r2000_kt45", "fast");
+//        } else if (re == iuhfService.SMART_MODE) {
+//            lm.setSelection(1, true);
+//            Log.i("r2000_kt45", "smart");
+//        } else if (re == iuhfService.LOW_POWER_MODE) {
+//            lm.setSelection(2, true);
+//            Log.i("r2000_kt45", "low");
+//        } else if (re == iuhfService.USER_MODE) {
+//            Log.i("r2000_kt45", "custom");
+//            lm.setSelection(3, true);
+//        } else {
+//            lm.setSelection(4, true);
+//            status.setText("inv mode setting read failed");
+//            Log.e("r2000_kt45", "inv mode setting read failed");
+//        }
 
         int ivp = iuhfService.get_antenna_power();
         if (ivp > 0) {
             setp.setEnabled(true);
             pv.setText("" + ivp);
         }
-        if (model.equals("3992")){
+        if (model.equals("as3992")){
             pv.setHint("0关天线1开天线");
             setp.setEnabled(true);
         }
@@ -185,9 +185,9 @@ public class SetModuleDialog extends Dialog implements android.view.View.OnClick
                     status.setText("set freq region ok");
                     back.setText("update settings");
                     this.setCancelable(false);
-                    if (model.equals("R2000")) {
-                        seted = true;
-                    }
+//                    if (model.equals("r2k")) {
+//                        seted = true;
+//                    }
                 }
             }
 
@@ -202,9 +202,9 @@ public class SetModuleDialog extends Dialog implements android.view.View.OnClick
                     status.setText("set invetory mode ok");
                     back.setText("update settings");
                     this.setCancelable(false);
-                    if (model.equals("R2000")) {
-                        seted = true;
-                    }
+//                    if (model.equals("R2000")) {
+//                        seted = true;
+//                    }
                 }
             }
         } else if (v == sett) {
@@ -228,9 +228,9 @@ public class SetModuleDialog extends Dialog implements android.view.View.OnClick
                 status.setText("set invetory time ok");
                 back.setText("update settings");
                 this.setCancelable(false);
-                if (model.equals("R2000")) {
-                    seted = true;
-                }
+//                if (model.equals("R2000")) {
+//                    seted = true;
+//                }
 
             }
         } else if (v == back) {
@@ -256,9 +256,9 @@ public class SetModuleDialog extends Dialog implements android.view.View.OnClick
                     status.setText("set antenna power ok");
                     back.setText("update settings");
                     this.setCancelable(false);
-                    if (model.equals("R2000")) {
-                        seted = true;
-                    }
+//                    if (model.equals("R2000")) {
+//                        seted = true;
+//                    }
                 }
             }
         }

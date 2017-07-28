@@ -26,7 +26,7 @@ android {
 def siteUrl = 'https://github.com/EchoXBR/speedata' // 项目的主页
 def gitUrl = 'https://github.com/EchoXBR/speedata.git' // Git仓库的url
 group = "com.speedata" //一般填你唯一的包名
-version = "5.9"
+version = "6.7"
 install {
     repositories.mavenInstaller {
         // This generates POM.xml with proper parameters
@@ -110,13 +110,13 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:25.0.1'
-//    compile 'com.android.support:appcompat-v7:23.4.0'
+    //    compile 'com.android.support:appcompat-v7:23.4.0'
     testCompile 'junit:junit:4.12'
-    provided 'com.speedata:deivice:+'
+    provided 'com.speedata:deivice:1.4.8'
     compile files('libs/R2K.jar')
     compile files('libs/Qilian_Feilixin_uhf.jar')
     compile files('libs/Module_Android_DemoPower_1.7.5.1.jar')
-    compile files('libs/ModuleAPI_Android_3.0.0.0.jar')
+    compile files('libs/ModuleAPI_J.jar')
 }
 
 

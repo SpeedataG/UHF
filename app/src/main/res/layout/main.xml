@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:padding="5dp"
     android:orientation="vertical" >
 
     <LinearLayout
@@ -56,6 +57,7 @@
     </LinearLayout>
 
     <EditText
+        android:background="@drawable/bg_edit"
         android:id="@+id/editText_content"
         android:layout_width="match_parent"
         android:layout_height="346dp"
@@ -96,8 +98,15 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/btn_set" />
-
         <Button
+            android:visibility="gone"
+            android:id="@+id/btn_inv_set"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/inv_set" />
+        <Button
+            android:visibility="gone"
             android:id="@+id/button_spt"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"

@@ -4,16 +4,25 @@
 
 package com.speedata.libuhf;
 
+import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.speedata.libuhf.bean.INV_TIME;
+import com.speedata.libuhf.bean.Single_Inventory_Time_Config;
+import com.speedata.libuhf.bean.Tag_Data;
+import com.speedata.libuhf.utils.ByteCharStrUtils;
+import com.speedata.libutils.CommonUtils;
+import com.speedata.libutils.ConfigUtils;
+import com.speedata.libutils.ReadBean;
 import com.uhf_sdk.linkage.Linkage;
 import com.uhf_sdk.model.Inventory_Data;
 import com.uhf_sdk.model.Value_c;
 import com.uhf_sdk.uhfpower.UhfPowaer;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -29,16 +38,19 @@ public class FLX_QiLian implements IUHFService {
     private Handler mHandler = null;
     private boolean isChecking = false;
     private static UhfPowaer sUhfPowaer;
-
     //全局的串口句柄，底层通过句柄操作模块
     public static int open_Com = 0;
-
     private inventory_command_thread mInventoryCommandThread = null;
     private get_inventoryData_thread mGetInventoryDataThread;
-
     private Timer timer = new Timer(true);
     private MyTimerTask task;
+    private Context mContext;
+    private ReadBean mRead;
+    private android.serialport.DeviceControl newDeviceControl;
 
+    public FLX_QiLian(Context context) {
+        this.mContext = context;
+    }
 
     private class inventory_command_thread extends Thread {
         public void run() {
@@ -70,13 +82,45 @@ public class FLX_QiLian implements IUHFService {
      */
     @Override
     public int OpenDev() {
-        if (android.os.Build.VERSION.RELEASE.equals("4.4.2")) {
+        if (ConfigUtils.isConfigFileExists() && !CommonUtils.subDeviceType().contains("55")) {
+            mRead = ConfigUtils.readConfig(mContext);
+            String powerType = mRead.getUhf().getPowerType();
+            int[] intArray = new int[mRead.getUhf().getGpio().size()];
+            for (int i = 0; i < mRead.getUhf().getGpio().size(); i++) {
+                intArray[i] = mRead.getUhf().getGpio().get(i);
+            }
+            try {
+                newDeviceControl = new android.serialport.DeviceControl(powerType, intArray);
+                newDeviceControl.PowerOnDevice();
+                try {
+                    Thread.sleep(400);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                open_Com = Linkage.open_Serial(mRead.getUhf().getSerialPort());
+                if (open_Com > 0) {
+                    Log.i(TAG, "-----open_Com-----" + open_Com);
+                    return 0;
+                } else {
+                    return -1;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return -1;
+            }
+        } else {
+            return NoXmlOpenDev();
+        }
+    }
+
+    private int NoXmlOpenDev() {
+        if (Build.VERSION.RELEASE.equals("4.4.2")) {
             sUhfPowaer = new UhfPowaer(POWERCTL, 64);
-        }else if (android.os.Build.VERSION.RELEASE.equals("5.1")){
+        } else if (Build.VERSION.RELEASE.equals("5.1")) {
             String xinghao = Build.MODEL;
             if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")) {
                 sUhfPowaer = new UhfPowaer(POWERCTL, 119);
-            } else if (xinghao.equals("KT55")){
+            } else if (xinghao.equals("KT55")) {
                 sUhfPowaer = new UhfPowaer(POWERCTL, 88);
             } else {
                 sUhfPowaer = new UhfPowaer(POWERCTL, 94);
@@ -101,9 +145,18 @@ public class FLX_QiLian implements IUHFService {
 
     @Override
     public void CloseDev() {
+        if (ConfigUtils.isConfigFileExists() && !CommonUtils.subDeviceType().contains("55")) {
+            Linkage.close_Serial(open_Com);
+            try {
+                newDeviceControl.PowerOffDevice();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Linkage.close_Serial(open_Com);
+            sUhfPowaer.PowerOffDevice();
+        }
 
-        Linkage.close_Serial(open_Com);
-        sUhfPowaer.PowerOffDevice();
 
     }
 
@@ -148,15 +201,30 @@ public class FLX_QiLian implements IUHFService {
     }
 
     @Override
-    public void inventory_stop() {
+    public void setListener(Listener listener) {
+
+    }
+
+    @Override
+    public void newInventoryStart() {
+
+    }
+
+    @Override
+    public void newInventoryStop() {
+
+    }
+
+    @Override
+    public int inventory_stop() {
         if (!isChecking) {
-            return;
+            return -1;
         }
         isChecking = false;
         mGetInventoryDataThread.interrupt();
         mInventoryCommandThread.interrupt();
         Linkage.inventory_Stop(open_Com);
-
+        return 0;
     }
 
 
@@ -165,14 +233,12 @@ public class FLX_QiLian implements IUHFService {
         Inventory_Data[] stInvData = new Inventory_Data[512];
         int num = Linkage.inventory_Data(open_Com, stInvData);
         if (num > 0) {
+            String strEPCTemp = "";
             for (int i = 0; i < num; i++) {
-                if (stInvData[i].getEPC_len() > 0 && stInvData[i].getEPC_len() < 80) {
-                    byte[] n_epc_result = new byte[stInvData[i].getEPC_len()];
-                    byte[] n_epc = stInvData[i].getEPC_Data();
-                    for (int j = 0; j < n_epc_result.length; j++) {
-                        n_epc_result[j] = n_epc[j];
-                    }
-                    tagData.add(new Tag_Data(null, n_epc_result));
+                if (stInvData[i].getEPC_len() > 0 && stInvData[i].getEPC_len() < 66) {
+                    strEPCTemp = ByteCharStrUtils.b2hexs(stInvData[i].getEPC_Data(),
+                            stInvData[i].getEPC_len());
+                    tagData.add(new Tag_Data(null, strEPCTemp, ""));
                 }
             }
             return tagData;
@@ -206,8 +272,9 @@ public class FLX_QiLian implements IUHFService {
         }
         return null;
     }
+
     public String read_area(int area, String str_addr
-            , String str_count, String str_passwd){
+            , String str_count, String str_passwd) {
         int num_addr;
         int num_count;
         long passwd;
@@ -215,22 +282,24 @@ public class FLX_QiLian implements IUHFService {
             num_addr = Integer.parseInt(str_addr, 16);
             num_count = Integer.parseInt(str_count, 10);
             passwd = Long.parseLong(str_passwd);
-        }catch (NumberFormatException p) {
+        } catch (NumberFormatException p) {
             return null;
         }
         String res = read_card(area, num_addr, num_count * 2, (int) passwd);
         return res;
     }
+
     private String read_card(int area, int addr, int count, int passwd) {
         byte[] v = read_area(area, addr, count, passwd);
         if (v == null) {
             return null;
         }
-        String j = new String();
-        for (byte i : v) {
-            j += String.format("%02x ", i);
-        }
-        return j;
+//        String j = new String();
+//        for (byte i : v) {
+//            j += String.format("%02x ", i);
+//        }
+        String hexs = ByteCharStrUtils.b2hexs(v, v.length);
+        return hexs;
     }
     // byte转char
 
@@ -248,6 +317,7 @@ public class FLX_QiLian implements IUHFService {
         }
         return null;
     }
+
     private static byte[] charToByte(char[] data, int length) {
         byte[] bytes = new byte[2 * length];
 
@@ -266,14 +336,14 @@ public class FLX_QiLian implements IUHFService {
      */
     @Override
     public int write_area(int area, int addr, int passwd, byte[] content) {
-        if ((content.length % 2) != 0){
+        if ((content.length % 2) != 0) {
             return -3;
         }
         int result = -1;
 
         if ((area >= 0) && (area <= 3)) {
             char[] access_password = getCharsPassword(passwd);
-            if ((access_password.length%2) !=0){
+            if ((access_password.length % 2) != 0) {
                 return -2;
             }
             result = Linkage.write_Label(open_Com, area, addr, (content.length / 4), byteToChar(content, content.length),
@@ -281,6 +351,7 @@ public class FLX_QiLian implements IUHFService {
         }
         return result;
     }
+
     public int write_area(int area, String addr, String pwd, String count, String content) {
         int num_addr;
         int num_count;
@@ -296,9 +367,11 @@ public class FLX_QiLian implements IUHFService {
         int rev = write_card(area, num_addr, num_count * 2, (int) passwd, content);
         return rev;
     }
+
     private int write_card(int area, int addr, int count, int passwd, String cnt) {
-        byte[] cf;
-        cf = getBytes(cnt);
+//        byte[] cf;
+//        cf = getBytes(cnt);
+        byte[] cf = ByteCharStrUtils.toByteArray(cnt);
         return write_area(area, addr, passwd, cf);
     }
 
@@ -333,7 +406,6 @@ public class FLX_QiLian implements IUHFService {
      * 启用掩码：返回值0：为成功，其他均为失败 注意：1、当需要启用掩码时，注意当掩码长度为0时，掩码启用无效的，相当于取消了掩码 2、设置掩码（掩码长度不为0的）成功后，在不退出程序，不执行第一条的情况下，该掩码一直有效。
      * 3、取消掩码：应设置掩码长度为0，并在启用掩码状态读取一次，本模块无取消掩码函数
      */
-    @Override
     public int select_card(byte[] epc) {
 
         int epc_area = 1;//1:为EPC区域。2：为TID区域。3：为USER区域。
@@ -349,17 +421,17 @@ public class FLX_QiLian implements IUHFService {
         }
         return -1;
     }
+
     public int select_card(String epc) {
-        byte[] eepc;
-        eepc = getBytes(epc);
-        if (select_card(eepc) != 0) {
+        byte[] writeByte = ByteCharStrUtils.toByteArray(epc);
+        if (select_card(writeByte) != 0) {
             return -1;
         }
         return 0;
     }
 
     //设置密码
-    public int set_Password(int which, String cur_pass, String new_pass){
+    public int set_Password(int which, String cur_pass, String new_pass) {
         if (which > 1 || which < 0) {
             return -1;
         }
@@ -415,6 +487,21 @@ public class FLX_QiLian implements IUHFService {
     @Override
     public int set_inventory_mode(int m) {
         return -1;
+    }
+
+    @Override
+    public String GetLastDetailError() {
+        return null;
+    }
+
+    @Override
+    public int SetInvMode(int invm, int addr, int length) {
+        return 0;
+    }
+
+    @Override
+    public int GetInvMode(int type) {
+        return 0;
     }
 
 

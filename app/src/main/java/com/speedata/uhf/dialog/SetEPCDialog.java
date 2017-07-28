@@ -17,8 +17,6 @@ import com.speedata.uhf.R;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.StringTokenizer;
-
 /**
  * Created by 张明_ on 2016/12/28.
  */
@@ -36,11 +34,11 @@ public class SetEPCDialog extends Dialog implements
     private IUHFService iuhfService;
     private String current_tag_epc;
 
-    public SetEPCDialog(Context context,IUHFService iuhfService,String current_tag_epc) {
+    public SetEPCDialog(Context context, IUHFService iuhfService, String current_tag_epc) {
         super(context);
         // TODO Auto-generated constructor stub
-        this.iuhfService=iuhfService;
-        this.current_tag_epc=current_tag_epc;
+        this.iuhfService = iuhfService;
+        this.current_tag_epc = current_tag_epc;
     }
 
     @Override
@@ -66,8 +64,8 @@ public class SetEPCDialog extends Dialog implements
     public void onClick(View v) {
         // TODO Auto-generated method stub
         if (v == Ok) {
-            final String password = passwd.getText().toString();
-            String epc_str = newepc.getText().toString();
+            final String password = passwd.getText().toString().replace(" ","");
+            final String epc_str = newepc.getText().toString().replace(" ","");
             String count_str = newepclength.getText().toString();
             final int epcl;
             try {
@@ -76,42 +74,40 @@ public class SetEPCDialog extends Dialog implements
                 Log.e("as3992", "parse int error in set epc");
                 return;
             }
-
-            StringTokenizer sepc = new StringTokenizer(epc_str);
-            int countTokens = sepc.countTokens();
-            if (epcl > countTokens) {
-                Status.setText(R.string.Status_Content_Length_Error);
-                return;
-            }
-
-            final byte[] eepc = new byte[sepc.countTokens()];
-
-            int index = 0;
-            while (sepc.hasMoreTokens()) {
-                try {
-                    int ak = Integer.parseInt(sepc.nextToken(), 16);
-                    if (ak > 0xff) {
-                        throw new NumberFormatException("Can't bigger than 0xff");
-                    }
-                    eepc[index++] = (byte) ak;
-                } catch (NumberFormatException p) {
-                    Log.e("as3992", "parse int error in set epc: " + p.getMessage());
-                    Status.setText("Invalid epc str");
-                    return;
-                }
-            }
+//            StringTokenizer sepc = new StringTokenizer(epc_str);
+//            if (epcl > sepc.countTokens()) {
+//                Status.setText(R.string.Status_Content_Length_Error);
+//                return;
+//            }
+//
+//            final byte[] eepc = new byte[sepc.countTokens()];
+//
+//            int index = 0;
+//            while (sepc.hasMoreTokens()) {
+//                try {
+//                    int ak = Integer.parseInt(sepc.nextToken(), 16);
+//                    if (ak > 0xff) {
+//                        throw new NumberFormatException("Can't bigger than 0xff");
+//                    }
+//                    eepc[index++] = (byte) ak;
+//                } catch (NumberFormatException p) {
+//                    Log.e("as3992", "parse int error in set epc: " + p.getMessage());
+//                    Status.setText("Invalid epc str");
+//                    return;
+//                }
+//            }
             Status.setText("正在写卡中....");
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    int reval = set_EPC(epcl, password, eepc);
-                    Message message=new Message();
-                    message.what=1;
-                    message.obj=reval;
+//                    int reval = set_EPC(epcl, password, eepc);
+                    int reval = iuhfService.write_area(1, "2", password, String.valueOf(epcl), epc_str);
+                    Message message = new Message();
+                    message.what = 1;
+                    message.obj = reval;
                     handler.sendMessage(message);
                 }
             }).start();
-
 
 
         } else if (v == Cancle) {
@@ -119,14 +115,14 @@ public class SetEPCDialog extends Dialog implements
         }
     }
 
-    Handler handler=new Handler(){
+    Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            if (msg.what==1){
-                int reval= (int) msg.obj;
+            if (msg.what == 1) {
+                int reval = (int) msg.obj;
                 if (reval == 0) {
-                    EventBus.getDefault().post(new MsgEvent("SetEPC_Status",""));
+                    EventBus.getDefault().post(new MsgEvent("SetEPC_Status", ""));
                     dismiss();
                 } else if (reval == -1) {
                     Status.setText(R.string.Status_Write_Error);
@@ -138,37 +134,39 @@ public class SetEPCDialog extends Dialog implements
                     Status.setText(R.string.Status_InvalidNumber);
                 } else if (reval == -5) {
                     Status.setText(R.string.Status_Read_Pc_Error);
+                } else {
+                    Status.setText(R.string.Status_Write_Error);
                 }
             }
         }
     };
-    int set_EPC(int epclength, String passwd, byte[] EPC) {
-        byte[] res;
-        long pss = 0;
-        if (epclength > 31) {
-            return -3;
-        }
-        if (epclength * 2 < EPC.length) {
-            return -3;
-        }
-        try {
-            pss = Long.parseLong(passwd, 16);
-        } catch (NumberFormatException e) {
-            return -4;
-        }
-        res = iuhfService.read_area(iuhfService.EPC_A, 1, 2, 0);
-        if (res == null) {
-            return -5;
-        }
-        res[0] = (byte) ((res[0] & 0x7) | (epclength << 3));
-        byte[] f = new byte[2 + epclength * 2];
-        try {
-            System.arraycopy(res, 0, f, 0, 2);
-            System.arraycopy(EPC, 0, f, 2, epclength * 2);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return -1;
-        }
-        return iuhfService.write_area(iuhfService.EPC_A, 1, (int) pss, f);
-    }
+//    int set_EPC(int epclength, String passwd, byte[] EPC) {
+//        byte[] res;
+//        long pss = 0;
+//        if (epclength > 31) {
+//            return -3;
+//        }
+//        if (epclength * 2 < EPC.length) {
+//            return -3;
+//        }
+//        try {
+//            pss = Long.parseLong(passwd, 16);
+//        } catch (NumberFormatException e) {
+//            return -4;
+//        }
+//        res = iuhfService.read_area(iuhfService.EPC_A, 1, 2, 0);
+//        if (res == null) {
+//            return -5;
+//        }
+//        res[0] = (byte) ((res[0] & 0x7) | (epclength << 3));
+//        byte[] f = new byte[2 + epclength * 2];
+//        try {
+//            System.arraycopy(res, 0, f, 0, 2);
+//            System.arraycopy(EPC, 0, f, 2, epclength * 2);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return -1;
+//        }
+//        return iuhfService.write_area(iuhfService.EPC_A, 1, (int) pss, f);
+//    }
 }

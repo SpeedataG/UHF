@@ -1,16 +1,21 @@
 package com.android.uhflibs;
 
+import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
+import android.serialport.DeviceControl;
 import android.util.Log;
 
-import com.speedata.libuhf.DeviceControl;
-import com.speedata.libuhf.INV_TIME;
 import com.speedata.libuhf.IUHFService;
-import com.speedata.libuhf.Tag_Data;
-import com.uhf_sdk.uhfpower.UhfPowaer;
+import com.speedata.libuhf.bean.INV_TIME;
+import com.speedata.libuhf.bean.Tag_Data;
+import com.speedata.libuhf.utils.ByteCharStrUtils;
+import com.speedata.libutils.CommonUtils;
+import com.speedata.libutils.ConfigUtils;
+import com.speedata.libutils.ReadBean;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
@@ -30,17 +35,63 @@ public class as3992_native implements IUHFService {
     private DeviceControl deviceControl;
     private ReadThread rthread;
     private byte[] mEpc;
+    private Context mContext;
+    private ReadBean mRead;
+    private android.serialport.DeviceControl newDeviceControl;
+
+    public as3992_native(Context mContext) {
+        this.mContext = mContext;
+    }
 
     @Override
     public int OpenDev() {
-        if (android.os.Build.VERSION.RELEASE.equals("4.4.2")) {
-            deviceControl = new DeviceControl(POWERCTL, 64);
-        } else if (android.os.Build.VERSION.RELEASE.equals("5.1")) {
+        if (ConfigUtils.isConfigFileExists() && !CommonUtils.subDeviceType().contains("55")) {
+            mRead = ConfigUtils.readConfig(mContext);
+            String powerType = mRead.getUhf().getPowerType();
+            int[] intArray = new int[mRead.getUhf().getGpio().size()];
+            for (int i = 0; i < mRead.getUhf().getGpio().size(); i++) {
+                intArray[i] = mRead.getUhf().getGpio().get(i);
+            }
+            try {
+                newDeviceControl = new android.serialport.DeviceControl(powerType, intArray);
+                newDeviceControl.PowerOnDevice();
+                if (OpenComPort(mRead.getUhf().getSerialPort()) != 0) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                return -1;
+            }
+        } else {
+            return NoXmlOpenDev();
+        }
+
+    }
+
+    private int NoXmlOpenDev() {
+        if (Build.VERSION.RELEASE.equals("4.4.2")) {
+            try {
+                deviceControl = new DeviceControl(DeviceControl.PowerType.MAIN, 64);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (Build.VERSION.RELEASE.equals("5.1")) {
             String xinghao = Build.MODEL;
             if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")) {
-                deviceControl = new DeviceControl(POWERCTL, 119);
+                try {
+                    deviceControl = new DeviceControl(DeviceControl.PowerType.MAIN, 119);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             } else {
-                deviceControl = new DeviceControl(POWERCTL, 94);
+                try {
+                    deviceControl = new DeviceControl(DeviceControl.PowerType.MAIN, 94);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
         if (OpenComPort(SERIALPORT) != 0) {
@@ -52,8 +103,6 @@ public class as3992_native implements IUHFService {
             e.printStackTrace();
             return -1;
         }
-//        String version = String.valueOf(get_version(0));
-//        Log.d(TAG, "OpenDev: "+version);
         return 0;
     }
 
@@ -72,7 +121,20 @@ public class as3992_native implements IUHFService {
     public void CloseDev() {
 //        rthread.interrupt();
         CloseComPort();
-        deviceControl.PowerOffDevice();
+        if (ConfigUtils.isConfigFileExists() && !CommonUtils.subDeviceType().contains("55")) {
+            try {
+                newDeviceControl.PowerOffDevice();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                deviceControl.PowerOffDevice();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     public void CloseComPort() {
@@ -251,11 +313,15 @@ public class as3992_native implements IUHFService {
                         Log.d("as3992", "get at last one card");
                     }
                     int epc_length = buf[1] - 2;
-                    byte[] pc = new byte[2];
+//                    byte[] pc = new byte[2];
                     byte[] epc = new byte[epc_length];
-                    System.arraycopy(buf, 2, pc, 0, 2);
+//                    System.arraycopy(buf, 2, pc, 0, 2);
                     System.arraycopy(buf, 4, epc, 0, epc_length);
-                    cx.add(new Tag_Data(pc, epc));
+//                    cx.add(new Tag_Data(pc, epc, ""));
+                    String strEPCTemp = "";
+                    strEPCTemp = ByteCharStrUtils.b2hexs(epc, epc.length);
+                    cx.add(new Tag_Data("", strEPCTemp, ""));
+
                     card_num--;
                 } else {
                     read_ok = false;
@@ -285,13 +351,28 @@ public class as3992_native implements IUHFService {
     }
 
     @Override
-    public void inventory_stop() {
+    public void setListener(Listener listener) {
+
+    }
+
+    @Override
+    public void newInventoryStart() {
+
+    }
+
+    @Override
+    public void newInventoryStop() {
+
+    }
+
+    @Override
+    public int inventory_stop() {
         if (!isChecking) {
-            return;
+            return -1;
         }
         isChecking = false;
         mGetInventoryDataThread.interrupt();
-
+        return 0;
     }
 
     @Override
@@ -486,7 +567,6 @@ public class as3992_native implements IUHFService {
     }
 
 
-    @Override
     public int select_card(byte[] epc) {
         mEpc = epc;
         byte[] cmd = new byte[3 + epc.length];
@@ -765,7 +845,7 @@ public class as3992_native implements IUHFService {
     @Override
     public int get_freq_region() {
         Freq_Msg res = get_freq();
-        if (res==null){
+        if (res == null) {
             return -1;
         }
         if (res.start == 840125) {
@@ -869,6 +949,21 @@ public class as3992_native implements IUHFService {
 
     @Override
     public int set_inventory_mode(int m) {
+        return 0;
+    }
+
+    @Override
+    public String GetLastDetailError() {
+        return null;
+    }
+
+    @Override
+    public int SetInvMode(int invm, int addr, int length) {
+        return 0;
+    }
+
+    @Override
+    public int GetInvMode(int type) {
         return 0;
     }
 

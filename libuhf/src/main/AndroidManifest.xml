@@ -4,17 +4,6 @@
     <application android:allowBackup="true"
                  android:supportsRtl="true">
 
-        <!--<receiver android:name=".receiver.BootCompletedReceiver">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.BOOT_COMPLETED" />-->
-            <!--</intent-filter>-->
-        <!--</receiver>-->
-
-        <!--<service android:name=".service.GetModleService">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="com.speedata.libuhf.service.GetModleService"></action>-->
-            <!--</intent-filter>-->
-        <!--</service>-->
     </application>
 
 </manifest>

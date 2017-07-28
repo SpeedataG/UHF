@@ -90,4 +90,5 @@
     <string name="antenna_p">antenna power</string>
     <string name="spt">speed\ntest</string>
     <string name="sptss">start</string>
+    <string name="inv_set">Inv\nSet</string>
 </resources>

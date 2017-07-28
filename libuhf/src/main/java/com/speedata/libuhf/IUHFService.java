@@ -3,6 +3,9 @@ package com.speedata.libuhf;
 
 import android.os.Handler;
 
+import com.speedata.libuhf.bean.INV_TIME;
+import com.speedata.libuhf.bean.Tag_Data;
+
 /**
  * Created by brxu on 2016/12/13.
  */
@@ -24,6 +27,7 @@ public interface IUHFService {
     public static final String SERIALPORT = "/dev/ttyMT2";
     public static final String POWERCTL = "/sys/class/misc/mtgpio/pin";
 
+
     //默认参数初始化模块
     public int OpenDev();
 
@@ -35,10 +39,22 @@ public interface IUHFService {
 
     // Handler用于处理返回的盘点数据
     public void inventory_start(Handler hd);
+
+    public void setListener(Listener listener);
+
+    public interface Listener {
+        void update(Tag_Data var1);
+    }
+    //新盘点方法，Listener回调
+    public void newInventoryStart();
+
+    public void newInventoryStop();
+
+
     //设置密码
     public int set_Password(int which, String cur_pass, String new_pass);
      //停止盘点
-    public void inventory_stop();
+    public int inventory_stop();
 
     /**
      * 从标签 area 区的 addr 位置（以 word 计算）读取 count 个值（以 byte 计算）
@@ -86,4 +102,9 @@ public interface IUHFService {
     public int setlock(int type, int area, int passwd);
     public int get_inventory_mode();
     public int set_inventory_mode(int m);
+    //拿到最近一次详细内部错误信息
+    public String GetLastDetailError();
+
+    public int SetInvMode(int invm, int addr, int length);
+    public int GetInvMode(int type);
 }

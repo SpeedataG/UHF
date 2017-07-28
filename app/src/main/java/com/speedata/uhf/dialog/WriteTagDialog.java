@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,6 +16,8 @@ import com.speedata.uhf.MsgEvent;
 import com.speedata.uhf.R;
 
 import org.greenrobot.eventbus.EventBus;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by 张明_ on 2016/12/27.
@@ -79,8 +82,10 @@ public class WriteTagDialog extends Dialog implements
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    Log.d(TAG, "write start: "+System.currentTimeMillis());
                     int rev=iuhfService.write_area(which_choose,str_addr,str_passwd,str_count
                             ,str_content);
+                    Log.d(TAG, "write end: "+System.currentTimeMillis());
                     Message message=new Message();
                     message.what=1;
                     message.obj=rev;
