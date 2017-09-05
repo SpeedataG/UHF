@@ -85,9 +85,9 @@ public class SetPasswordDialog extends Dialog implements
                 public void run() {
                     int reval = iuhfService.set_Password(which, cur_pass,
                             new_pass);
-                    Message message=new Message();
-                    message.what=1;
-                    message.obj=reval;
+                    Message message = new Message();
+                    message.what = 1;
+                    message.obj = reval;
                     handler.sendMessage(message);
                 }
             }).start();
@@ -97,12 +97,12 @@ public class SetPasswordDialog extends Dialog implements
         }
     }
 
-    Handler handler=new Handler(){
+    Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            if (msg.what==1){
-                int reval= (int) msg.obj;
+            if (msg.what == 1) {
+                int reval = (int) msg.obj;
                 if (reval == 0) {
                     EventBus.getDefault().post(new MsgEvent("setPWD_Status", ""));
                     dismiss();
@@ -116,6 +116,8 @@ public class SetPasswordDialog extends Dialog implements
                     Status.setText(R.string.Status_InvalidNumber);
                 } else if (reval == -5) {
                     Status.setText(R.string.Status_Wrong_Password_Type);
+                } else {
+                    Status.setText(R.string.Status_Write_Error);
                 }
             }
         }

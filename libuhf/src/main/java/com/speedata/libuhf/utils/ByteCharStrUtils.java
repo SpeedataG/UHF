@@ -65,6 +65,9 @@ public class ByteCharStrUtils {
      * 把16进制字符串转换成字节数组
      */
     public static byte[] toByteArray(String hex) {
+        if (hex == null) {
+            return null;
+        }
         int len = (hex.length() / 2);
         byte[] result = new byte[len];
         char[] achar = hex.toCharArray();
@@ -82,6 +85,24 @@ public class ByteCharStrUtils {
 
     private static byte toByte(char c) {
         byte b = (byte) "0123456789ABCDEF".indexOf(c);
+        return b;
+    }
+
+    /**
+     * 判断十六进制
+     */
+    public static boolean IsHex(String str) {
+        boolean b = false;
+
+        char[] c = str.toUpperCase().toCharArray();
+        for (char aC : c) {
+            if ((aC >= '0' && aC <= '9') || (aC >= 'A' && aC <= 'F')) {
+                b = true;
+            } else {
+                b = false;
+                break;
+            }
+        }
         return b;
     }
 }

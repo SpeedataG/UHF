@@ -26,7 +26,7 @@ android {
 def siteUrl = 'https://github.com/EchoXBR/speedata' // 项目的主页
 def gitUrl = 'https://github.com/EchoXBR/speedata.git' // Git仓库的url
 group = "com.speedata" //一般填你唯一的包名
-version = "6.7"
+version = "7.1"
 install {
     repositories.mavenInstaller {
         // This generates POM.xml with proper parameters

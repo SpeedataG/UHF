@@ -29,7 +29,7 @@
             android:layout_width="80dp"
             android:layout_height="match_parent"
             android:text="@string/Search_Btn_T" />
-    
+
     </LinearLayout>
 
     <LinearLayout
@@ -118,7 +118,12 @@
     <TextView
         android:id="@+id/textView_status"
         android:layout_width="match_parent"
-        android:layout_height="86dp"
+        android:layout_height="wrap_content"
+        android:text="@string/TextView_Null" />
+    <TextView
+        android:id="@+id/textView_version"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="@string/TextView_Null" />
 
 </LinearLayout>

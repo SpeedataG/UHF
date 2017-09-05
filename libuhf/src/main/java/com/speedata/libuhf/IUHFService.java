@@ -3,7 +3,6 @@ package com.speedata.libuhf;
 
 import android.os.Handler;
 
-import com.speedata.libuhf.bean.INV_TIME;
 import com.speedata.libuhf.bean.Tag_Data;
 
 /**
@@ -16,6 +15,8 @@ public interface IUHFService {
     public static final int REGION_CHINA_920_925 = 1;
     public static final int REGION_CHINA_902_928 = 2;
     public static final int REGION_EURO_865_868 = 3;
+    public static final int REGION_920_5_924_5 = 3;
+
     public static final int RESERVED_A = 0;
     public static final int EPC_A = 1;
     public static final int TID_A = 2;
@@ -66,19 +67,19 @@ public interface IUHFService {
      * @param passwd
      * @return
      */
-    public byte[] read_area(int area, int addr, int count, int passwd);
+    public byte[] read_area(int area, int addr, int count, String passwd);
     public String read_area(int area, String str_addr
             , String str_count, String str_passwd);
 
 
     //把 content 中的数据写到标签 area 区中 addr（以 word 计算）开始的位 置。
-    public int write_area(int area, int addr, int passwd, byte[] content);
+    public int write_area(int area, int addr, String passwd, byte[] content);
     public int write_area(int area, String addr, String pwd, String count, String content);
 
 
     //选中要进行操作的 epc 标签
-    public int select_card(byte[] epc);
-    public int select_card(String epc);
+    public int select_card(int bank,byte[] epc,boolean mFlag);
+    public int select_card(int bank,String epc,boolean mFlag);
 
 
     //设置天线功率
@@ -95,16 +96,13 @@ public interface IUHFService {
     //设置盘点的handler
     public void reg_handler(Handler hd);
 
-
-    public INV_TIME get_inventory_time();
-    public int set_inventory_time(int work_t, int rest_t);
-    public int MakeSetValid();
     public int setlock(int type, int area, int passwd);
-    public int get_inventory_mode();
-    public int set_inventory_mode(int m);
     //拿到最近一次详细内部错误信息
     public String GetLastDetailError();
 
     public int SetInvMode(int invm, int addr, int length);
     public int GetInvMode(int type);
+
+    //设置频点
+    public int setFrequency(double frequency);
 }

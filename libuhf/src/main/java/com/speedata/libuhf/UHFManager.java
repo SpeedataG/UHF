@@ -37,10 +37,11 @@ public class UHFManager {
     //飞利信读取制造商指令
     private static byte[] feilixin_cmd = {(byte) 0xbb, 0x00, 0x03, 0x00, 0x01, 0x02, 0x06, 0x7e};
     //R2000获取版本号
-    private static byte[] r2000_cmd = {(byte) 0x7e, 0x00, 0x0e, 0x40, 0x06, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x54, 0x7e};
+    private static byte[] r2000_cmd = {(byte) 0x7e, 0x00, 0x0e, (byte) 0xC0, 0x06, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, (byte) 0xd4, 0X7e};
     //芯联
     private static byte[] xinlian_cmd = {(byte) 0xFF, 0x00, 0x03, 0x1d, 0x0C};
+
     private final static String FACTORY_FEILIXIN = "feilixin";
     private final static String FACTORY_XINLIAN = "xinlian";
     private final static String FACTORY_R2000 = "r2k";
@@ -163,7 +164,8 @@ public class UHFManager {
             } else if (Build.VERSION.RELEASE.equals("5.1")) {
                 String xinghao = Build.MODEL;
                 if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")
-                        || xinghao.equals("Biowolf LE")) {
+                        || xinghao.equals("Biowolf LE") || xinghao.equals("FC-PK80")
+                        || xinghao.equals("FC-K80")) {
                     powerOn(DeviceControl.PowerType.MAIN, 119);
                 } else if (xinghao.equals("KT55")) {
                     String readEm55 = readEm55();
@@ -181,7 +183,7 @@ public class UHFManager {
             }
 
             try {
-                Thread.sleep(100);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -214,18 +216,18 @@ public class UHFManager {
             e.printStackTrace();
         }
         fd = serialPort.getFd();
-        byte[] bytes = new byte[84];
+        byte[] bytes = new byte[1024];
 
         //判断是不是R2000
         serialPort.clearPortBuf(fd);
         serialPort.WriteSerialByte(fd, r2000_cmd);
-//        try {
-//            Thread.sleep(400);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
         try {
-            bytes = serialPort.ReadSerial(fd, 84);
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        try {
+            bytes = serialPort.ReadSerial(fd, 1024);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

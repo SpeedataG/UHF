@@ -114,6 +114,7 @@ public class SearchTagDialog extends Dialog implements
                         }
                     }
                 }
+
                 adapter = new ArrayAdapter<EpcDataBase>(
                         cont, android.R.layout.simple_list_item_1, firm);
                 EpcList.setAdapter(adapter);
@@ -216,6 +217,7 @@ public class SearchTagDialog extends Dialog implements
                 inSearch = true;
                 this.setCancelable(false);
                 scant = 0;
+                iuhfService.select_card(1, "", false);
                 iuhfService.inventory_start(handler);
                 Action.setText(R.string.Stop_Search_Btn);
                 Cancle.setEnabled(false);
@@ -249,13 +251,14 @@ public class SearchTagDialog extends Dialog implements
         public String toString() {
             if (TextUtils.isEmpty(tid_user)) {
                 return "EPC:" + epc + "\n"
-                        + "(" + "COUNT:" + valid + ")" + " RSSI:" + rssi+"\n";
+                        + "(" + "COUNT:" + valid + ")" + " RSSI:" + rssi + "\n";
             } else {
                 return "EPC:" + epc + "\n"
                         + "T/U:" + tid_user + "\n"
-                        + "(" + "COUNT:" + valid + ")" + " RSSI:" + rssi+"\n";
+                        + "(" + "COUNT:" + valid + ")" + " RSSI:" + rssi + "\n";
             }
         }
+
     }
 
     @Override
@@ -265,9 +268,10 @@ public class SearchTagDialog extends Dialog implements
         if (inSearch) {
             return;
         }
-        int res = iuhfService.select_card(firm.get(arg2).epc);
+        String epcStr = firm.get(arg2).epc;
+        int res = iuhfService.select_card(1, epcStr, true);
         if (res == 0) {
-            EventBus.getDefault().post(new MsgEvent("set_current_tag_epc", firm.get(arg2).epc));
+            EventBus.getDefault().post(new MsgEvent("set_current_tag_epc", epcStr));
             dismiss();
         } else {
             Status.setText(R.string.Status_Select_Card_Faild);

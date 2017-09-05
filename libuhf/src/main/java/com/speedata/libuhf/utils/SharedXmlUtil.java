@@ -13,8 +13,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
-import com.speedata.libuhf.R;
-
 
 /**
  * 本地SharedPreferences数据保存读取工具类
@@ -35,7 +33,7 @@ public class SharedXmlUtil {
 
     private SharedXmlUtil(Context context) {
         mShared = context.getSharedPreferences(
-                context.getString(R.string.app_name),
+                "uhf",
                 Context.MODE_MULTI_PROCESS);
         mEditor = mShared.edit();
     }

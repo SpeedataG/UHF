@@ -10,7 +10,6 @@ import android.serialport.DeviceControl;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.speedata.libuhf.bean.INV_TIME;
 import com.speedata.libuhf.bean.Tag_Data;
 import com.speedata.libuhf.utils.ByteCharStrUtils;
 import com.speedata.libutils.CommonUtils;
@@ -154,7 +153,8 @@ public class XinLianQilian implements IUHFService {
                 } else {
                     return -1;
                 }
-            } else if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")) {
+            } else if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")
+                    || xinghao.equals("FC-PK80") || xinghao.equals("FC-K80")) {
                 try {
                     deviceControl = new DeviceControl(DeviceControl.PowerType.MAIN, 119);
                     deviceControl.PowerOnDevice();
@@ -320,7 +320,7 @@ public class XinLianQilian implements IUHFService {
 
     //从标签 area 区的 addr 位置（以 word 计算）读取 count 个值（以 byte 计算）
     // passwd 是访问密码，如果区域没被锁就给 0 值。
-    public byte[] read_area(int area, int addr, int count, int passwd) {
+    public byte[] read_area(int area, int addr, int count, String passwd) {
         Log.d(TAG, "read_area: start22222");
         if ((area > 3) || (area < 0) || ((count % 2) != 0)) {
             return new byte[]{(byte) 0xFF, 0x07, (byte) 0xEE};
@@ -328,8 +328,8 @@ public class XinLianQilian implements IUHFService {
         try {
             byte[] rdata = new byte[count];
             byte[] rpaswd = new byte[4];
-            for (int i = 0; i < 4; i++) {
-                rpaswd[i] = (byte) (passwd >>> (24 - i * 8));
+            if (!passwd.equals("")) {
+                Mreader.Str2Hex(passwd, passwd.length(), rpaswd);
             }
             Reader.READER_ERR er = Reader.READER_ERR.MT_OK_ERR;
             int trycount = 3;
@@ -397,41 +397,44 @@ public class XinLianQilian implements IUHFService {
     public String read_area(int area, String str_addr
             , String str_count, String str_passwd) {
         Log.d(TAG, "read_card: start1111");
+        if (TextUtils.isEmpty(str_passwd)) {
+            return null;
+        }
+        if (!ByteCharStrUtils.IsHex(str_passwd)) {
+            return null;
+        }
         int num_addr;
         int num_count;
-        long passwd;
         try {
             num_addr = Integer.parseInt(str_addr, 16);
             num_count = Integer.parseInt(str_count, 10);
-            passwd = Long.parseLong(str_passwd, 16);
         } catch (NumberFormatException p) {
             return null;
         }
-        String res = read_card(area, num_addr, num_count * 2, (int) passwd);
+        String res = read_card(area, num_addr, num_count * 2, str_passwd);
         return res;
     }
 
-    private String read_card(int area, int addr, int count, int passwd) {
+    private String read_card(int area, int addr, int count, String passwd) {
         byte[] v = read_area(area, addr, count, passwd);
         if (v == null) {
             return null;
         }
         String hexs = ByteCharStrUtils.b2hexs(v, v.length);
-//        String j = new String();
-//        for (byte i : v) {
-//            j += String.format("%02x ", i);
-//        }
         return hexs;
     }
 
 
     //把 content 中的数据写到标签 area 区中 addr（以 word 计算）开始的位 置。
-    public int write_area(int area, int addr, int passwd, byte[] content) {
+    public int write_area(int area, int addr, String passwd, byte[] content) {
         Log.d(TAG, "write_area: start22222");
         try {
+            if ((content.length % 2) != 0) {
+                return -3;
+            }
             byte[] rpaswd = new byte[4];
-            for (int i = 0; i < 4; i++) {
-                rpaswd[i] = (byte) (passwd >>> (24 - i * 8));
+            if (!passwd.equals("")) {
+                Mreader.Str2Hex(passwd, passwd.length(), rpaswd);
             }
             Reader.READER_ERR er = Reader.READER_ERR.MT_OK_ERR;
             int trycount = 3;
@@ -497,22 +500,26 @@ public class XinLianQilian implements IUHFService {
 
     public int write_area(int area, String addr, String pwd, String count, String content) {
         Log.d(TAG, "write_area: start11111");
+        if (TextUtils.isEmpty(pwd)) {
+            return -3;
+        }
+        if (!ByteCharStrUtils.IsHex(pwd)) {
+            return -3;
+        }
         int num_addr;
         int num_count;
-        long passwd;
         try {
             num_addr = Integer.parseInt(addr, 16);
             num_count = Integer.parseInt(count, 10);
-            passwd = Long.parseLong(pwd, 16);
         } catch (NumberFormatException p) {
             return -3;
         }
         int rev = write_card(area, num_addr, num_count * 2,
-                (int) passwd, content);
+                pwd, content);
         return rev;
     }
 
-    public int write_card(int area, int addr, int count, int passwd, String cnt) {
+    public int write_card(int area, int addr, int count, String passwd, String cnt) {
 //        byte[] cf;
 //        StringTokenizer cn = new StringTokenizer(cnt);
 //        if (cn.countTokens() < count) {
@@ -537,43 +544,42 @@ public class XinLianQilian implements IUHFService {
 
 
     //选中要进行操作的 epc 标签
-    public int select_card(byte[] epc) {
-        if (epc == null) {
+    public int select_card(int bank, byte[] epc, boolean mFlag) {
+        Reader.READER_ERR er;
+        try {
+            if (mFlag) {
+                if (epc == null) {
+                    return -1;
+                }
+                g2tf = Mreader.new TagFilter_ST();
+                g2tf.fdata = epc;
+                g2tf.flen = epc.length * 8;
+                g2tf.isInvert = 0;
+                g2tf.bank = bank;
+                g2tf.startaddr = 32;
+                er = Mreader.ParamSet(Reader.Mtr_Param.MTR_PARAM_TAG_FILTER, g2tf);
+            } else {
+                er = Mreader.ParamSet(Reader.Mtr_Param.MTR_PARAM_TAG_FILTER, null);
+            }
+
+            if (er != Reader.READER_ERR.MT_OK_ERR) {
+                return -1;
+            }
+            return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
             return -1;
         }
-        g2tf = Mreader.new TagFilter_ST();
-        g2tf.fdata = epc;
-        g2tf.flen = epc.length * 8;
-        g2tf.isInvert = 0;
-        g2tf.bank = 1;
-        g2tf.startaddr = 32;
-        Reader.READER_ERR er = Mreader.ParamSet(Reader.Mtr_Param.MTR_PARAM_TAG_FILTER, g2tf);
-        if (er != Reader.READER_ERR.MT_OK_ERR) {
-            return -1;
-        }
-        return 0;
+
     }
 
-    public int select_card(String epc) {
-        if (TextUtils.isEmpty(epc)) {
-            return -1;
-        }
+    public int select_card(int bank, String epc, boolean mFlag) {
         Log.d(TAG, "select_card: start");
-//        byte[] eepc;
-//        StringTokenizer sepc = new StringTokenizer(epc);
-//        eepc = new byte[sepc.countTokens()];
-//        int index = 0;
-//        while (sepc.hasMoreTokens()) {
-//            try {
-//                eepc[index++] = (byte) Integer.parseInt(sepc.nextToken(), 16);
-//            } catch (NumberFormatException p) {
-//                Log.d(TAG, "select_card: failed NumberFormatException");
-//                return -1;
-//            }
-//        }
-
+        if (!mFlag) {
+            epc = "0000";
+        }
         byte[] writeByte = ByteCharStrUtils.toByteArray(epc);
-        if (select_card(writeByte) != 0) {
+        if (select_card(bank, writeByte, mFlag) != 0) {
             Log.d(TAG, "select_card: failed");
             return -1;
         }
@@ -834,6 +840,11 @@ public class XinLianQilian implements IUHFService {
         return 0;
     }
 
+    @Override
+    public int setFrequency(double frequency) {
+        return -1;
+    }
+
     //获得模式
     public int get_inventory_mode() {
 //        int[] val = new int[]{-1};
@@ -976,22 +987,6 @@ public class XinLianQilian implements IUHFService {
     public void reg_handler(Handler hd) {
         handler_inventer = hd;
     }
-
-    @Override
-    public INV_TIME get_inventory_time() {
-        return null;
-    }
-
-    @Override
-    public int set_inventory_time(int work_t, int rest_t) {
-        return 0;
-    }
-
-    @Override
-    public int MakeSetValid() {
-        return 0;
-    }
-
 
     public class ReaderParams {
 

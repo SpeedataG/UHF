@@ -79,7 +79,7 @@
     <string name="DEV_OPEN_ERR">Device open failed！Software will quit！</string>
     <string name="DIA_ALERT">警告！</string>
     <string name="DIA_CHECK">确定</string>
-    <string name="VALUE_ZERO">0</string>
+    <string name="VALUE_ZERO">00000000</string>
     <!--    <string name=""></string>  -->
     <string name="btn_set">设置</string>
     <string name="view_wt">工作时间</string>

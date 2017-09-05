@@ -8,6 +8,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.speedata.libuhf.bean.INV_TIME;
@@ -19,12 +20,12 @@ import com.speedata.libutils.ConfigUtils;
 import com.speedata.libutils.ReadBean;
 import com.uhf_sdk.linkage.Linkage;
 import com.uhf_sdk.model.Inventory_Data;
+import com.uhf_sdk.model.Parameter;
 import com.uhf_sdk.model.Value_c;
 import com.uhf_sdk.uhfpower.UhfPowaer;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Timer;
 import java.util.TimerTask;
 
 
@@ -42,8 +43,8 @@ public class FLX_QiLian implements IUHFService {
     public static int open_Com = 0;
     private inventory_command_thread mInventoryCommandThread = null;
     private get_inventoryData_thread mGetInventoryDataThread;
-    private Timer timer = new Timer(true);
-    private MyTimerTask task;
+    //    private Timer timer = new Timer(true);
+//    private MyTimerTask task;
     private Context mContext;
     private ReadBean mRead;
     private android.serialport.DeviceControl newDeviceControl;
@@ -118,7 +119,8 @@ public class FLX_QiLian implements IUHFService {
             sUhfPowaer = new UhfPowaer(POWERCTL, 64);
         } else if (Build.VERSION.RELEASE.equals("5.1")) {
             String xinghao = Build.MODEL;
-            if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")) {
+            if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")
+                    || xinghao.equals("FC-PK80") || xinghao.equals("FC-K80")) {
                 sUhfPowaer = new UhfPowaer(POWERCTL, 119);
             } else if (xinghao.equals("KT55")) {
                 sUhfPowaer = new UhfPowaer(POWERCTL, 88);
@@ -130,7 +132,7 @@ public class FLX_QiLian implements IUHFService {
             //初始化模块，为模块上电，为保证上电成功，建议先下电，在上电
             sUhfPowaer.PowerOffDevice();
             sUhfPowaer.PowerOnDevice();
-            Thread.sleep(400);
+            Thread.sleep(500);
             open_Com = Linkage.open_Serial(SERIALPORT);
             if (open_Com > 0) {
                 Log.i(TAG, "-----open_Com-----" + open_Com);
@@ -175,16 +177,16 @@ public class FLX_QiLian implements IUHFService {
         mGetInventoryDataThread = new get_inventoryData_thread();
         mGetInventoryDataThread.start();
 
-        /**
-         * 定时器，在间隔约10分钟时重新下发盘点开始命令
-         */
-        if (timer != null) {
-            if (task != null) {
-                task.cancel(); // 将原任务从队列中移除
-            }
-            task = new MyTimerTask(); // 新建一个任务
-            timer.schedule(task, 10 * 60 * 1000, 10 * 60 * 1000);
-        }
+//        /**
+//         * 定时器，在间隔约10分钟时重新下发盘点开始命令
+//         */
+//        if (timer != null) {
+//            if (task != null) {
+//                task.cancel(); // 将原任务从队列中移除
+//            }
+//            task = new MyTimerTask(); // 新建一个任务
+//            timer.schedule(task, 10 * 60 * 1000, 10 * 60 * 1000);
+//        }
 
     }
 
@@ -232,20 +234,21 @@ public class FLX_QiLian implements IUHFService {
         ArrayList<Tag_Data> tagData = new ArrayList<>();
         Inventory_Data[] stInvData = new Inventory_Data[512];
         int num = Linkage.inventory_Data(open_Com, stInvData);
-        if (num > 0) {
+        if (num > 0 && (stInvData != null)) {
             String strEPCTemp = "";
+            String strRSSITemp = "";
             for (int i = 0; i < num; i++) {
-                if (stInvData[i].getEPC_len() > 0 && stInvData[i].getEPC_len() < 66) {
+                if (stInvData[i].getEPC_len() > 0 && stInvData[i].getEPC_len() < 80) {
                     strEPCTemp = ByteCharStrUtils.b2hexs(stInvData[i].getEPC_Data(),
                             stInvData[i].getEPC_len());
-                    tagData.add(new Tag_Data(null, strEPCTemp, ""));
+                    strRSSITemp = String.valueOf(stInvData[i].getRSSI());
+                    tagData.add(new Tag_Data(null, strEPCTemp, strRSSITemp));
                 }
             }
             return tagData;
         }
         return null;
     }
-
 
     /*
      * 读标签函数
@@ -254,14 +257,14 @@ public class FLX_QiLian implements IUHFService {
    * passwd 是访问密码，如果区域没被锁就给 0 值。
      */
     @Override
-    public byte[] read_area(int area, int addr, int count, int passwd) {
+    public byte[] read_area(int area, int addr, int count, String passwd) {
         Value_c result = new Value_c();
 
         if ((area > 4) || (area < 0)) {
             return null;
         }
         char[] ReadText;
-        char[] access_password = getCharsPassword(passwd);
+        char[] access_password = Linkage.s2char(passwd);
 
         ReadText = Linkage.read_Label(open_Com, area, addr, count / 2, access_password,
                 result);
@@ -275,34 +278,35 @@ public class FLX_QiLian implements IUHFService {
 
     public String read_area(int area, String str_addr
             , String str_count, String str_passwd) {
+        if (TextUtils.isEmpty(str_passwd)) {
+            return null;
+        }
+        if (!ByteCharStrUtils.IsHex(str_passwd)) {
+            return null;
+        }
         int num_addr;
         int num_count;
-        long passwd;
         try {
             num_addr = Integer.parseInt(str_addr, 16);
             num_count = Integer.parseInt(str_count, 10);
-            passwd = Long.parseLong(str_passwd);
         } catch (NumberFormatException p) {
             return null;
         }
-        String res = read_card(area, num_addr, num_count * 2, (int) passwd);
+        String res = read_card(area, num_addr, num_count * 2, str_passwd);
         return res;
     }
 
-    private String read_card(int area, int addr, int count, int passwd) {
+    private String read_card(int area, int addr, int count, String passwd) {
         byte[] v = read_area(area, addr, count, passwd);
         if (v == null) {
             return null;
         }
-//        String j = new String();
-//        for (byte i : v) {
-//            j += String.format("%02x ", i);
-//        }
         String hexs = ByteCharStrUtils.b2hexs(v, v.length);
         return hexs;
     }
-    // byte转char
 
+
+    // byte转char
     private static char[] byteToChar(byte[] data, int length) {
         if (length % 2 == 0) {
             char[] chars = new char[length / 4];
@@ -335,42 +339,45 @@ public class FLX_QiLian implements IUHFService {
    * passwd 是访问密码，如果区域没被锁就给 0 值。
      */
     @Override
-    public int write_area(int area, int addr, int passwd, byte[] content) {
+    public int write_area(int area, int addr, String passwd, byte[] content) {
         if ((content.length % 2) != 0) {
             return -3;
         }
         int result = -1;
 
         if ((area >= 0) && (area <= 3)) {
-            char[] access_password = getCharsPassword(passwd);
+            char[] access_password = Linkage.s2char(passwd);
             if ((access_password.length % 2) != 0) {
                 return -2;
             }
-            result = Linkage.write_Label(open_Com, area, addr, (content.length / 4), byteToChar(content, content.length),
+            String s = ByteCharStrUtils.b2hexs(content, content.length);
+            char[] WriteText = Linkage.s2char(s);
+            result = Linkage.write_Label(open_Com, area, addr, (content.length / 2), WriteText,
                     access_password);
         }
         return result;
     }
 
     public int write_area(int area, String addr, String pwd, String count, String content) {
+        if (TextUtils.isEmpty(pwd)) {
+            return -3;
+        }
+        if (!ByteCharStrUtils.IsHex(pwd)) {
+            return -3;
+        }
         int num_addr;
         int num_count;
-        long passwd;
         try {
             num_addr = Integer.parseInt(addr, 16);
             num_count = Integer.parseInt(count, 10);
-            passwd = Long.parseLong(pwd);
-
         } catch (NumberFormatException p) {
             return -3;
         }
-        int rev = write_card(area, num_addr, num_count * 2, (int) passwd, content);
+        int rev = write_card(area, num_addr, num_count * 2, pwd, content);
         return rev;
     }
 
-    private int write_card(int area, int addr, int count, int passwd, String cnt) {
-//        byte[] cf;
-//        cf = getBytes(cnt);
+    private int write_card(int area, int addr, int count, String passwd, String cnt) {
         byte[] cf = ByteCharStrUtils.toByteArray(cnt);
         return write_area(area, addr, passwd, cf);
     }
@@ -406,28 +413,48 @@ public class FLX_QiLian implements IUHFService {
      * 启用掩码：返回值0：为成功，其他均为失败 注意：1、当需要启用掩码时，注意当掩码长度为0时，掩码启用无效的，相当于取消了掩码 2、设置掩码（掩码长度不为0的）成功后，在不退出程序，不执行第一条的情况下，该掩码一直有效。
      * 3、取消掩码：应设置掩码长度为0，并在启用掩码状态读取一次，本模块无取消掩码函数
      */
-    public int select_card(byte[] epc) {
-
-        int epc_area = 1;//1:为EPC区域。2：为TID区域。3：为USER区域。
-        int epc_lenght = epc.length / 4;
-        int epc_add = 2;
-        int mask_sel = 0;//注意：该参数必须和模块中参数的sel值保持一致（当前为模块初始值）
-        int mask_session = 0;//注意：该参数必须和模块中参数的session值保持一致（当前为模块初始值）
-
-
-        if (epc.length > 0) {
-            return Linkage.set_Mask(open_Com, mask_sel, mask_session, epc_area, epc_add, epc_lenght,
-                    byteToChar(epc, epc.length));
+    public int select_card(int bank, byte[] epc, boolean mFlag) {
+        try {
+            int epc_area = bank;//1:为EPC区域。2：为TID区域。3：为USER区域。
+            int epc_add = 2;
+            int mask_sel = 0;//注意：该参数必须和模块中参数的sel值保持一致（当前为模块初始值）
+            int mask_session = 0;//注意：该参数必须和模块中参数的session值保持一致（当前为模块初始值）
+            int epc_lenght = 0;
+            if (mFlag) {
+                if (epc == null) {
+                    return -1;
+                }
+                epc_lenght = epc.length / 2;
+            } else {
+                epc_lenght = 0;
+                epc = new byte[]{0, 0};
+            }
+            String b2hexs = ByteCharStrUtils.b2hexs(epc, epc.length);
+            char[] mask_input = Linkage.s2char(b2hexs);
+            int setMask = Linkage.set_Mask(open_Com, mask_sel, mask_session, epc_area, epc_add, epc_lenght,
+                    mask_input);
+            Parameter mParameter = new Parameter();
+            int status = Linkage.get_Query(open_Com, mParameter);
+            if (status == 0) {
+                Linkage.set_Query(open_Com, 0, 0, 1, 0, 0, mParameter.getTarget(), mParameter.getQ());
+            }
+            return setMask;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
         }
-        return -1;
     }
 
-    public int select_card(String epc) {
+    public int select_card(int bank, String epc, boolean mFlag) {
+        if (!mFlag) {
+            epc = "0000";
+        }
         byte[] writeByte = ByteCharStrUtils.toByteArray(epc);
-        if (select_card(writeByte) != 0) {
+        if (select_card(bank, writeByte, mFlag) != 0) {
             return -1;
         }
         return 0;
+
     }
 
     //设置密码
@@ -435,10 +462,10 @@ public class FLX_QiLian implements IUHFService {
         if (which > 1 || which < 0) {
             return -1;
         }
-        long cp = Long.parseLong(cur_pass);
-        byte[] nps = getBytes(new_pass);
-        return write_area(0, which * 2, (int) cp, nps);
+        byte[] nps = ByteCharStrUtils.toByteArray(new_pass);
+        return write_area(0, which * 2, cur_pass, nps);
     }
+
 
     /**
      * @param power 取值为19到30之间,小于19的值设置成功后，功率依然是19，大于30的功率设置成功后，功率依然是30 power最大值30，最小值19
@@ -479,15 +506,6 @@ public class FLX_QiLian implements IUHFService {
         return 0;
     }
 
-    @Override
-    public int get_inventory_mode() {
-        return -1;
-    }
-
-    @Override
-    public int set_inventory_mode(int m) {
-        return -1;
-    }
 
     @Override
     public String GetLastDetailError() {
@@ -502,6 +520,11 @@ public class FLX_QiLian implements IUHFService {
     @Override
     public int GetInvMode(int type) {
         return 0;
+    }
+
+    @Override
+    public int setFrequency(double frequency) {
+        return -1;
     }
 
 

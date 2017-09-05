@@ -376,10 +376,10 @@ public class as3992_native implements IUHFService {
     }
 
     @Override
-    public byte[] read_area(int area, int addr, int count, int passwd) {
+    public byte[] read_area(int area, int addr, int count, String passwd) {
         byte[] res = null;
         do {
-            if (mEpc != null && select_card(mEpc) < 0) {
+            if (mEpc != null && select_card(1,mEpc,true) < 0) {
                 Log.e("as3992", "read select failed");
                 continue;
             }
@@ -401,11 +401,11 @@ public class as3992_native implements IUHFService {
         } catch (NumberFormatException p) {
             return null;
         }
-        String res = read_card(area, num_addr, num_count * 2, (int) passwd);
+        String res = read_card(area, num_addr, num_count * 2, str_passwd);
         return res;
     }
 
-    private String read_card(int area, int addr, int count, int passwd) {
+    private String read_card(int area, int addr, int count, String passwd) {
         byte[] v = read_area(area, addr, count, passwd);
         if (v == null) {
             return null;
@@ -466,14 +466,14 @@ public class as3992_native implements IUHFService {
 
 
     @Override
-    public int write_area(int area, int addr, int passwd, byte[] content) {
+    public int write_area(int area, int addr, String passwd, byte[] content) {
         byte[] rpaswd = new byte[4];
-        for (int i = 0; i < 4; i++) {
-            rpaswd[i] = (byte) (passwd >>> (24 - i * 8));
-        }
+//        for (int i = 0; i < 4; i++) {
+//            rpaswd[i] = (byte) (passwd >>> (24 - i * 8));
+//        }
         int i = -1;
         do {
-            if (mEpc != null && select_card(mEpc) < 0) {
+            if (mEpc != null && select_card(1,mEpc,true) < 0) {
                 Log.e("as3992", "read select failed");
                 continue;
             }
@@ -512,7 +512,7 @@ public class as3992_native implements IUHFService {
                 return -3;
             }
         }
-        return write_area(area, num_addr, (int) passwd, cf);
+        return write_area(area, num_addr, pwd, cf);
     }
 
     public int write_area(int area, int addr, int count, byte[] passwd,
@@ -567,7 +567,7 @@ public class as3992_native implements IUHFService {
     }
 
 
-    public int select_card(byte[] epc) {
+    public int select_card(int bank,byte[] epc, boolean mFlag) {
         mEpc = epc;
         byte[] cmd = new byte[3 + epc.length];
         cmd[0] = 0x33;
@@ -601,7 +601,7 @@ public class as3992_native implements IUHFService {
         }
     }
 
-    public int select_card(String epc) {
+    public int select_card(int bank,String epc, boolean mFlag) {
         byte[] eepc;
         StringTokenizer sepc = new StringTokenizer(epc);
         eepc = new byte[sepc.countTokens()];
@@ -617,7 +617,7 @@ public class as3992_native implements IUHFService {
         int i = 0;
         do {
             i++;
-            select_card = select_card(eepc);
+            select_card = select_card(1,eepc,mFlag);
         } while (select_card != 0 && i < 5);
 
         if (select_card != 0) {
@@ -646,7 +646,7 @@ public class as3992_native implements IUHFService {
             nps[2] = (byte) ((np >> 8) & 0xff);
             nps[1] = (byte) ((np >> 16) & 0xff);
             nps[0] = (byte) ((np >> 24) & 0xff);
-            return write_area(0, which * 2, (int) cp, nps);
+            return write_area(0, which * 2, cur_pass, nps);
         } catch (NumberFormatException e) {
             return -1;
         }
@@ -865,20 +865,6 @@ public class as3992_native implements IUHFService {
         mHandler = hd;
     }
 
-    @Override
-    public INV_TIME get_inventory_time() {
-        return null;
-    }
-
-    @Override
-    public int set_inventory_time(int work_t, int rest_t) {
-        return 0;
-    }
-
-    @Override
-    public int MakeSetValid() {
-        return 0;
-    }
 
     //以前3992接口定义
     public int setlock(byte type, byte area, byte[] passwd) {
@@ -941,17 +927,6 @@ public class as3992_native implements IUHFService {
         return res;
     }
 
-
-    @Override
-    public int get_inventory_mode() {
-        return 0;
-    }
-
-    @Override
-    public int set_inventory_mode(int m) {
-        return 0;
-    }
-
     @Override
     public String GetLastDetailError() {
         return null;
@@ -965,6 +940,11 @@ public class as3992_native implements IUHFService {
     @Override
     public int GetInvMode(int type) {
         return 0;
+    }
+
+    @Override
+    public int setFrequency(double frequency) {
+        return -1;
     }
 
     private native int open_serial(String port);

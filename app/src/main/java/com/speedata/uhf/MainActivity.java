@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.speedata.libuhf.IUHFService;
 import com.speedata.libuhf.UHFManager;
 import com.speedata.libuhf.utils.SharedXmlUtil;
+import com.speedata.libutils.CommonUtils;
 import com.speedata.uhf.dialog.InvSetDialog;
 import com.speedata.uhf.dialog.LockTagDialog;
 import com.speedata.uhf.dialog.ReadTagDialog;
@@ -36,7 +37,7 @@ import org.greenrobot.eventbus.ThreadMode;
 public class MainActivity extends Activity implements OnClickListener {
     private static final String[] list = {"Reserved", "EPC", "TID", "USER"};
     private TextView Cur_Tag_Info;
-    private TextView Status;
+    private TextView Status, Version;
     private Spinner Area_Select;
     private ArrayAdapter<String> adapter;
     private Button Search_Tag;
@@ -68,12 +69,7 @@ public class MainActivity extends Activity implements OnClickListener {
         }
         modle = SharedXmlUtil.getInstance(MainActivity.this).read("modle", "");
         initUI();
-//        StringBuffer stringBuffer=new StringBuffer();
-//        for (int i = 0; i < 100; i++) {
-//            stringBuffer.append("1");
-//        }
-//        Tag_Content.setText(stringBuffer+"");
-        Status.setText(modle);
+        Version.append("-" + modle);
         newWakeLock();
         EventBus.getDefault().register(this);
         Set_Tag.setEnabled(true);
@@ -101,12 +97,11 @@ public class MainActivity extends Activity implements OnClickListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
         try {
             if (iuhfService != null) {
                 iuhfService.CloseDev();
@@ -206,6 +201,8 @@ public class MainActivity extends Activity implements OnClickListener {
         Cur_Tag_Info = (TextView) findViewById(R.id.textView_epc);
         Cur_Tag_Info.setText("");
         Status = (TextView) findViewById(R.id.textView_status);
+        Version = (TextView) findViewById(R.id.textView_version);
+        Version.setText(CommonUtils.getAppVersionName(this));
         adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, list);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
