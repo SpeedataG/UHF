@@ -77,7 +77,33 @@
             android:text="@string/btn_set" />
 
     </LinearLayout>
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/ll_zaibo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
+        <TextView
+            android:gravity="center"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:text="载波:"
+            android:textSize="15sp" />
+
+        <EditText
+            android:hint="0-31"
+            android:id="@+id/et_zaibo"
+            android:inputType="numberDecimal"
+            android:layout_width="180dp"
+            android:layout_height="match_parent" />
+        <Button
+            android:id="@+id/button_zaibo"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0.56"
+            android:text="@string/btn_set" />
+
+    </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

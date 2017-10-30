@@ -845,6 +845,11 @@ public class XinLianQilian implements IUHFService {
         return -1;
     }
 
+    @Override
+    public int enableEngTest(int gain) {
+        return 0;
+    }
+
     //获得模式
     public int get_inventory_mode() {
 //        int[] val = new int[]{-1};

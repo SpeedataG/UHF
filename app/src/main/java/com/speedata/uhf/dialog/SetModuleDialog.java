@@ -41,6 +41,9 @@ public class SetModuleDialog extends Dialog implements View.OnClickListener {
     private EditText et_pin_dian;
     private Button button_set_pindian;
     private LinearLayout ll_dianpin;
+    private EditText et_zaibo;
+    private Button button_zaibo;
+    private LinearLayout ll_zaibo;
 
 
     public SetModuleDialog(Context context, IUHFService iuhfService, String model) {
@@ -84,6 +87,7 @@ public class SetModuleDialog extends Dialog implements View.OnClickListener {
             } else {
                 lf.setSelection(4, true);
                 et_pin_dian.setText(String.valueOf(new DecimalFormat("0.000").format(re / 1000.0)));
+                ll_zaibo.setVisibility(View.VISIBLE);
             }
         } else {
             if (re == iuhfService.REGION_CHINA_920_925) {
@@ -128,6 +132,10 @@ public class SetModuleDialog extends Dialog implements View.OnClickListener {
         button_set_pindian.setOnClickListener(this);
         et_pin_dian = (EditText) findViewById(R.id.et_pin_dian);
         ll_dianpin = (LinearLayout) findViewById(R.id.ll_dianpin);
+        button_zaibo = (Button) findViewById(R.id.button_zaibo);
+        button_zaibo.setOnClickListener(this);
+        et_zaibo = (EditText) findViewById(R.id.et_zaibo);
+        ll_zaibo = (LinearLayout) findViewById(R.id.ll_zaibo);
     }
 
     @Override
@@ -169,8 +177,18 @@ public class SetModuleDialog extends Dialog implements View.OnClickListener {
             int frequency = iuhfService.setFrequency(parseDouble);
             if (frequency == 0) {
                 status.setText("set fixed frequency ok");
+                ll_zaibo.setVisibility(View.VISIBLE);
             } else {
                 status.setText("set fixed frequency failed");
+                ll_zaibo.setVisibility(View.GONE);
+            }
+        } else if (v == button_zaibo) {
+            int zaibo = Integer.parseInt(et_zaibo.getText().toString());
+            int engTest = iuhfService.enableEngTest(zaibo);
+            if (engTest == 0) {
+                status.setText("Set carrier success");
+            } else {
+                status.setText("Set carrier failed");
             }
         }
     }

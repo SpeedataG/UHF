@@ -105,4 +105,6 @@ public interface IUHFService {
 
     //设置频点
     public int setFrequency(double frequency);
+    //载波测试接口
+    public  int enableEngTest(int gain);
 }

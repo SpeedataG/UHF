@@ -52,6 +52,16 @@ public class R2K implements IUHFService, OnInventoryListener, OnReadWriteListene
         this.mContext = mContext;
     }
 
+    //设置连接模式，默认传0本地模式，传1为蓝牙透传模式
+    public void setRFConnectMode(int flag) {
+        getLinkage().setRFConnectMode(flag);
+    }
+
+    //接收到蓝牙数据后传来的R2000数据交由库解析，解析完成后，原接口不变
+    public void pushRemoteRFIDData(byte[] packageData) {
+        getLinkage().pushRemoteRFIDData(packageData);
+    }
+
     /**
      * 盘点回调
      *
@@ -460,6 +470,12 @@ public class R2K implements IUHFService, OnInventoryListener, OnReadWriteListene
             return -1;
         }
         return getLinkage().Radio_SetSingleFrequency(singleFrequency);
+    }
+
+    //载波测试接口
+    @Override
+    public int enableEngTest(int gain) {
+        return getLinkage().enableEngTest(gain);
     }
 
     public int get_freq_region() {

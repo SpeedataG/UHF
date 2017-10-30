@@ -527,6 +527,11 @@ public class FLX_QiLian implements IUHFService {
         return -1;
     }
 
+    @Override
+    public int enableEngTest(int gain) {
+        return 0;
+    }
+
 
     /**
      * @param region 为region=1:中国920_925(0),region=0：中国840_845(4),region=2欧规;

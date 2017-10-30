@@ -947,6 +947,11 @@ public class as3992_native implements IUHFService {
         return -1;
     }
 
+    @Override
+    public int enableEngTest(int gain) {
+        return 0;
+    }
+
     private native int open_serial(String port);
 
     private native void close_serial(int fd);

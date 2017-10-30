@@ -89,18 +89,24 @@ public class UHFManager {
             // TODO Auto-generated method stub
             //判断它是否是为电量变化的Broadcast Action
             if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
-                //获取当前电量
-                int level = intent.getIntExtra("level", 0);
-                if (level < 20) {
-                    iuhfService.CloseDev();
-                    Handler handler = new Handler(Looper.getMainLooper());
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(mContext, "电量低禁用超高频", Toast.LENGTH_LONG).show();
+                try {
+                    //获取当前电量
+                    int level = intent.getIntExtra("level", 0);
+                    if (level < 20) {
+                        if (iuhfService != null) {
+                            iuhfService.CloseDev();
                         }
-                    });
+                        Handler handler = new Handler(Looper.getMainLooper());
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(mContext, "电量低禁用超高频", Toast.LENGTH_LONG).show();
+                            }
+                        });
 
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }
