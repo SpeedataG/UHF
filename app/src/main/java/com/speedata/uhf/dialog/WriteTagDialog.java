@@ -40,15 +40,15 @@ public class WriteTagDialog extends Dialog implements
     private String current_tag_epc;
     private String model;
 
-    public WriteTagDialog(Context context,IUHFService iuhfService,
-                          String str_content,int which_choose,String current_tag_epc,String model) {
+    public WriteTagDialog(Context context, IUHFService iuhfService,
+                          String str_content, int which_choose, String current_tag_epc, String model) {
         super(context);
-        this.iuhfService=iuhfService;
-        this.mContext=context;
-        this.which_choose=which_choose;
-        this.str_content=str_content;
-        this.current_tag_epc=current_tag_epc;
-        this.model=model;
+        this.iuhfService = iuhfService;
+        this.mContext = context;
+        this.which_choose = which_choose;
+        this.str_content = str_content;
+        this.current_tag_epc = current_tag_epc;
+        this.model = model;
         // TODO Auto-generated constructor stub
     }
 
@@ -63,7 +63,7 @@ public class WriteTagDialog extends Dialog implements
         Cancle.setOnClickListener(this);
 
         EPC = (TextView) findViewById(R.id.textView_write_epc);
-        EPC.setText( current_tag_epc);
+        EPC.setText(current_tag_epc);
         Status = (TextView) findViewById(R.id.textView_write_status);
 
         Write_Addr = (EditText) findViewById(R.id.editText_write_addr);
@@ -82,13 +82,13 @@ public class WriteTagDialog extends Dialog implements
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d(TAG, "write start: "+System.currentTimeMillis());
-                    int rev=iuhfService.write_area(which_choose,str_addr,str_passwd,str_count
-                            ,str_content);
-                    Log.d(TAG, "write end: "+System.currentTimeMillis());
-                    Message message=new Message();
-                    message.what=1;
-                    message.obj=rev;
+                    Log.d(TAG, "write start: " + System.currentTimeMillis());
+                    int rev = iuhfService.write_area(which_choose, str_addr, str_passwd, str_count
+                            , str_content);
+                    Log.d(TAG, "write end: " + System.currentTimeMillis());
+                    Message message = new Message();
+                    message.what = 1;
+                    message.obj = rev;
                     handler.sendMessage(message);
                 }
             }).start();
@@ -99,14 +99,14 @@ public class WriteTagDialog extends Dialog implements
     }
 
 
-    Handler handler=new Handler(){
+    Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            if (msg.what==1){
-                int rev= (int) msg.obj;
+            if (msg.what == 1) {
+                int rev = (int) msg.obj;
                 if (rev == 0) {
-                    EventBus.getDefault().post(new MsgEvent("write_Status","" ));
+                    EventBus.getDefault().post(new MsgEvent("write_Status", ""));
                     dismiss();
                 } else if (rev == -1) {
                     Status.setText(R.string.Status_Write_Error);
@@ -114,7 +114,7 @@ public class WriteTagDialog extends Dialog implements
                     Status.setText(R.string.Status_Content_Length_Error);
                 } else if (rev == -3) {
                     Status.setText(R.string.Status_InvalidNumber);
-                }else {
+                } else {
                     Status.setText(R.string.Status_Write_Error);
                 }
             }

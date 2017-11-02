@@ -409,7 +409,8 @@ public class R2K implements IUHFService, OnInventoryListener, OnReadWriteListene
         byte[] pwdBytes = StringUtils.stringToByte(passwd);
         int Read_status = getLinkage().Radio_ReadTag(count / 2, addr, area, pwdBytes);
         if (Read_status == 0) {
-            SystemClock.sleep(100);
+//            while ()
+            SystemClock.sleep(200);
             return epcData;
         } else {
             return null;
@@ -475,7 +476,8 @@ public class R2K implements IUHFService, OnInventoryListener, OnReadWriteListene
     //载波测试接口
     @Override
     public int enableEngTest(int gain) {
-        return getLinkage().enableEngTest(gain);
+//        return getLinkage().enableEngTest(gain);
+        return 0;
     }
 
     public int get_freq_region() {
@@ -510,7 +512,7 @@ public class R2K implements IUHFService, OnInventoryListener, OnReadWriteListene
             int status = getLinkage().Radio_WriteTag(content.length / 2,
                     addr, area, pwdBytes, content);
             if (status == 0) {
-                SystemClock.sleep(50);
+                SystemClock.sleep(200);
                 return writeStatus;
             } else {
                 return -1;
@@ -534,7 +536,7 @@ public class R2K implements IUHFService, OnInventoryListener, OnReadWriteListene
         } catch (NumberFormatException p) {
             return -3;
         }
-        return write_card(area, num_addr, num_count * 2, pwd, content);
+        return write_card(area, num_addr, num_count, pwd, content);
     }
 
 
@@ -545,10 +547,10 @@ public class R2K implements IUHFService, OnInventoryListener, OnReadWriteListene
         if ((area >= 0) && (area <= 3) && ((content.length() % 2) == 0)) {
             byte[] stringToByte = StringUtils.stringToByte(content);
             byte[] pwdBytes = StringUtils.stringToByte(passwd);
-            int status = getLinkage().Radio_WriteTag(content.length(),
+            int status = getLinkage().Radio_WriteTag(count,
                     addr, area, pwdBytes, stringToByte);
             if (status == 0) {
-                SystemClock.sleep(50);
+                SystemClock.sleep(200);
                 return writeStatus;
             } else {
                 return -1;
