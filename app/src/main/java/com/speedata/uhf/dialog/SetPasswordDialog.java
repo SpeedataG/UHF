@@ -37,6 +37,7 @@ public class SetPasswordDialog extends Dialog implements
     private IUHFService iuhfService;
     private String current_tag_epc;
     private String model;
+    private Context context;
 
     public SetPasswordDialog(Context context, IUHFService iuhfService
             , String current_tag_epc, String model) {
@@ -45,6 +46,7 @@ public class SetPasswordDialog extends Dialog implements
         this.iuhfService = iuhfService;
         this.current_tag_epc = current_tag_epc;
         this.model = model;
+        this.context = context;
     }
 
     @Override
@@ -85,6 +87,8 @@ public class SetPasswordDialog extends Dialog implements
                 public void run() {
                     int reval = iuhfService.set_Password(which, cur_pass,
                             new_pass);
+//                    byte[] pwdBytes = StringUtils.stringToByte("77777777");
+//                    int reval = iuhfService.write_area(0, 2, "00000000", pwdBytes);
                     Message message = new Message();
                     message.what = 1;
                     message.obj = reval;
@@ -103,6 +107,7 @@ public class SetPasswordDialog extends Dialog implements
             super.handleMessage(msg);
             if (msg.what == 1) {
                 int reval = (int) msg.obj;
+//                Toast.makeText(context, reval + "", Toast.LENGTH_SHORT);
                 if (reval == 0) {
                     EventBus.getDefault().post(new MsgEvent("setPWD_Status", ""));
                     dismiss();

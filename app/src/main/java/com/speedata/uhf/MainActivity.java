@@ -241,6 +241,7 @@ public class MainActivity extends Activity implements OnClickListener {
                     , Area_Select.getSelectedItemPosition(), current_tag_epc, modle);
             readTag.setTitle(R.string.Item_Read);
             readTag.show();
+
         } else if (arg0 == Write_Tag) {
             if (current_tag_epc == null) {
                 Status.setText(R.string.Status_No_Card_Select);
@@ -252,6 +253,19 @@ public class MainActivity extends Activity implements OnClickListener {
                     , current_tag_epc, modle);
             writeTag.setTitle(R.string.Item_Write);
             writeTag.show();
+
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    final int i = iuhfService.write_area(0, "2", "00000007", "2", "02288860");
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Toast.makeText(MainActivity.this, ""+i, Toast.LENGTH_SHORT).show();
+//                        }
+//                    });
+//                }
+//            }).start();
         } else if (arg0 == Search_Tag) {
 
             //盘点选卡

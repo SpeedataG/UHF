@@ -33,6 +33,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 //R2000 接口实现
 
 public class R2K implements IUHFService, OnInventoryListener, OnReadWriteListener {
@@ -108,10 +109,12 @@ public class R2K implements IUHFService, OnInventoryListener, OnReadWriteListene
             }
         } else if (rw_params.type == 3) {
             writeStatus = rw_params.status;
+            writeStatusLists.add(writeStatus);
         }
 
     }
 
+    private volatile List<Integer> writeStatusLists = new ArrayList<>();
     public static final int InvModeType = 0;
     public static final int InvAddrType = 1;
     public static final int InvSizeType = 2;
@@ -504,15 +507,22 @@ public class R2K implements IUHFService, OnInventoryListener, OnReadWriteListene
     }
 
     public int write_area(int area, int addr, String passwd, byte[] content) {
-        if ((content.length % 2) != 0) {
+        writeStatusLists.clear();
+        int length = content.length;
+        if ((length % 2) != 0) {
             return -3;
         }
-        if ((area >= 0) && (area <= 3) && ((content.length % 2) == 0)) {
+        if ((area >= 0) && (area <= 3) && ((length % 2) == 0)) {
             byte[] pwdBytes = StringUtils.stringToByte(passwd);
-            int status = getLinkage().Radio_WriteTag(content.length / 2,
+            int status = getLinkage().Radio_WriteTag(length / 2,
                     addr, area, pwdBytes, content);
             if (status == 0) {
-                SystemClock.sleep(200);
+                SystemClock.sleep(300);
+                for (Integer writeStatusList : writeStatusLists) {
+                    if (writeStatusList == 0) {
+                        return 0;
+                    }
+                }
                 return writeStatus;
             } else {
                 return -1;
@@ -522,6 +532,7 @@ public class R2K implements IUHFService, OnInventoryListener, OnReadWriteListene
     }
 
     public int write_area(int area, String addr, String pwd, String count, String content) {
+        writeStatusLists.clear();
         if (TextUtils.isEmpty(pwd)) {
             return -3;
         }
@@ -550,7 +561,12 @@ public class R2K implements IUHFService, OnInventoryListener, OnReadWriteListene
             int status = getLinkage().Radio_WriteTag(count,
                     addr, area, pwdBytes, stringToByte);
             if (status == 0) {
-                SystemClock.sleep(200);
+                SystemClock.sleep(300);
+                for (Integer writeStatusList : writeStatusLists) {
+                    if (writeStatusList == 0) {
+                        return 0;
+                    }
+                }
                 return writeStatus;
             } else {
                 return -1;
