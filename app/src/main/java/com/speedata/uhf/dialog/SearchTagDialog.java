@@ -262,12 +262,26 @@ public class SearchTagDialog extends Dialog implements
     }
 
     @Override
-    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+    public void onItemClick(AdapterView<?> arg0, View arg1,  int arg2,
                             long arg3) {
         // TODO Auto-generated method stub
         if (inSearch) {
             return;
         }
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                String epcStr = firm.get(arg2).epc;
+//                iuhfService.select_card(1, "", false);
+//                int res = iuhfService.select_card(1, epcStr, true);
+//                String area = iuhfService.read_area(1, "32", "1",
+//                        "00000000");
+//                Log.d("123zm", res+"run: "+area);
+////                Toast.makeText(cont, "" + area, Toast.LENGTH_SHORT).show();
+//            }
+//        }).start();
+
+
         String epcStr = firm.get(arg2).epc;
         int res = iuhfService.select_card(1, epcStr, true);
         if (res == 0) {

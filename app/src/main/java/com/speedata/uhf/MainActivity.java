@@ -242,6 +242,25 @@ public class MainActivity extends Activity implements OnClickListener {
             readTag.setTitle(R.string.Item_Read);
             readTag.show();
 
+
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    while (true) {
+//                        iuhfService.select_card(1, "", false);
+//                        String epc = iuhfService.read_area(1, "2", "6", "00000000");
+//                        if (!TextUtils.isEmpty(epc)) {
+//                            int selectCard = iuhfService.select_card(1, epc, true);
+//                            Log.d("ZM", "选卡: " + epc + "--" + selectCard);
+//                            String area = iuhfService.read_area(1, "2", "1",
+//                                    "00000000");
+//                            Log.d("ZM", "读卡: " + area + "--");
+//                        }
+//                    }
+//                }
+//            }).start();
+
+
         } else if (arg0 == Write_Tag) {
             if (current_tag_epc == null) {
                 Status.setText(R.string.Status_No_Card_Select);

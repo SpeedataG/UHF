@@ -413,7 +413,7 @@ public class R2K implements IUHFService, OnInventoryListener, OnReadWriteListene
         int Read_status = getLinkage().Radio_ReadTag(count / 2, addr, area, pwdBytes);
         if (Read_status == 0) {
 //            while ()
-            SystemClock.sleep(200);
+            SystemClock.sleep(400);
             return epcData;
         } else {
             return null;
