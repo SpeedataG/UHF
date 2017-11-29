@@ -126,13 +126,13 @@ public class UHFManager {
         boolean initResult = true;
         switch (factory) {
             case FACTORY_FEILIXIN:
-                iuhfService = new FLX_QiLian(mContext);
+                iuhfService = new FLX(mContext, 1);
                 break;
             case FACTORY_XINLIAN:
                 iuhfService = new XinLianQilian(mContext);
                 break;
             case FACTORY_R2000:
-                iuhfService = new R2K(mContext);
+                iuhfService = new FLX(mContext, 0);
                 break;
 //            case FACTORY_3992:
 //                iuhfService = new com.android.uhflibs.as3992_native(mContext);
@@ -171,7 +171,7 @@ public class UHFManager {
                 String xinghao = Build.MODEL;
                 if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")
                         || xinghao.equals("Biowolf LE") || xinghao.equals("FC-PK80")
-                        || xinghao.equals("FC-K80")) {
+                        || xinghao.equals("FC-K80")||xinghao.equals("T80")) {
                     powerOn(DeviceControl.PowerType.MAIN, 119);
                 } else if (xinghao.equals("KT55")) {
                     String readEm55 = readEm55();

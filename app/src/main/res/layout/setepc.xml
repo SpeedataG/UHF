@@ -35,6 +35,7 @@
             android:text="@string/Item_Access_Pswd" />
 
         <EditText
+            android:inputType="number"
             android:id="@+id/editText_epc_passwd"
             android:layout_width="240dp"
             android:layout_height="wrap_content"
@@ -57,6 +58,7 @@
             android:text="@string/Item_EPC_Length" />
 
         <EditText
+            android:inputType="number"
             android:id="@+id/editText_epc_epclength"
             android:layout_width="240dp"
             android:layout_height="wrap_content"
@@ -82,6 +84,7 @@
     </LinearLayout>
 
     <TextView
+        android:textColor="#f11304"
         android:id="@+id/textView_epc_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

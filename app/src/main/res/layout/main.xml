@@ -2,74 +2,85 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:padding="5dp"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:padding="5dp">
 
     <LinearLayout
-        android:id="@+id/linearLayout1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+    android:id="@+id/linearLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1">
 
-        <TextView
-            android:id="@+id/textView_item"
-            android:layout_width="80dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.03"
-            android:text="@string/Name_item" />
+    <TextView
+        android:id="@+id/textView_item"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.2"
+        android:gravity="center"
+        android:text="@string/Name_item" />
 
-        <TextView
-            android:id="@+id/textView_epc"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="0.87"
-            android:text="@string/TextView_Null" />
+    <TextView
+        android:id="@+id/textView_epc"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.8"
+        android:gravity="center"
+        android:text="@string/TextView_Null" />
 
-        <Button
-            android:id="@+id/btn_search"
-            android:layout_width="80dp"
-            android:layout_height="match_parent"
-            android:text="@string/Search_Btn_T" />
 
-    </LinearLayout>
+</LinearLayout>
+
 
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/spinner_area_text" />
 
         <Spinner
             android:id="@+id/spinner_area"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1" />
 
-        <Button
-            android:id="@+id/btn_read"
-            android:layout_width="80dp"
-            android:layout_height="match_parent"
-            android:text="@string/Read_Btn_T" />
 
-        <Button
-            android:id="@+id/btn_write"
-            android:layout_width="80dp"
-            android:layout_height="match_parent"
-            android:text="@string/Write_Btn_T" />
     </LinearLayout>
 
-    <EditText
-        android:background="@drawable/bg_edit"
-        android:id="@+id/editText_content"
+    <Button
+        android:id="@+id/btn_search"
         android:layout_width="match_parent"
-        android:layout_height="346dp"
-        android:layout_weight="0.73" >
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="@string/Search_Btn_T" />
 
-        <requestFocus />
-    </EditText>
+    <Button
+        android:id="@+id/btn_read"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="30dp"
+        android:layout_weight="1"
+        android:text="@string/Read_Btn_T" />
+
+    <Button
+        android:id="@+id/btn_write"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="30dp"
+        android:layout_weight="1"
+        android:text="@string/Write_Btn_T" />
+
 
     <LinearLayout
         android:id="@+id/linearLayout4"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="0dp"
+        android:layout_marginTop="30dp"
+        android:layout_weight="1">
 
         <Button
             android:id="@+id/btn_setpasswd"
@@ -98,20 +109,22 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/btn_set" />
+
         <Button
-            android:visibility="gone"
             android:id="@+id/btn_inv_set"
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="@string/inv_set" />
+            android:text="@string/inv_set"
+            android:visibility="gone" />
+
         <Button
-            android:visibility="gone"
             android:id="@+id/button_spt"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="0.03"
-            android:text="@string/spt" />
+            android:text="@string/spt"
+            android:visibility="gone" />
 
     </LinearLayout>
 
@@ -120,6 +133,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/TextView_Null" />
+
     <TextView
         android:id="@+id/textView_version"
         android:layout_width="match_parent"

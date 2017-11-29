@@ -3,7 +3,9 @@ package com.speedata.uhf.dialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
+import android.os.Message;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -12,10 +14,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.speedata.libuhf.IUHFService;
-import com.speedata.uhf.MsgEvent;
+import com.speedata.libuhf.bean.SpdWriteData;
+import com.speedata.libuhf.interfaces.OnSpdWriteListener;
+import com.speedata.libuhf.utils.StringUtils;
 import com.speedata.uhf.R;
-
-import org.greenrobot.eventbus.EventBus;
 
 /**
  * Created by 张明_ on 2016/12/28.
@@ -39,14 +41,15 @@ public class LockTagDialog extends Dialog implements
     private IUHFService iuhfService;
     private String current_tag_epc;
     private String model;
+    private boolean isSuccess = false;
 
-    public LockTagDialog(Context context,IUHFService iuhfService
-            ,String current_tag_epc,String model) {
+    public LockTagDialog(Context context, IUHFService iuhfService
+            , String current_tag_epc, String model) {
         super(context);
         // TODO Auto-generated constructor stub
-        this.iuhfService=iuhfService;
-        this.current_tag_epc=current_tag_epc;
-        this.model=model;
+        this.iuhfService = iuhfService;
+        this.current_tag_epc = current_tag_epc;
+        this.model = model;
     }
 
     @Override
@@ -78,39 +81,62 @@ public class LockTagDialog extends Dialog implements
                 .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         style = (Spinner) findViewById(R.id.spinner_lock_style);
         style.setAdapter(setadapter);
+        iuhfService.setOnWriteListener(new OnSpdWriteListener() {
+            @Override
+            public void getWriteData(SpdWriteData var1) {
+                StringBuilder stringBuilder = new StringBuilder();
+                byte[] epcData = var1.getEPCData();
+                String hexString = StringUtils.byteToHexString(epcData, var1.getEPCLen());
+                if (!TextUtils.isEmpty(hexString)) {
+                    stringBuilder.append("EPC：" + hexString + "\n");
+                }
+                if (var1.getStatus() == 0) {
+                    //状态判断，已经写卡成功了就不返回错误码了
+                    isSuccess = true;
+                    stringBuilder.append("WriteSuccess" + "\n");
+                    handler.sendMessage(handler.obtainMessage(1, stringBuilder));
+                } else {
+                    stringBuilder.append("WriteError：" + var1.getStatus() + "\n");
+                }
+                if (!isSuccess) {
+                    handler.sendMessage(handler.obtainMessage(1, stringBuilder));
+                }
 
+            }
+        });
     }
 
     @Override
     public void onClick(View v) {
         // TODO Auto-generated method stub
         if (v == Ok) {
-            int area_nr = area.getSelectedItemPosition();
-            int style_nr = style.getSelectedItemPosition();
-            String ps = passwd.getText().toString();
-            int reval = -1;
-            try {
-                long passwd;
-                if (model.equals("feilixin")) {
-                    passwd = Long.parseLong(ps);
-                } else {
-                    passwd = Long.parseLong(ps, 16);
+            final int area_nr = area.getSelectedItemPosition();
+            final int style_nr = style.getSelectedItemPosition();
+            final String ps = passwd.getText().toString();
+
+            Status.setText("正在锁卡中....");
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    int reval = iuhfService.newSetLock(style_nr, area_nr, ps);
+                    if (reval != 0) {
+                        handler.sendMessage(handler.obtainMessage(1,"参数不正确"));
+                    }
                 }
-                Log.i("as3992", "set lock to area " + area_nr + " type to "
-                        + style_nr + " " + passwd);
-                reval = iuhfService.setlock(style_nr, area_nr, (int) passwd);
-            } catch (NumberFormatException e) {
-                Status.setText("Not a vaild Hex number");
-                return;
-            }
-            if (reval == 0) {
-                EventBus.getDefault().post(new MsgEvent("lock_Status",""));
-                dismiss();
-            } else {
-                Status.setText(R.string.Status_Lock_Card_Error);
-            }
+            }).start();
         } else if (v == Cancle) {
             dismiss();
         }
     }
+
+
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == 1) {
+                Status.setText(msg.obj + "");
+            }
+        }
+    };
 }

@@ -16,10 +16,10 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.speedata.libuhf.IUHFService;
-import com.speedata.libuhf.bean.Tag_Data;
+import com.speedata.libuhf.bean.SpdInventoryData;
+import com.speedata.libuhf.interfaces.OnSpdInventoryListener;
 import com.speedata.uhf.MsgEvent;
 import com.speedata.uhf.R;
 
@@ -41,7 +41,6 @@ public class SearchTagDialog extends Dialog implements
     private ListView EpcList;
     private boolean inSearch = false;
     private List<EpcDataBase> firm = new ArrayList<EpcDataBase>();
-    private Handler handler = null;
     private ArrayAdapter<EpcDataBase> adapter;
     private Context cont;
     private SoundPool soundPool;
@@ -82,114 +81,63 @@ public class SearchTagDialog extends Dialog implements
         soundId = soundPool.load("/system/media/audio/ui/VideoRecord.ogg", 0);
         Log.w("as3992_6C", "id is " + soundId);
 
-        //inventory_start(handler) 方法参考代码
 
-        handler = new Handler() {
+        //新的Listener回调参考代码
+
+        adapter = new ArrayAdapter<EpcDataBase>(
+                cont, android.R.layout.simple_list_item_1, firm);
+        EpcList.setAdapter(adapter);
+
+        iuhfService.setOnInventoryListener(new OnSpdInventoryListener() {
             @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                if (msg.what == 1) {
+            public void getInventoryData(SpdInventoryData var1) {
+                handler.sendMessage(handler.obtainMessage(1, var1));
+            }
+        });
+    }
+
+    //新的Listener回调参考代码
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case 1:
                     scant++;
                     if (!cbb.isChecked()) {
                         if (scant % 10 == 0) {
                             soundPool.play(soundId, 1, 1, 0, 0, 1);
                         }
                     }
-                    ArrayList<Tag_Data> ks = (ArrayList<Tag_Data>) msg.obj;
-                    int i, j;
-                    for (i = 0; i < ks.size(); i++) {
-                        for (j = 0; j < firm.size(); j++) {
-                            if (ks.get(i).epc.equals(firm.get(j).epc)) {
-                                firm.get(j).valid++;
-                                firm.get(j).setRssi(ks.get(i).rssi);
-                                break;
-                            }
-                        }
-                        if (j == firm.size()) {
-                            firm.add(new EpcDataBase(ks.get(i).epc, 1,
-                                    ks.get(i).rssi, ks.get(i).tid));
-                            if (cbb.isChecked()) {
-                                soundPool.play(soundId, 1, 1, 0, 0, 1);
-                            }
+                    SpdInventoryData var1 = (SpdInventoryData) msg.obj;
+                    int j;
+                    for (j = 0; j < firm.size(); j++) {
+                        if (var1.epc.equals(firm.get(j).epc)) {
+                            firm.get(j).valid++;
+                            firm.get(j).setRssi(var1.rssi);
+                            break;
                         }
                     }
-                }
-
-                adapter = new ArrayAdapter<EpcDataBase>(
-                        cont, android.R.layout.simple_list_item_1, firm);
-                EpcList.setAdapter(adapter);
-                Status.setText("Total: " + firm.size());
-
+                    if (j == firm.size()) {
+                        firm.add(new EpcDataBase(var1.epc, 1,
+                                var1.rssi, var1.tid));
+                        if (cbb.isChecked()) {
+                            soundPool.play(soundId, 1, 1, 0, 0, 1);
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+                    Status.setText("Total: " + firm.size());
+                    break;
             }
-        };
 
-
-        //新的Listener回调参考代码
-
-//        adapter = new ArrayAdapter<EpcDataBase>(
-//                cont, android.R.layout.simple_list_item_1, firm);
-//        EpcList.setAdapter(adapter);
-//
-//        iuhfService.setListener(new IUHFService.Listener() {
-//            @Override
-//            public void update(Tag_Data var1) {
-//                handler.sendMessage(handler.obtainMessage(1, var1));
-//            }
-//        });
-    }
-
-    //新的Listener回调参考代码
-//    private Handler handler = new Handler() {
-//        @Override
-//        public void handleMessage(Message msg) {
-//            super.handleMessage(msg);
-//            switch (msg.what) {
-//                case 1:
-//                    scant++;
-//                    if (!cbb.isChecked()) {
-//                        if (scant % 10 == 0) {
-//                            soundPool.play(soundId, 1, 1, 0, 0, 1);
-//                        }
-//                    }
-//                    Tag_Data var1 = (Tag_Data) msg.obj;
-//                    byte[] nq = var1.epc;
-//                    if (nq != null) {
-//                        StringBuilder tmp = new StringBuilder("");
-//                        for (byte aNq : nq) {
-//                            tmp.append(String.format("%02x ", aNq));
-//                        }
-//                        final String finalTmp = tmp.toString();
-//
-//                        int i = 0;
-//                        for (int j = 0; j < firm.size(); j++) {
-//                            if (finalTmp.equals(firm.get(j).epc)) {
-//                                firm.get(j).valid++;
-//                                i++;
-//                                break;
-//                            }
-//                        }
-//                        if (i == 0) {
-//                            firm.add(new EpcDataBase(finalTmp, 1));
-//                            if (cbb.isChecked()) {
-//                                soundPool.play(soundId, 1, 1, 0, 0, 1);
-//                            }
-//                        }
-//                        adapter.notifyDataSetChanged();
-//                        Status.setText("Total: " + firm.size());
-//                    }
-//                    break;
-//
-//            }
-//
-//        }
-//    };
+        }
+    };
 
     @Override
     protected void onStop() {
         Log.w("stop", "im stopping");
         if (inSearch) {
-            iuhfService.inventory_stop();
-//            iuhfService.newInventoryStop();
+            iuhfService.newInventoryStop();
             inSearch = false;
         }
         soundPool.release();
@@ -205,11 +153,7 @@ public class SearchTagDialog extends Dialog implements
             if (inSearch) {
                 inSearch = false;
                 this.setCancelable(true);
-                int inventoryStop = iuhfService.inventory_stop();
-                if (inventoryStop != 0) {
-                    Toast.makeText(cont, "停止失败", Toast.LENGTH_SHORT).show();
-                }
-//                        iuhfService.newInventoryStop();
+                iuhfService.newInventoryStop();
 
                 Action.setText(R.string.Start_Search_Btn);
                 Cancle.setEnabled(true);
@@ -217,8 +161,10 @@ public class SearchTagDialog extends Dialog implements
                 inSearch = true;
                 this.setCancelable(false);
                 scant = 0;
+                //取消掩码
                 iuhfService.select_card(1, "", false);
-                iuhfService.inventory_start(handler);
+                EventBus.getDefault().post(new MsgEvent("CancelSelectCard",""));
+                iuhfService.newInventoryStart();
                 Action.setText(R.string.Stop_Search_Btn);
                 Cancle.setEnabled(false);
             }
@@ -262,25 +208,12 @@ public class SearchTagDialog extends Dialog implements
     }
 
     @Override
-    public void onItemClick(AdapterView<?> arg0, View arg1,  int arg2,
+    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
                             long arg3) {
         // TODO Auto-generated method stub
         if (inSearch) {
             return;
         }
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                String epcStr = firm.get(arg2).epc;
-//                iuhfService.select_card(1, "", false);
-//                int res = iuhfService.select_card(1, epcStr, true);
-//                String area = iuhfService.read_area(1, "32", "1",
-//                        "00000000");
-//                Log.d("123zm", res+"run: "+area);
-////                Toast.makeText(cont, "" + area, Toast.LENGTH_SHORT).show();
-//            }
-//        }).start();
-
 
         String epcStr = firm.get(arg2).epc;
         int res = iuhfService.select_card(1, epcStr, true);

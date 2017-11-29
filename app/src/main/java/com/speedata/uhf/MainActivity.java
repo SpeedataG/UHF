@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,7 +27,6 @@ import com.speedata.uhf.dialog.SearchTagDialog;
 import com.speedata.uhf.dialog.SetEPCDialog;
 import com.speedata.uhf.dialog.SetModuleDialog;
 import com.speedata.uhf.dialog.SetPasswordDialog;
-import com.speedata.uhf.dialog.SpeedTestDialog;
 import com.speedata.uhf.dialog.WriteTagDialog;
 
 import org.greenrobot.eventbus.EventBus;
@@ -48,7 +46,6 @@ public class MainActivity extends Activity implements OnClickListener {
     private Button Set_EPC;
     private Button Lock_Tag;
     private Button btn_inv_set;
-    private EditText Tag_Content;
     private IUHFService iuhfService;
     private String current_tag_epc = null;
     private Button Speedt;
@@ -105,6 +102,9 @@ public class MainActivity extends Activity implements OnClickListener {
         try {
             if (iuhfService != null) {
                 iuhfService.CloseDev();
+                //断点后选卡操作会失效，需要重新选卡（掩码）
+                current_tag_epc = null;
+                Cur_Tag_Info.setText("");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -115,20 +115,11 @@ public class MainActivity extends Activity implements OnClickListener {
     public void onEventMainThread(MsgEvent mEvent) {
         String type = mEvent.getType();
         String msg = (String) mEvent.getMsg();
-        if (type.equals("write_Status")) {
-            MainActivity.this.Status
-                    .setText(R.string.Status_Write_Card_Ok);
-        }
         if (type.equals("set_current_tag_epc")) {
             current_tag_epc = msg;
             Cur_Tag_Info.setText(msg);
             MainActivity.this.Status
                     .setText(R.string.Status_Select_Card_Ok);
-        }
-        if (type.equals("read_Status")) {
-            Tag_Content.setText(msg);
-            MainActivity.this.Status
-                    .setText(R.string.Status_Read_Card_Ok);
         }
         if (type.equals("setPWD_Status")) {
             MainActivity.this.Status
@@ -141,6 +132,11 @@ public class MainActivity extends Activity implements OnClickListener {
         if (type.equals("SetEPC_Status")) {
             MainActivity.this.Status
                     .setText(R.string.Status_Write_Card_Ok);
+        }
+        if (type.equals("CancelSelectCard")){
+            //断点后选卡操作会失效，需要重新选卡（掩码）
+            current_tag_epc = null;
+            Cur_Tag_Info.setText("");
         }
     }
 
@@ -155,12 +151,16 @@ public class MainActivity extends Activity implements OnClickListener {
                 init_progress++;
             }
         }
-
         if (init_progress == 1) {
             Log.w("3992_6C", "wake lock init failed");
         }
     }
 
+    /**
+     * 上电开串口
+     *
+     * @return
+     */
     private boolean openDev() {
         if (iuhfService.OpenDev() != 0) {
             Cur_Tag_Info.setText("Open serialport failed");
@@ -179,7 +179,6 @@ public class MainActivity extends Activity implements OnClickListener {
 
     private void initUI() {
         setContentView(R.layout.main);
-        Tag_Content = (EditText) findViewById(R.id.editText_content);
         Write_Tag = (Button) findViewById(R.id.btn_write);
         Write_Tag.setOnClickListener(this);
         Read_Tag = (Button) findViewById(R.id.btn_read);
@@ -234,6 +233,7 @@ public class MainActivity extends Activity implements OnClickListener {
         if (arg0 == Read_Tag) {
             if (current_tag_epc == null) {
                 Status.setText(R.string.Status_No_Card_Select);
+                Toast.makeText(this, R.string.Status_No_Card_Select, Toast.LENGTH_SHORT).show();
                 return;
             }
             //读卡
@@ -242,49 +242,19 @@ public class MainActivity extends Activity implements OnClickListener {
             readTag.setTitle(R.string.Item_Read);
             readTag.show();
 
-
-//            new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    while (true) {
-//                        iuhfService.select_card(1, "", false);
-//                        String epc = iuhfService.read_area(1, "2", "6", "00000000");
-//                        if (!TextUtils.isEmpty(epc)) {
-//                            int selectCard = iuhfService.select_card(1, epc, true);
-//                            Log.d("ZM", "选卡: " + epc + "--" + selectCard);
-//                            String area = iuhfService.read_area(1, "2", "1",
-//                                    "00000000");
-//                            Log.d("ZM", "读卡: " + area + "--");
-//                        }
-//                    }
-//                }
-//            }).start();
-
-
         } else if (arg0 == Write_Tag) {
             if (current_tag_epc == null) {
                 Status.setText(R.string.Status_No_Card_Select);
+                Toast.makeText(this, R.string.Status_No_Card_Select, Toast.LENGTH_SHORT).show();
                 return;
             }
             //写卡
             WriteTagDialog writeTag = new WriteTagDialog(this, iuhfService,
-                    Tag_Content.getText().toString(), Area_Select.getSelectedItemPosition()
+                    Area_Select.getSelectedItemPosition()
                     , current_tag_epc, modle);
             writeTag.setTitle(R.string.Item_Write);
             writeTag.show();
 
-//            new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    final int i = iuhfService.write_area(0, "2", "00000007", "2", "02288860");
-//                    runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            Toast.makeText(MainActivity.this, ""+i, Toast.LENGTH_SHORT).show();
-//                        }
-//                    });
-//                }
-//            }).start();
         } else if (arg0 == Search_Tag) {
 
             //盘点选卡
@@ -301,6 +271,7 @@ public class MainActivity extends Activity implements OnClickListener {
         } else if (arg0 == Set_Password) {
             if (current_tag_epc == null) {
                 Status.setText(R.string.Status_No_Card_Select);
+                Toast.makeText(this, R.string.Status_No_Card_Select, Toast.LENGTH_SHORT).show();
                 return;
             }
             //设置密码
@@ -311,6 +282,7 @@ public class MainActivity extends Activity implements OnClickListener {
         } else if (arg0 == Set_EPC) {
             if (current_tag_epc == null) {
                 Status.setText(R.string.Status_No_Card_Select);
+                Toast.makeText(this, R.string.Status_No_Card_Select, Toast.LENGTH_SHORT).show();
                 return;
             }
             //写EPC
@@ -320,6 +292,7 @@ public class MainActivity extends Activity implements OnClickListener {
         } else if (arg0 == Lock_Tag) {
             if (current_tag_epc == null) {
                 Status.setText(R.string.Status_No_Card_Select);
+                Toast.makeText(this, R.string.Status_No_Card_Select, Toast.LENGTH_SHORT).show();
                 return;
             }
             //锁
@@ -327,10 +300,6 @@ public class MainActivity extends Activity implements OnClickListener {
                     , current_tag_epc, modle);
             lockTagDialog.setTitle(R.string.Lock_Btn);
             lockTagDialog.show();
-        } else if (arg0 == Speedt) {
-            SpeedTestDialog sptd = new SpeedTestDialog(this, iuhfService);
-            sptd.setTitle("Speed Test");
-            sptd.show();
         } else if (arg0 == btn_inv_set) {
             //盘点内容设置
             InvSetDialog invSetDialog = new InvSetDialog(this, iuhfService);

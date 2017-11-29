@@ -91,4 +91,6 @@
     <string name="spt">speed\ntest</string>
     <string name="sptss">start</string>
     <string name="inv_set">Inv\nSet</string>
+    <string name="spinner_area_text">Read\Write Area</string>
+    <string name="write_content">Content(hex)</string>
 </resources>

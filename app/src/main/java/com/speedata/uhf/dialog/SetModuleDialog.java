@@ -29,7 +29,7 @@ public class SetModuleDialog extends Dialog implements View.OnClickListener {
     private final String[] freq_area_item = {"840-845", "920-925", "902-928", "865-868", "..."};
     //R2000模块频段
     private final String[] r2k_freq_area_item = {"840-845", "920-925", "902-928",
-            "920.5-924.5", "当前状态为定频", "..."};
+            "865-868", "当前状态为定频", "..."};
     private Button setf, back;
     private TextView status;
     private Spinner lf;
@@ -78,7 +78,7 @@ public class SetModuleDialog extends Dialog implements View.OnClickListener {
                 lf.setSelection(0, true);
             } else if (re == iuhfService.REGION_CHINA_902_928) {
                 lf.setSelection(2, true);
-            } else if (re == iuhfService.REGION_920_5_924_5) {
+            } else if (re == iuhfService.REGION_EURO_865_868) {
                 lf.setSelection(3, true);
             } else if (re == -1) {
                 lf.setSelection(5, true);

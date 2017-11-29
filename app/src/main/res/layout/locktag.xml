@@ -84,6 +84,7 @@
     </LinearLayout>
 
     <TextView
+        android:textColor="#f20707"
         android:id="@+id/textView_lock_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
