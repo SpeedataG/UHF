@@ -49,8 +49,12 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
     private ReadBean mRead = null;
     private android.serialport.DeviceControl newDeviceControl = null;
     private byte[] epcData;
+    private volatile boolean isReadOutTime = false;
+    private volatile boolean isReadSuccess = false;
     private int writeStatus;
     private int lockStatus;
+    private volatile boolean isLockOutTime = false;
+    private volatile boolean isLockSuccess = false;
     //    private volatile List<Integer> writeStatusLists = new ArrayList<>();
     public static final int InvModeType = 0;
     public static final int InvAddrType = 1;
@@ -162,14 +166,19 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             SpdReadData spdReadData = new SpdReadData();
             spdReadData.setEPCData(resultData);
             spdReadData.setEPCLen(rw_params.EPCLen);
+            Log.d("ZM", "读卡状态: " + rw_params.status);
             if (rw_params.status == 0) {
                 byte[] readResultData = new byte[rw_params.DataLen];
                 byte[] readData = rw_params.ReadData;
                 System.arraycopy(readData, 0, readResultData, 0, rw_params.DataLen);
                 spdReadData.setReadData(readResultData);
                 this.epcData = readResultData;
+                isReadSuccess = true;
+                isReadOutTime = true;
+                Log.d("ZM", "读卡状态: " + isReadSuccess + isReadOutTime);
             } else {
-                this.epcData = null;
+//                this.epcData = null;
+                isReadOutTime = true;
                 spdReadData.setReadData(null);
             }
             spdReadData.setDataLen(rw_params.DataLen);
@@ -193,6 +202,10 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         } else if (rw_params.type == 4 || rw_params.type == 5) {
             lockStatus = rw_params.status;
             Log.d("ZM", "锁卡状态: " + rw_params.status);
+            if (rw_params.status == 0) {
+                isLockSuccess = true;
+                isLockOutTime = true;
+            }
 
             SpdWriteData spdWriteData = new SpdWriteData();
             spdWriteData.setEPCData(resultData);
@@ -551,6 +564,8 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
 
     public int setlock(int type, int area, String passwd) {
         lockStatus = -1;
+        isLockOutTime = false;
+        isLockSuccess = false;
         int kp = Linkage.RFID_18K6C_TAG_PWD_PERM.NO_CHANGE.getValue();
         int ap = Linkage.RFID_18K6C_TAG_PWD_PERM.NO_CHANGE.getValue();
         int ta = Linkage.RFID_18K6C_TAG_MEM_PERM.NO_CHANGE.getValue();
@@ -579,8 +594,17 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             byte[] rpaswd = StringUtils.stringToByte(passwd);
             res = getLinkage().Radio_LockTag(rpaswd, ap, kp, ea, ta, ua);
             if (res == 0) {
-                SystemClock.sleep(500);
+                LockTimeOutThread timeOutThread = new LockTimeOutThread();
+                timeOutThread.start();
+
+                while (!isLockOutTime) {
+                    if (isLockSuccess) {
+                        return 0;
+                    }
+                }
                 return lockStatus;
+            } else {
+                return -1;
             }
         }
         return -1;
@@ -597,15 +621,28 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
 
     public byte[] read_area(int area, int addr, int count, String passwd) {
         epcData = null;
+        isReadOutTime = false;
+        isReadSuccess = false;
         if ((area > 3) || (area < 0)) {
             return null;
         }
         byte[] pwdBytes = StringUtils.stringToByte(passwd);
         int Read_status = getLinkage().Radio_ReadTag(count, addr, area, pwdBytes);
         if (Read_status == 0) {
-            SystemClock.sleep(500);
-            return epcData;
+            ReadTimeOutThread timeOutThread = new ReadTimeOutThread();
+            timeOutThread.start();
+
+            while (!isReadOutTime) {
+                Log.d("zm", "read_area-isReadSuccess状态： " + isReadSuccess + "isReadOutTime状态：" + isReadOutTime);
+                if (isReadSuccess) {
+                    Log.d("zm", "read_area: success");
+                    return epcData;
+                }
+            }
+            Log.d("zm", "read_area: failed");
+            return null;
         } else {
+            Log.d("zm", "read_area: failed");
             return null;
         }
     }
@@ -713,12 +750,14 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             byte[] pwdBytes = StringUtils.stringToByte(passwd);
             int status = getLinkage().Radio_WriteTag(count,
                     addr, area, pwdBytes, content);
+            Log.d("ZM", "write_card: 状态" + status);
             if (status == 0) {
                 TimeOutThread timeOutThread = new TimeOutThread();
                 timeOutThread.start();
 
                 while (!isWriteOutTime) {
                     if (isWriteSuccess) {
+                        Log.d("ZM", "write_card: 状态" + "成功");
                         return 0;
                     }
                 }
@@ -764,11 +803,13 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             byte[] pwdBytes = StringUtils.stringToByte(passwd);
             int status = getLinkage().Radio_WriteTag(count,
                     addr, area, pwdBytes, stringToByte);
+            Log.d("ZM", "write_card: 状态" + status);
             if (status == 0) {
                 TimeOutThread timeOutThread = new TimeOutThread();
                 timeOutThread.start();
                 while (!isWriteOutTime) {
                     if (isWriteSuccess) {
+                        Log.d("ZM", "write_card: 状态" + "成功");
                         return 0;
                     }
                 }
@@ -786,6 +827,24 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             super.run();
             SystemClock.sleep(1000);
             isWriteOutTime = true;
+        }
+    }
+
+    class LockTimeOutThread extends Thread {
+        @Override
+        public void run() {
+            super.run();
+            SystemClock.sleep(1000);
+            isLockOutTime = true;
+        }
+    }
+
+    class ReadTimeOutThread extends Thread {
+        @Override
+        public void run() {
+            super.run();
+            SystemClock.sleep(1000);
+            isReadOutTime = true;
         }
     }
 
