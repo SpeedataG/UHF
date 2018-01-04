@@ -28,6 +28,7 @@ import com.uhf.structures.OnReadWriteListener;
 import com.uhf.structures.RW_Params;
 import com.uhf.structures.Rfid_Value;
 import com.uhf.structures.SelectCriteria;
+import com.uhf.structures.TagGroup;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -281,7 +282,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            } else if (xinghao.equals("KT55")) {
+            } else if (xinghao.contains("KT55")) {
                 String readEm55 = readEm55();
                 if (readEm55.equals("80")) {
                     try {
@@ -509,6 +510,22 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             }
             byte[] rpaswd = StringUtils.stringToByte(passwd);
             return getLinkage().Radio_LockTag(rpaswd, ap, kp, ea, ta, ua);
+        }
+        return -1;
+    }
+
+    @Override
+    public int setQueryTagGroup(int selected, int session, int target) {
+        TagGroup tg = new TagGroup(selected, session, target);
+        return getLinkage().Radio_SetQueryTagGroup(tg);
+    }
+
+    @Override
+    public int getQueryTagGroup() {
+        TagGroup tagGroup = new TagGroup();
+        int value = getLinkage().Radio_GetQueryTagGroup(tagGroup);
+        if (value == 0) {
+            return tagGroup.session;
         }
         return -1;
     }

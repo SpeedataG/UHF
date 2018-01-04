@@ -173,7 +173,7 @@ public class UHFManager {
                         || xinghao.equals("Biowolf LE") || xinghao.equals("FC-PK80")
                         || xinghao.equals("FC-K80")||xinghao.equals("T80")) {
                     powerOn(DeviceControl.PowerType.MAIN, 119);
-                } else if (xinghao.equals("KT55")) {
+                } else if (xinghao.contains("KT55")) {
                     String readEm55 = readEm55();
                     if (readEm55.equals("80")) {
                         powerOn(DeviceControl.PowerType.MAIN_AND_EXPAND, 88, 7, 5);

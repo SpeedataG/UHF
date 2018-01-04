@@ -124,7 +124,7 @@ public class XinLianQilian implements IUHFService {
             }
         } else if (Build.VERSION.RELEASE.equals("5.1")) {
             String xinghao = Build.MODEL;
-            if (xinghao.equals("KT55")) {
+            if (xinghao.contains("KT55")) {
                 String readEm55 = readEm55();
                 if (readEm55.equals("80")) {
                     try {
@@ -641,6 +641,16 @@ public class XinLianQilian implements IUHFService {
             e.printStackTrace();
             return -1;
         }
+    }
+
+    @Override
+    public int setQueryTagGroup(int selected, int session, int target) {
+        return 0;
+    }
+
+    @Override
+    public int getQueryTagGroup() {
+        return 0;
     }
 
     //********************************************老版接口（不再维护）******************************************

@@ -112,6 +112,10 @@ public interface IUHFService {
      */
     public int newSetLock(int type, int area, String passwd) ;
 
+
+    public int setQueryTagGroup(int selected, int session, int target);
+    public int getQueryTagGroup();
+
     //********************************************老版接口（不再维护）***************************************************
 
 
