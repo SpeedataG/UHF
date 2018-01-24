@@ -79,6 +79,10 @@ public class UHFManager {
         iuhfService = null;
     }
 
+    public void unregisterBatteryReceiver() {
+        mContext.unregisterReceiver(batteryReceiver);
+    }
+
     /**
      * 广播接受者
      */
@@ -100,7 +104,13 @@ public class UHFManager {
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(mContext, "电量低禁用超高频", Toast.LENGTH_LONG).show();
+                                boolean cn = mContext.getResources().getConfiguration().locale.getCountry().equals("CN");
+                                if (cn) {
+                                    Toast.makeText(mContext, "电量低禁用超高频", Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(mContext, "Low power UHF is forbidden", Toast.LENGTH_LONG).show();
+                                }
+
                             }
                         });
 
@@ -171,7 +181,7 @@ public class UHFManager {
                 String xinghao = Build.MODEL;
                 if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")
                         || xinghao.equals("Biowolf LE") || xinghao.equals("FC-PK80")
-                        || xinghao.equals("FC-K80")||xinghao.equals("T80")) {
+                        || xinghao.equals("FC-K80") || xinghao.equals("T80")) {
                     powerOn(DeviceControl.PowerType.MAIN, 119);
                 } else if (xinghao.contains("KT55")) {
                     String readEm55 = readEm55();

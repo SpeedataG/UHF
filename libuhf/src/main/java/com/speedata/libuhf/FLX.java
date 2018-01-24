@@ -693,6 +693,9 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
 
     public int set_freq_region(int region) {
         int res = -1;
+        if (type == 1 && region == 0) {
+            region = 4;
+        }
         switch (region) {
             case REGION_CHINA_840_845:
                 res = getLinkage().Radio_MacSetRegion(0);
@@ -705,6 +708,9 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
                 break;
             case REGION_EURO_865_868:
                 res = getLinkage().Radio_MacSetRegion(3);
+                break;
+            case 4:
+                res = getLinkage().Radio_MacSetRegion(4);
                 break;
             case 6:
                 res = getLinkage().Radio_MacSetRegion(6);
@@ -733,10 +739,15 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         Rfid_Value rfid_value = new Rfid_Value();
         int result;
         // 定频
-        result = getLinkage().Radio_GetSingleFrequency(rfid_value);
+        if (type==1){
+            result = getLinkage().Radio_MacGetRegion(rfid_value);
+        }else {
+            result = getLinkage().Radio_GetSingleFrequency(rfid_value);
+        }
         if (result == 0) {
+            Log.d("zm", "get_freq_region: " + rfid_value.value);
             if (rfid_value.value < 840) {
-                if (rfid_value.value == 0) {
+                if (rfid_value.value == 0 || rfid_value.value == 4) {
                     return REGION_CHINA_840_845;
                 } else if (rfid_value.value == 1) {
                     return REGION_CHINA_920_925;
