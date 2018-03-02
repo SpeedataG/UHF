@@ -530,6 +530,46 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         return -1;
     }
 
+    @Override
+    public int Mask(int area, int addr, int length, byte[] content) {
+        int queryTagGroup = setQueryTagGroup(2, 2, 0);
+        if (queryTagGroup != 0) {
+            return queryTagGroup;
+        }
+
+        SelectCriteria selectCriteria = new SelectCriteria();
+        selectCriteria.status = 1;
+        selectCriteria.length = length;
+        selectCriteria.offset = addr;
+        selectCriteria.bank = area;
+        selectCriteria.session = 4;
+        selectCriteria.jq = 0;
+        selectCriteria.action = 0;
+        System.arraycopy(content, 0, selectCriteria.maskData, 0, content.length);
+        return getLinkage().set18K6CSelectCriteria(selectCriteria);
+    }
+
+    @Override
+    public int cancelMask() {
+        int queryTagGroup = setQueryTagGroup(0, 2, 0);
+        if (queryTagGroup != 0) {
+            return queryTagGroup;
+        }
+        getLinkage().set18K6CSelectCriteria(new SelectCriteria(0));
+        return 0;
+    }
+
+    @Override
+    public SelectCriteria getMask() {
+        int status;
+        SelectCriteria sc = new SelectCriteria();
+        status = getLinkage().get18K6CSelectCriteria(sc);
+        if (status == 0) {
+            return sc;
+        }
+        return null;
+    }
+
     //********************************************老版接口（不再维护）******************************************
 
 

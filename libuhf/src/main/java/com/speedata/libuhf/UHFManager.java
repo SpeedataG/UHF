@@ -9,7 +9,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.serialport.DeviceControl;
-import android.serialport.SerialPort;
+import android.serialport.SerialPortBackup;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -225,7 +225,7 @@ public class UHFManager {
      */
     private static String getModle() {
         String factory = "";
-        SerialPort serialPort = new SerialPort();
+        SerialPortBackup serialPort = new SerialPortBackup();
         try {
             serialPort.OpenSerial("/dev/ttyMT2", 115200);
         } catch (IOException e) {

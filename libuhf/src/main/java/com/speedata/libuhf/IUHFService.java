@@ -6,6 +6,7 @@ import android.os.Handler;
 import com.speedata.libuhf.interfaces.OnSpdInventoryListener;
 import com.speedata.libuhf.interfaces.OnSpdReadListener;
 import com.speedata.libuhf.interfaces.OnSpdWriteListener;
+import com.uhf.structures.SelectCriteria;
 
 /**
  * Created by brxu on 2016/12/13.
@@ -115,6 +116,29 @@ public interface IUHFService {
 
     public int setQueryTagGroup(int selected, int session, int target);
     public int getQueryTagGroup();
+
+
+    /**
+     * 掩码
+     * @param area 区域
+     * @param addr 起始地址 bit
+     * @param length 长度 bit
+     * @param content 掩码内容
+     * @return
+     */
+    public int Mask(int area, int addr, int length, byte[] content);
+
+    /**
+     * 取消选卡
+     * @return
+     */
+    public int cancelMask();
+
+    /**
+     * 获取掩码信息
+     * @return
+     */
+    public SelectCriteria getMask();
 
     //********************************************老版接口（不再维护）***************************************************
 

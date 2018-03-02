@@ -23,6 +23,7 @@ import com.speedata.libutils.ConfigUtils;
 import com.speedata.libutils.ReadBean;
 import com.uhf.api.cls.ErrInfo;
 import com.uhf.api.cls.Reader;
+import com.uhf.structures.SelectCriteria;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -651,6 +652,21 @@ public class XinLianQilian implements IUHFService {
     @Override
     public int getQueryTagGroup() {
         return 0;
+    }
+
+    @Override
+    public int Mask(int area, int addr, int length, byte[] content) {
+        return 0;
+    }
+
+    @Override
+    public int cancelMask() {
+        return 0;
+    }
+
+    @Override
+    public SelectCriteria getMask() {
+        return null;
     }
 
     //********************************************老版接口（不再维护）******************************************
