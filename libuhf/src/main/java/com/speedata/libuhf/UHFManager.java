@@ -14,10 +14,10 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.speedata.libuhf.utils.CommonUtils;
+import com.speedata.libuhf.utils.ConfigUtils;
+import com.speedata.libuhf.utils.ReadBean;
 import com.speedata.libuhf.utils.SharedXmlUtil;
-import com.speedata.libutils.CommonUtils;
-import com.speedata.libutils.ConfigUtils;
-import com.speedata.libutils.ReadBean;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -47,7 +47,7 @@ public class UHFManager {
     private final static String FACTORY_R2000 = "r2k";
     private final static String FACTORY_3992 = "as3992";
     private static int fd;
-    private static android.serialport.DeviceControl pw;
+    private static DeviceControl pw;
     private static Context mContext;
     private static BatteryReceiver batteryReceiver;
     private static ReadBean mRead;
@@ -72,6 +72,10 @@ public class UHFManager {
 
     public static void closeUHFService() {
         iuhfService = null;
+        unregisterReceiver();
+    }
+
+    public static void unregisterReceiver() {
         mContext.unregisterReceiver(batteryReceiver);
     }
 
@@ -96,7 +100,7 @@ public class UHFManager {
                 try {
                     //获取当前电量
                     int level = intent.getIntExtra("level", 0);
-                    if (level < 20) {
+                    if (level < 15) {
                         if (iuhfService != null) {
                             iuhfService.CloseDev();
                         }
@@ -177,7 +181,7 @@ public class UHFManager {
             Log.d("getModle_start", String.valueOf(System.currentTimeMillis()));
             if (Build.VERSION.RELEASE.equals("4.4.2")) {
                 powerOn(DeviceControl.PowerType.MAIN, 64);
-            } else if (Build.VERSION.RELEASE.equals("5.1")) {
+            } else {
                 String xinghao = Build.MODEL;
                 if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")
                         || xinghao.equals("Biowolf LE") || xinghao.equals("FC-PK80")
@@ -210,9 +214,9 @@ public class UHFManager {
         }
     }
 
-    private static void powerOn(android.serialport.DeviceControl.PowerType POWERCTL, int... gpios) {
+    private static void powerOn(DeviceControl.PowerType POWERCTL, int... gpios) {
         try {
-            pw = new android.serialport.DeviceControl(POWERCTL, gpios);
+            pw = new DeviceControl(POWERCTL, gpios);
             pw.PowerOnDevice();
         } catch (IOException e) {
             e.printStackTrace();

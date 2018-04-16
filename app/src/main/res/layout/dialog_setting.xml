@@ -52,6 +52,8 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/ll_session"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -85,7 +87,7 @@
             android:layout_width="60dp"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="频点:"
+            android:text="@string/pindian"
             android:textSize="15sp" />
 
         <EditText

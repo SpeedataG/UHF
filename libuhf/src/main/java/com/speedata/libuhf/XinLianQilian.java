@@ -17,10 +17,10 @@ import com.speedata.libuhf.interfaces.OnSpdInventoryListener;
 import com.speedata.libuhf.interfaces.OnSpdReadListener;
 import com.speedata.libuhf.interfaces.OnSpdWriteListener;
 import com.speedata.libuhf.utils.ByteCharStrUtils;
+import com.speedata.libuhf.utils.CommonUtils;
+import com.speedata.libuhf.utils.ConfigUtils;
+import com.speedata.libuhf.utils.ReadBean;
 import com.speedata.libuhf.utils.StringUtils;
-import com.speedata.libutils.CommonUtils;
-import com.speedata.libutils.ConfigUtils;
-import com.speedata.libutils.ReadBean;
 import com.uhf.api.cls.ErrInfo;
 import com.uhf.api.cls.Reader;
 import com.uhf.structures.SelectCriteria;
@@ -52,7 +52,7 @@ public class XinLianQilian implements IUHFService {
     private DeviceControl deviceControl;
     private Context mContext;
     private ReadBean mRead;
-    private android.serialport.DeviceControl newDeviceControl;
+    private DeviceControl newDeviceControl;
     private Thread myInvThread = null;
 
     public XinLianQilian(Context mContext) {
@@ -71,7 +71,7 @@ public class XinLianQilian implements IUHFService {
                 intArray[i] = mRead.getUhf().getGpio().get(i);
             }
             try {
-                newDeviceControl = new android.serialport.DeviceControl(powerType, intArray);
+                newDeviceControl = new DeviceControl(powerType, intArray);
                 newDeviceControl.PowerOnDevice();
                 Reader.READER_ERR er = Mreader.InitReader_Notype(mRead.getUhf().getSerialPort(), 1);
                 if (er == Reader.READER_ERR.MT_OK_ERR) {
@@ -123,7 +123,7 @@ public class XinLianQilian implements IUHFService {
             } else {
                 return -1;
             }
-        } else if (Build.VERSION.RELEASE.equals("5.1")) {
+        } else {
             String xinghao = Build.MODEL;
             if (xinghao.contains("KT55")) {
                 String readEm55 = readEm55();
@@ -193,8 +193,8 @@ public class XinLianQilian implements IUHFService {
                 }
             }
         }
-        Log.d(TAG, "OpenDev: end");
-        return -1;
+//        Log.d(TAG, "OpenDev: end");
+//        return -1;
     }
 
     //关闭模块

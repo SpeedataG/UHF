@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/UHF.iml" filepath="$PROJECT_DIR$/UHF.iml" />
       <module fileurl="file://$PROJECT_DIR$/androidSDK.iml" filepath="$PROJECT_DIR$/androidSDK.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/libuhf/libuhf.iml" filepath="$PROJECT_DIR$/libuhf/libuhf.iml" />
-      <module fileurl="file://$PROJECT_DIR$/uhf.iml" filepath="$PROJECT_DIR$/uhf.iml" />
     </modules>
   </component>
 </project>

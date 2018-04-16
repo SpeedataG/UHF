@@ -16,10 +16,10 @@ import com.speedata.libuhf.interfaces.OnSpdInventoryListener;
 import com.speedata.libuhf.interfaces.OnSpdReadListener;
 import com.speedata.libuhf.interfaces.OnSpdWriteListener;
 import com.speedata.libuhf.utils.ByteCharStrUtils;
+import com.speedata.libuhf.utils.CommonUtils;
+import com.speedata.libuhf.utils.ConfigUtils;
+import com.speedata.libuhf.utils.ReadBean;
 import com.speedata.libuhf.utils.StringUtils;
-import com.speedata.libutils.CommonUtils;
-import com.speedata.libutils.ConfigUtils;
-import com.speedata.libutils.ReadBean;
 import com.uhf.linkage.Linkage;
 import com.uhf.structures.InventoryData;
 import com.uhf.structures.InventoryParams;
@@ -48,7 +48,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
     private DeviceControl pw = null;
     private Context mContext = null;
     private ReadBean mRead = null;
-    private android.serialport.DeviceControl newDeviceControl = null;
+    private DeviceControl newDeviceControl = null;
     private byte[] epcData;
     private volatile boolean isReadOutTime = false;
     private volatile boolean isReadSuccess = false;
@@ -232,7 +232,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
                 intArray[i] = mRead.getUhf().getGpio().get(i);
             }
             try {
-                newDeviceControl = new android.serialport.DeviceControl(powerType, intArray);
+                newDeviceControl = new DeviceControl(powerType, intArray);
                 newDeviceControl.PowerOffDevice();
                 newDeviceControl.PowerOnDevice();
                 int result = getLinkage().open_serial(mRead.getUhf().getSerialPort());
@@ -272,7 +272,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else if (Build.VERSION.RELEASE.equals("5.1")) {
+        } else {
             String xinghao = Build.MODEL;
             if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")
                     || xinghao.equals("Biowolf LE") || xinghao.equals("FC-PK80")
@@ -779,9 +779,9 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         Rfid_Value rfid_value = new Rfid_Value();
         int result;
         // 定频
-        if (type==1){
+        if (type == 1) {
             result = getLinkage().Radio_MacGetRegion(rfid_value);
-        }else {
+        } else {
             result = getLinkage().Radio_GetSingleFrequency(rfid_value);
         }
         if (result == 0) {
