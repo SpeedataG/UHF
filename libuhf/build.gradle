@@ -19,6 +19,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    lintOptions {
+        abortOnError false
+    }
+
 }
 
 
@@ -26,7 +31,7 @@ android {
 def siteUrl = 'https://github.com/EchoXBR/speedata' // 项目的主页
 def gitUrl = 'https://github.com/EchoXBR/speedata.git' // Git仓库的url
 group = "com.speedata" //一般填你唯一的包名
-version = "7.5.3"
+version = "7.5.5"
 install {
     repositories.mavenInstaller {
         // This generates POM.xml with proper parameters
@@ -122,7 +127,7 @@ dependencies {
 //打包
 task buildJar(type: Jar, dependsOn: ['build']) {
 //导出的jar文件名称
-    archiveName = 'uhf_7.4.8.jar'
+    archiveName = 'uhf_7.5.4.jar'
 //从哪个目录打包jar
     from('build/intermediates/classes/debug')
 //导出的jar文件的存放目录（未指定则默认存放在buildbs下）

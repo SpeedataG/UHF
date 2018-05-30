@@ -85,6 +85,7 @@ public class MainActivity extends Activity implements OnClickListener {
         }
 
 
+        UHFManager.setStipulationLevel(0);
     }
 
     @Override
@@ -97,7 +98,6 @@ public class MainActivity extends Activity implements OnClickListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     @Override

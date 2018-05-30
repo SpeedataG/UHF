@@ -52,6 +52,7 @@ public class UHFManager {
     private static BatteryReceiver batteryReceiver;
     private static ReadBean mRead;
     private static String factory;
+    private static volatile int stipulationLevel = 15;
 
 
     public static IUHFService getUHFService(Context context) {
@@ -83,8 +84,8 @@ public class UHFManager {
         iuhfService = null;
     }
 
-    public void unregisterBatteryReceiver() {
-        mContext.unregisterReceiver(batteryReceiver);
+    public static void setStipulationLevel(int level) {
+        stipulationLevel = level;
     }
 
     /**
@@ -100,7 +101,7 @@ public class UHFManager {
                 try {
                     //获取当前电量
                     int level = intent.getIntExtra("level", 0);
-                    if (level < 15) {
+                    if (level < stipulationLevel) {
                         if (iuhfService != null) {
                             iuhfService.CloseDev();
                         }
