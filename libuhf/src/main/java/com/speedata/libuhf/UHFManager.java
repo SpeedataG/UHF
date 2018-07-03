@@ -103,7 +103,7 @@ public class UHFManager {
                     int level = intent.getIntExtra("level", 0);
                     if (level < stipulationLevel) {
                         if (iuhfService != null) {
-                            iuhfService.CloseDev();
+                            iuhfService.closeDev();
                         }
                         Handler handler = new Handler(Looper.getMainLooper());
                         handler.post(new Runnable() {

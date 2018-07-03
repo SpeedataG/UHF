@@ -69,7 +69,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         this.type = type;
     }
 
-    public int SetInvMode(int invm, int addr, int length) {
+    public int setInvMode(int invm, int addr, int length) {
         InventoryParams inventoryParams = new InventoryParams();
         inventoryParams.inventoryArea = invm;
         inventoryParams.address = addr;
@@ -77,7 +77,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         return getLinkage().Radio_SetInventoryParams(inventoryParams);
     }
 
-    public int GetInvMode(int type) {
+    public int getInvMode(int type) {
         InventoryParams inventoryParams = new InventoryParams();
         int i = getLinkage().Radio_GetInventoryParams(inventoryParams);
         if (i == 0) {
@@ -223,7 +223,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
      *
      * @return 0成功-1失败
      */
-    public int OpenDev() {
+    public int openDev() {
         if (ConfigUtils.isConfigFileExists() && !CommonUtils.subDeviceType().contains("55")) {
             mRead = ConfigUtils.readConfig(mContext);
             String powerType = mRead.getUhf().getPowerType();
@@ -246,7 +246,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
                 return -1;
             }
         } else {
-            return NoXmlOpenDev();
+            return NoXmlopenDev();
         }
     }
 
@@ -265,7 +265,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         return state;
     }
 
-    private int NoXmlOpenDev() {
+    private int NoXmlopenDev() {
         if (Build.VERSION.RELEASE.equals("4.4.2")) {
             try {
                 pw = new DeviceControl(DeviceControl.PowerType.MAIN, 64);
@@ -333,7 +333,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
     /**
      * 下电关串口
      */
-    public void CloseDev() {
+    public void closeDev() {
         getLinkage().close_serial();
         if (ConfigUtils.isConfigFileExists() && !CommonUtils.subDeviceType().contains("55")) {
             try {
@@ -383,14 +383,14 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
      * 开始盘点
      */
     @Override
-    public void newInventoryStart() {
+    public void inventoryStart() {
         getLinkage().startInventory(0);
     }
 
     /**
      * 停止盘点
      */
-    public void newInventoryStop() {
+    public void inventoryStop() {
         getLinkage().stopInventory();
     }
 
@@ -416,7 +416,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
     }
 
     @Override
-    public int newReadArea(int area, int addr, int count, String passwd) {
+    public int readArea(int area, int addr, int count, String passwd) {
         if ((area > 3) || (area < 0)) {
             return -1;
         }
@@ -448,7 +448,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
 
     }
 
-    public int newWriteArea(int area, int addr, int count, String passwd, byte[] content) {
+    public int writeArea(int area, int addr, int count, String passwd, byte[] content) {
         int length = content.length;
         if ((length % 2) != 0) {
             return -3;
@@ -466,16 +466,16 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
 
     //设置密码
     @Override
-    public int newSetPassword(int which, String cur_pass, String new_pass) {
+    public int setPassword(int which, String cur_pass, String new_pass) {
         if (which > 1 || which < 0) {
             return -1;
         }
         byte[] stringToByte = StringUtils.stringToByte(new_pass);
         try {
             if (which == 0) {
-                return newWriteArea(0, 0, 2, cur_pass, stringToByte);
+                return writeArea(0, 0, 2, cur_pass, stringToByte);
             } else {
-                return newWriteArea(0, 2, 2, cur_pass, stringToByte);
+                return writeArea(0, 2, 2, cur_pass, stringToByte);
             }
         } catch (NumberFormatException e) {
             return -1;
@@ -483,7 +483,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
     }
 
     @Override
-    public int newSetLock(int type, int area, String passwd) {
+    public int setLock(int type, int area, String passwd) {
         int kp = Linkage.RFID_18K6C_TAG_PWD_PERM.NO_CHANGE.getValue();
         int ap = Linkage.RFID_18K6C_TAG_PWD_PERM.NO_CHANGE.getValue();
         int ta = Linkage.RFID_18K6C_TAG_MEM_PERM.NO_CHANGE.getValue();
@@ -531,7 +531,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
     }
 
     @Override
-    public int Mask(int area, int addr, int length, byte[] content) {
+    public int mask(int area, int addr, int length, byte[] content) {
         int queryTagGroup = setQueryTagGroup(2, 2, 0);
         if (queryTagGroup != 0) {
             return queryTagGroup;
@@ -731,7 +731,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         return StringUtils.byteToHexString(v, count);
     }
 
-    public int set_freq_region(int region) {
+    public int setFreqRegion(int region) {
         int res = -1;
         if (type == 1 && region == 0) {
             region = 4;
@@ -775,7 +775,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         return 0;
     }
 
-    public int get_freq_region() {
+    public int getFreqRegion() {
         Rfid_Value rfid_value = new Rfid_Value();
         int result;
         // 定频
@@ -785,7 +785,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             result = getLinkage().Radio_GetSingleFrequency(rfid_value);
         }
         if (result == 0) {
-            Log.d("zm", "get_freq_region: " + rfid_value.value);
+            Log.d("zm", "getFreqRegion: " + rfid_value.value);
             if (rfid_value.value < 840) {
                 if (rfid_value.value == 0 || rfid_value.value == 4) {
                     return REGION_CHINA_840_845;
@@ -919,7 +919,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
     private final int ANTENNA_P_MIN = 10;
     private final int ANTENNA_P_MAX = 30;
 
-    public int set_antenna_power(int power) {
+    public int setAntennaPower(int power) {
         int res = -1;
         if ((power >= ANTENNA_P_MIN) && (power <= ANTENNA_P_MAX)) {
             res = getLinkage().Radio_SetAntennaPower(power * 10);
@@ -927,7 +927,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         return res;
     }
 
-    public int get_antenna_power() {
+    public int getAntennaPower() {
         Rfid_Value rv = new Rfid_Value();
         int p = getLinkage().Radio_GetAntennaPower(rv);
         if (p != 0) {
@@ -954,7 +954,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
     }
 
     @Override
-    public int select_card(int bank, byte[] epc, boolean mFlag) {
+    public int selectCard(int bank, byte[] epc, boolean mFlag) {
         SelectCriteria selectCriteria = new SelectCriteria();
         if (mFlag) {
             selectCriteria.status = 1;
@@ -974,9 +974,9 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
 
     }
 
-    public int select_card(int bank, String epc, boolean mFlag) {
+    public int selectCard(int bank, String epc, boolean mFlag) {
         byte[] writeByte = StringUtils.stringToByte(epc);
-        return select_card(bank, writeByte, mFlag);
+        return selectCard(bank, writeByte, mFlag);
     }
 
     //设置密码

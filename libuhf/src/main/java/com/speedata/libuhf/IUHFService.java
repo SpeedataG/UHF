@@ -34,10 +34,10 @@ public interface IUHFService {
     //*************************************************共用接口*********************************************************
 
     //默认参数初始化模块上电
-    public int OpenDev();
+    public int openDev();
 
     //释放模块下电
-    public void CloseDev();
+    public void closeDev();
 
     //*************************************************新版接口*********************************************************
 
@@ -51,12 +51,12 @@ public interface IUHFService {
     /**
      * 开始盘点
      */
-    public void newInventoryStart();
+    public void inventoryStart();
 
     /**
      * 停止盘点
      */
-    public void newInventoryStop();
+    public void inventoryStop();
 
     /**
      * 设置读数据监听
@@ -74,7 +74,7 @@ public interface IUHFService {
      * @param passwd 密码
      * @return 0成功-1失败
      */
-    public int newReadArea(int area, int addr, int count, String passwd);
+    public int readArea(int area, int addr, int count, String passwd);
 
     /**
      * 设置写数据监听
@@ -92,7 +92,7 @@ public interface IUHFService {
      * @param content 内容
      * @return
      */
-    public int newWriteArea(int area, int addr, int count, String passwd, byte[] content);
+    public int writeArea(int area, int addr, int count, String passwd, byte[] content);
 
     /**
      * 设置密码
@@ -102,7 +102,7 @@ public interface IUHFService {
      * @param new_pass 新密码
      * @return 是否成功通过setOnWriteListener监听回调所得
      */
-    public int newSetPassword(int which, String cur_pass, String new_pass);
+    public int setPassword(int which, String cur_pass, String new_pass);
 
     /**
      * 锁卡
@@ -111,7 +111,7 @@ public interface IUHFService {
      * @param passwd
      * @return
      */
-    public int newSetLock(int type, int area, String passwd) ;
+    public int setLock(int type, int area, String passwd) ;
 
 
     public int setQueryTagGroup(int selected, int session, int target);
@@ -126,7 +126,7 @@ public interface IUHFService {
      * @param content 掩码内容
      * @return
      */
-    public int Mask(int area, int addr, int length, byte[] content);
+    public int mask(int area, int addr, int length, byte[] content);
 
     /**
      * 取消选卡
@@ -178,21 +178,21 @@ public interface IUHFService {
 
 
     //选中要进行操作的 epc 标签
-    public int select_card(int bank, byte[] epc, boolean mFlag);
+    public int selectCard(int bank, byte[] epc, boolean mFlag);
 
-    public int select_card(int bank, String epc, boolean mFlag);
+    public int selectCard(int bank, String epc, boolean mFlag);
 
 
     //设置天线功率
-    public int set_antenna_power(int power);
+    public int setAntennaPower(int power);
 
     //读取当前天线功率值
-    public int get_antenna_power();
+    public int getAntennaPower();
 
     //设置频率区域
-    public int set_freq_region(int region);
+    public int setFreqRegion(int region);
 
-    public int get_freq_region();
+    public int getFreqRegion();
 
     //设置盘点的handler
     public void reg_handler(Handler hd);
@@ -202,9 +202,9 @@ public interface IUHFService {
     //拿到最近一次详细内部错误信息
     public String GetLastDetailError();
 
-    public int SetInvMode(int invm, int addr, int length);
+    public int setInvMode(int invm, int addr, int length);
 
-    public int GetInvMode(int type);
+    public int getInvMode(int type);
 
     //设置频点
     public int setFrequency(double frequency);

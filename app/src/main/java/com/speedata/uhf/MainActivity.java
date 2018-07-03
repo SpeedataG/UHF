@@ -105,7 +105,7 @@ public class MainActivity extends Activity implements OnClickListener {
         super.onStop();
         try {
             if (iuhfService != null) {
-                iuhfService.CloseDev();
+                iuhfService.closeDev();
                 //断点后选卡操作会失效，需要重新选卡（掩码）
                 current_tag_epc = null;
                 Cur_Tag_Info.setText("");
@@ -142,6 +142,7 @@ public class MainActivity extends Activity implements OnClickListener {
             current_tag_epc = null;
             Cur_Tag_Info.setText("");
         }
+
     }
 
     private void newWakeLock() {
@@ -166,7 +167,7 @@ public class MainActivity extends Activity implements OnClickListener {
      * @return
      */
     private boolean openDev() {
-        if (iuhfService.OpenDev() != 0) {
+        if (iuhfService.openDev() != 0) {
             Cur_Tag_Info.setText("Open serialport failed");
             new AlertDialog.Builder(this).setTitle(R.string.DIA_ALERT).setMessage(R.string.DEV_OPEN_ERR).setPositiveButton(R.string.DIA_CHECK, new DialogInterface.OnClickListener() {
 

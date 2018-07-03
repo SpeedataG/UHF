@@ -61,8 +61,8 @@ public class XinLianQilian implements IUHFService {
 
 
     //初始化模块
-    public int OpenDev() {
-        Log.d(TAG, "OpenDev: start");
+    public int openDev() {
+        Log.d(TAG, "openDev: start");
         if (ConfigUtils.isConfigFileExists() && !CommonUtils.subDeviceType().contains("55")) {
             mRead = ConfigUtils.readConfig(mContext);
             String powerType = mRead.getUhf().getPowerType();
@@ -85,7 +85,7 @@ public class XinLianQilian implements IUHFService {
                 return -1;
             }
         } else {
-            return NoXmlOpenDEV();
+            return NoXmlopenDev();
         }
 
     }
@@ -107,7 +107,7 @@ public class XinLianQilian implements IUHFService {
         return state;
     }
 
-    private int NoXmlOpenDEV() {
+    private int NoXmlopenDev() {
         Log.d("xl_1", String.valueOf(System.currentTimeMillis()));
         if (Build.VERSION.RELEASE.equals("4.4.2")) {
             try {
@@ -193,13 +193,13 @@ public class XinLianQilian implements IUHFService {
                 }
             }
         }
-//        Log.d(TAG, "OpenDev: end");
+//        Log.d(TAG, "openDev: end");
 //        return -1;
     }
 
     //关闭模块
-    public void CloseDev() {
-        Log.d(TAG, "CloseDev: start");
+    public void closeDev() {
+        Log.d(TAG, "closeDev: start");
         if (Mreader != null)
             Mreader.CloseReader();
         if (ConfigUtils.isConfigFileExists() && !CommonUtils.subDeviceType().contains("55")) {
@@ -215,7 +215,7 @@ public class XinLianQilian implements IUHFService {
                 e.printStackTrace();
             }
         }
-        Log.d(TAG, "CloseDev: end");
+        Log.d(TAG, "closeDev: end");
 
     }
 
@@ -249,14 +249,14 @@ public class XinLianQilian implements IUHFService {
      * 开始盘点
      */
     @Override
-    public void newInventoryStart() {
+    public void inventoryStart() {
         inventory_start();
     }
 
     /**
      * 停止盘点
      */
-    public void newInventoryStop() {
+    public void inventoryStop() {
         if (!inSearch) {
             return;
         }
@@ -297,7 +297,7 @@ public class XinLianQilian implements IUHFService {
     }
 
     @Override
-    public int newReadArea(int area, int addr, int count, String passwd) {
+    public int readArea(int area, int addr, int count, String passwd) {
         Log.d(TAG, "read_area: start22222");
         if ((area > 3) || (area < 0)) {
             return -3;
@@ -439,7 +439,7 @@ public class XinLianQilian implements IUHFService {
 
     }
 
-    public int newWriteArea(int area, int addr, int count, String passwd, byte[] content) {
+    public int writeArea(int area, int addr, int count, String passwd, byte[] content) {
         Log.d(TAG, "write_area: start22222");
         try {
             if ((content.length % 2) != 0) {
@@ -541,16 +541,16 @@ public class XinLianQilian implements IUHFService {
 
     //设置密码
     @Override
-    public int newSetPassword(int which, String cur_pass, String new_pass) {
+    public int setPassword(int which, String cur_pass, String new_pass) {
         if (which > 1 || which < 0) {
             return -1;
         }
         byte[] stringToByte = StringUtils.stringToByte(new_pass);
         try {
             if (which == 0) {
-                return newWriteArea(0, 0, 2, cur_pass, stringToByte);
+                return writeArea(0, 0, 2, cur_pass, stringToByte);
             } else {
-                return newWriteArea(0, 2, 2, cur_pass, stringToByte);
+                return writeArea(0, 2, 2, cur_pass, stringToByte);
             }
 
         } catch (NumberFormatException e) {
@@ -559,7 +559,7 @@ public class XinLianQilian implements IUHFService {
     }
 
     //设定区域锁定状态。
-    public int newSetLock(int type, int area, String passwd) {
+    public int setLock(int type, int area, String passwd) {
         try {
             Reader.Lock_Obj lobj = null;
             Reader.Lock_Type ltyp = null;
@@ -655,7 +655,7 @@ public class XinLianQilian implements IUHFService {
     }
 
     @Override
-    public int Mask(int area, int addr, int length, byte[] content) {
+    public int mask(int area, int addr, int length, byte[] content) {
         return 0;
     }
 
@@ -969,7 +969,7 @@ public class XinLianQilian implements IUHFService {
 
 
     //选中要进行操作的 epc 标签
-    public int select_card(int bank, byte[] epc, boolean mFlag) {
+    public int selectCard(int bank, byte[] epc, boolean mFlag) {
         Reader.READER_ERR er;
         try {
             if (mFlag) {
@@ -998,23 +998,23 @@ public class XinLianQilian implements IUHFService {
 
     }
 
-    public int select_card(int bank, String epc, boolean mFlag) {
-        Log.d(TAG, "select_card: start");
+    public int selectCard(int bank, String epc, boolean mFlag) {
+        Log.d(TAG, "selectCard: start");
         if (!mFlag) {
             epc = "0000";
         }
         byte[] writeByte = ByteCharStrUtils.toByteArray(epc);
-        if (select_card(bank, writeByte, mFlag) != 0) {
-            Log.d(TAG, "select_card: failed");
+        if (selectCard(bank, writeByte, mFlag) != 0) {
+            Log.d(TAG, "selectCard: failed");
             return -1;
         }
-        Log.d(TAG, "select_card: end");
+        Log.d(TAG, "selectCard: end");
         return 0;
     }
 
 
     //设置天线功率
-    public int set_antenna_power(int power) {
+    public int setAntennaPower(int power) {
         Reader.AntPowerConf apcf = Mreader.new AntPowerConf();
         apcf.antcnt = antportc;
         int[] rpow = new int[apcf.antcnt];
@@ -1046,7 +1046,7 @@ public class XinLianQilian implements IUHFService {
     }
 
     //读取当前天线功率值
-    public int get_antenna_power() {
+    public int getAntennaPower() {
         int rv = 0;
         try {
             Reader.AntPowerConf apcf2 = Mreader.new AntPowerConf();
@@ -1166,7 +1166,7 @@ public class XinLianQilian implements IUHFService {
 
 
     //设置频率区域
-    public int set_freq_region(int region) {
+    public int setFreqRegion(int region) {
         try {
             Reader.Region_Conf rre;
             switch (region) {
@@ -1201,7 +1201,7 @@ public class XinLianQilian implements IUHFService {
         return 0;
     }
 
-    public int get_freq_region() {
+    public int getFreqRegion() {
         try {
             Reader.Region_Conf[] rcf2 = new Reader.Region_Conf[1];
             Reader.READER_ERR er = Mreader.ParamGet(
@@ -1246,12 +1246,12 @@ public class XinLianQilian implements IUHFService {
     }
 
     @Override
-    public int SetInvMode(int invm, int addr, int length) {
+    public int setInvMode(int invm, int addr, int length) {
         return 0;
     }
 
     @Override
-    public int GetInvMode(int type) {
+    public int getInvMode(int type) {
         return 0;
     }
 
