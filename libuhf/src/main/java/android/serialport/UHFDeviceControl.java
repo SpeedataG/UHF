@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class DeviceControl {
+public class UHFDeviceControl {
     //kt系列
     public static final String POWER_MAIN = "/sys/class/misc/mtgpio/pin";
     //tt系列
@@ -37,7 +37,7 @@ public class DeviceControl {
     private String poweroff = "";
     private String currentPath = "";
 
-    public DeviceControl(String path) throws IOException {
+    public UHFDeviceControl(String path) throws IOException {
         File DeviceName = new File(path);
         CtrlFile = new BufferedWriter(new FileWriter(DeviceName, false));    //open file
         currentPath = path;
@@ -66,7 +66,7 @@ public class DeviceControl {
      * @param gpios      若为主板上电 gpio[0]需为主板gpio 扩展gpio可以有多个
      * @throws IOException
      */
-    public DeviceControl(PowerType power_type, int... gpios) throws IOException {
+    public UHFDeviceControl(PowerType power_type, int... gpios) throws IOException {
         this.gpios = gpios;
         this.power_type = power_type;
     }
@@ -76,7 +76,7 @@ public class DeviceControl {
      * @param gpios      若为主板上电 gpio[0]需为主板gpio 扩展gpio可以有多个
      * @throws IOException
      */
-    public DeviceControl(String power_type, int... gpios) throws IOException {
+    public UHFDeviceControl(String power_type, int... gpios) throws IOException {
         this.gpios = gpios;
         switch (power_type) {
             case "MAIN":
@@ -98,10 +98,10 @@ public class DeviceControl {
      * @throws IOException
      */
     public void MainPowerOn(int gpio) throws IOException {
-        DeviceControl deviceControl = new DeviceControl(DeviceControl.POWER_MAIN);
-        deviceControl.setGpio(gpio);
-        deviceControl.writeON();
-        deviceControl.DeviceClose();
+        UHFDeviceControl UHFDeviceControl = new UHFDeviceControl(POWER_MAIN);
+        UHFDeviceControl.setGpio(gpio);
+        UHFDeviceControl.writeON();
+        UHFDeviceControl.DeviceClose();
     }
 
     /**
@@ -111,10 +111,10 @@ public class DeviceControl {
      * @throws IOException
      */
     public void MainPowerOff(int gpio) throws IOException {
-        DeviceControl deviceControl = new DeviceControl(DeviceControl.POWER_MAIN);
-        deviceControl.setGpio(gpio);
-        deviceControl.WriteOff();
-        deviceControl.DeviceClose();
+        UHFDeviceControl UHFDeviceControl = new UHFDeviceControl(POWER_MAIN);
+        UHFDeviceControl.setGpio(gpio);
+        UHFDeviceControl.WriteOff();
+        UHFDeviceControl.DeviceClose();
     }
 
     /**
@@ -124,10 +124,10 @@ public class DeviceControl {
      * @throws IOException
      */
     public void ExpandPowerOn(int gpio) throws IOException {
-        DeviceControl deviceControl = new DeviceControl(DeviceControl.POWER_EXTERNAL);
-        deviceControl.setGpio(gpio);
-        deviceControl.writeON();
-        deviceControl.DeviceClose();
+        UHFDeviceControl UHFDeviceControl = new UHFDeviceControl(POWER_EXTERNAL);
+        UHFDeviceControl.setGpio(gpio);
+        UHFDeviceControl.writeON();
+        UHFDeviceControl.DeviceClose();
     }
 
     /**
@@ -137,10 +137,10 @@ public class DeviceControl {
      * @throws IOException
      */
     public void ExpandPowerOff(int gpio) throws IOException {
-        DeviceControl deviceControl = new DeviceControl(DeviceControl.POWER_EXTERNAL);
-        deviceControl.setGpio(gpio);
-        deviceControl.WriteOff();
-        deviceControl.DeviceClose();
+        UHFDeviceControl UHFDeviceControl = new UHFDeviceControl(POWER_EXTERNAL);
+        UHFDeviceControl.setGpio(gpio);
+        UHFDeviceControl.WriteOff();
+        UHFDeviceControl.DeviceClose();
     }
 
 

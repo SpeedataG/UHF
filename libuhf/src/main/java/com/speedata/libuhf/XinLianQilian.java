@@ -6,7 +6,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
-import android.serialport.DeviceControl;
+import android.serialport.UHFDeviceControl;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -49,10 +49,10 @@ public class XinLianQilian implements IUHFService {
     private Handler handler = new Handler();
     public boolean nostop = false;
     Reader.TagFilter_ST g2tf = null;
-    private DeviceControl deviceControl;
+    private UHFDeviceControl deviceControl;
     private Context mContext;
     private ReadBean mRead;
-    private DeviceControl newDeviceControl;
+    private UHFDeviceControl newUHFDeviceControl;
     private Thread myInvThread = null;
 
     public XinLianQilian(Context mContext) {
@@ -71,8 +71,8 @@ public class XinLianQilian implements IUHFService {
                 intArray[i] = mRead.getUhf().getGpio().get(i);
             }
             try {
-                newDeviceControl = new DeviceControl(powerType, intArray);
-                newDeviceControl.PowerOnDevice();
+                newUHFDeviceControl = new UHFDeviceControl(powerType, intArray);
+                newUHFDeviceControl.PowerOnDevice();
                 Reader.READER_ERR er = Mreader.InitReader_Notype(mRead.getUhf().getSerialPort(), 1);
                 if (er == Reader.READER_ERR.MT_OK_ERR) {
                     antportc = 1;
@@ -111,7 +111,7 @@ public class XinLianQilian implements IUHFService {
         Log.d("xl_1", String.valueOf(System.currentTimeMillis()));
         if (Build.VERSION.RELEASE.equals("4.4.2")) {
             try {
-                deviceControl = new DeviceControl(DeviceControl.PowerType.MAIN, 64);
+                deviceControl = new UHFDeviceControl(UHFDeviceControl.PowerType.MAIN, 64);
                 deviceControl.PowerOnDevice();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -125,11 +125,11 @@ public class XinLianQilian implements IUHFService {
             }
         } else {
             String xinghao = Build.MODEL;
-            if (xinghao.contains("KT55")) {
+            if (xinghao.contains("55")) {
                 String readEm55 = readEm55();
                 if (readEm55.equals("80")) {
                     try {
-                        deviceControl = new DeviceControl(DeviceControl.PowerType.MAIN_AND_EXPAND
+                        deviceControl = new UHFDeviceControl(UHFDeviceControl.PowerType.MAIN_AND_EXPAND
                                 , 88, 7, 5);
                         deviceControl.PowerOnDevice();
                     } catch (IOException e) {
@@ -138,7 +138,7 @@ public class XinLianQilian implements IUHFService {
 
                 } else if (readEm55.equals("48") || readEm55.equals("81")) {
                     try {
-                        deviceControl = new DeviceControl(DeviceControl.PowerType.MAIN_AND_EXPAND
+                        deviceControl = new UHFDeviceControl(UHFDeviceControl.PowerType.MAIN_AND_EXPAND
                                 , 88, 7, 6);
                         deviceControl.PowerOnDevice();
                     } catch (IOException e) {
@@ -146,7 +146,7 @@ public class XinLianQilian implements IUHFService {
                     }
                 } else {
                     try {
-                        deviceControl = new DeviceControl(DeviceControl.PowerType.MAIN, 88);
+                        deviceControl = new UHFDeviceControl(UHFDeviceControl.PowerType.MAIN, 88);
                         deviceControl.PowerOnDevice();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -162,9 +162,9 @@ public class XinLianQilian implements IUHFService {
                 }
             } else if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")
                     || xinghao.equals("Biowolf LE") || xinghao.equals("FC-PK80")
-                    || xinghao.equals("FC-K80") || xinghao.equals("T80")) {
+                    || xinghao.equals("FC-K80") || xinghao.equals("T80") || xinghao.contains("80")) {
                 try {
-                    deviceControl = new DeviceControl(DeviceControl.PowerType.MAIN, 119);
+                    deviceControl = new UHFDeviceControl(UHFDeviceControl.PowerType.MAIN, 119);
                     deviceControl.PowerOnDevice();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -179,7 +179,7 @@ public class XinLianQilian implements IUHFService {
 
             } else {
                 try {
-                    deviceControl = new DeviceControl(DeviceControl.PowerType.MAIN, 94);
+                    deviceControl = new UHFDeviceControl(UHFDeviceControl.PowerType.MAIN, 94);
                     deviceControl.PowerOnDevice();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -204,7 +204,7 @@ public class XinLianQilian implements IUHFService {
             Mreader.CloseReader();
         if (ConfigUtils.isConfigFileExists() && !CommonUtils.subDeviceType().contains("55")) {
             try {
-                newDeviceControl.PowerOffDevice();
+                newUHFDeviceControl.PowerOffDevice();
             } catch (IOException e) {
                 e.printStackTrace();
             }

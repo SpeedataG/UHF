@@ -8,7 +8,7 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.serialport.DeviceControl;
+import android.serialport.UHFDeviceControl;
 import android.serialport.SerialPortBackup;
 import android.text.TextUtils;
 import android.util.Log;
@@ -47,7 +47,7 @@ public class UHFManager {
     private final static String FACTORY_R2000 = "r2k";
     private final static String FACTORY_3992 = "as3992";
     private static int fd;
-    private static DeviceControl pw;
+    private static UHFDeviceControl pw;
     private static Context mContext;
     private static BatteryReceiver batteryReceiver;
     private static ReadBean mRead;
@@ -181,25 +181,25 @@ public class UHFManager {
         if (TextUtils.isEmpty(factory)) {
             Log.d("getModle_start", String.valueOf(System.currentTimeMillis()));
             if (Build.VERSION.RELEASE.equals("4.4.2")) {
-                powerOn(DeviceControl.PowerType.MAIN, 64);
+                powerOn(UHFDeviceControl.PowerType.MAIN, 64);
             } else {
                 String xinghao = Build.MODEL;
                 if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")
                         || xinghao.equals("Biowolf LE") || xinghao.equals("FC-PK80")
-                        || xinghao.equals("FC-K80") || xinghao.equals("T80")) {
-                    powerOn(DeviceControl.PowerType.MAIN, 119);
-                } else if (xinghao.contains("KT55")) {
+                        || xinghao.equals("FC-K80") || xinghao.equals("T80") || xinghao.contains("80")) {
+                    powerOn(UHFDeviceControl.PowerType.MAIN, 119);
+                } else if (xinghao.contains("55")) {
                     String readEm55 = readEm55();
                     if (readEm55.equals("80")) {
-                        powerOn(DeviceControl.PowerType.MAIN_AND_EXPAND, 88, 7, 5);
+                        powerOn(UHFDeviceControl.PowerType.MAIN_AND_EXPAND, 88, 7, 5);
                     } else if (readEm55.equals("48") || readEm55.equals("81")) {
-                        powerOn(DeviceControl.PowerType.MAIN_AND_EXPAND, 88, 6, 7);
+                        powerOn(UHFDeviceControl.PowerType.MAIN_AND_EXPAND, 88, 6, 7);
                     } else {
-                        powerOn(DeviceControl.PowerType.MAIN, 88);
+                        powerOn(UHFDeviceControl.PowerType.MAIN, 88);
                     }
 
                 } else {
-                    powerOn(DeviceControl.PowerType.MAIN, 94);
+                    powerOn(UHFDeviceControl.PowerType.MAIN, 94);
                 }
             }
 
@@ -215,9 +215,9 @@ public class UHFManager {
         }
     }
 
-    private static void powerOn(DeviceControl.PowerType POWERCTL, int... gpios) {
+    private static void powerOn(UHFDeviceControl.PowerType POWERCTL, int... gpios) {
         try {
-            pw = new DeviceControl(POWERCTL, gpios);
+            pw = new UHFDeviceControl(POWERCTL, gpios);
             pw.PowerOnDevice();
         } catch (IOException e) {
             e.printStackTrace();
