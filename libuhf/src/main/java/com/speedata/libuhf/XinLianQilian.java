@@ -1003,8 +1003,14 @@ public class XinLianQilian implements IUHFService {
         if (!mFlag) {
             epc = "0000";
         }
-        byte[] writeByte = ByteCharStrUtils.toByteArray(epc);
-        if (selectCard(bank, writeByte, mFlag) != 0) {
+        int ln = epc.length();
+        if (ln == 1 || ln % 2 == 1) {
+            ln++;
+        }
+        byte[] fdata = new byte[ln / 2];
+        Mreader.Str2Hex(epc, epc.length(), fdata);
+//        byte[] writeByte = ByteCharStrUtils.toByteArray(epc);
+        if (selectCard(bank, fdata, mFlag) != 0) {
             Log.d(TAG, "selectCard: failed");
             return -1;
         }
