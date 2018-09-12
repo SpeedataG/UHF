@@ -184,7 +184,11 @@ public class UHFManager {
                 powerOn(UHFDeviceControl.PowerType.MAIN, 64);
             } else {
                 String xinghao = Build.MODEL;
-                if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")
+                if (xinghao.equalsIgnoreCase("SD60RT")) {
+                    powerOn(UHFDeviceControl.PowerType.NEW_MAIN, 86);
+                } else if (xinghao.contains("SD55")) {
+                    powerOn(UHFDeviceControl.PowerType.NEW_MAIN, 128);
+                } else if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")
                         || xinghao.equals("Biowolf LE") || xinghao.equals("FC-PK80")
                         || xinghao.equals("FC-K80") || xinghao.equals("T80") || xinghao.contains("80")) {
                     powerOn(UHFDeviceControl.PowerType.MAIN, 119);
@@ -231,11 +235,21 @@ public class UHFManager {
     private static String getModle() {
         String factory = "";
         SerialPortBackup serialPort = new SerialPortBackup();
-        try {
-            serialPort.OpenSerial("/dev/ttyMT2", 115200);
-        } catch (IOException e) {
-            e.printStackTrace();
+        String xinghao = Build.MODEL;
+        if (xinghao.equalsIgnoreCase("SD60RT")) {
+            try {
+                serialPort.OpenSerial("/dev/ttyMT0", 115200);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                serialPort.OpenSerial("/dev/ttyMT2", 115200);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
         fd = serialPort.getFd();
         byte[] bytes = new byte[1024];
 
@@ -255,7 +269,7 @@ public class UHFManager {
         if (bytes != null) {
             factory = bytesToHexString(bytes);
         }
-        if (factory.equals("7E002A240349006D00700069006E006A00530065007200690061006C004E0075006D003000310006A97E")) {
+        if (factory.equals("7E002A240349006D00700069006E006A00530065007200690061006C004E0075006D003000310006A97E") || factory.contains("A0A0A0")) {
             serialPort.CloseSerial(fd);
             try {
                 pw.PowerOffDevice();

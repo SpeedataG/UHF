@@ -57,7 +57,7 @@ public class MainActivity extends Activity implements OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        SharedXmlUtil.getInstance(this).write("modle", "xinlian");
+        SharedXmlUtil.getInstance(this).write("modle", "r2k");
         try {
             iuhfService = UHFManager.getUHFService(MainActivity.this);
         } catch (Exception e) {

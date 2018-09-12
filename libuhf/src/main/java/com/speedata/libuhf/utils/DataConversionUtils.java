@@ -160,22 +160,35 @@ public class DataConversionUtils {
         return value;
     }
 
-	/**
-	 * byte[]转int
-	 *
-	 * @param bytes
-	 * @return int
-	 */
-	public static int byteArrayToInt(byte[] bytes) {
-		int value = 0;
-		//   低位在前
-		for (int i = 0; i < bytes.length; i++) {
-			int shift = (bytes.length - 1 - i) * 8;
-			value += (bytes[i] & 0x000000FF) << shift;// 往高位游
-		}
-		return value;
-	}
+    /**
+     * byte[]转int
+     *
+     * @param bytes
+     * @return int
+     */
+    public static int byteArrayToInt(byte[] bytes) {
+        int value = 0;
+        //   低位在前
+        for (int i = 0; i < bytes.length; i++) {
+            int shift = (bytes.length - 1 - i) * 8;
+            value += (bytes[i] & 0x000000FF) << shift;// 往高位游
+        }
+        return value;
+    }
 
+    /**
+     * 截取数组
+     *
+     * @param bytes  被截取数组
+     * @param start  被截取数组开始截取位置
+     * @param length 新数组的长度
+     * @return 新数组
+     */
+    public static byte[] cutBytes(byte[] bytes, int start, int length) {
+        byte[] res = new byte[length];
+        System.arraycopy(bytes, start, res, 0, length);
+        return res;
+    }
 
     /**
      * @param format example:yyyyMMddHHmmss
@@ -189,6 +202,7 @@ public class DataConversionUtils {
 
     /**
      * 获取当前时间 yyyyMMddHHmmss
+     *
      * @return String
      */
 
@@ -227,6 +241,7 @@ public class DataConversionUtils {
 
     /**
      * 针对psam3310 的方法  指令打包
+     *
      * @param strCmd02 apdu指令
      * @return 3310格式的指令
      */
@@ -346,14 +361,11 @@ public class DataConversionUtils {
     }
 
 
-
     /**
      * 将一个4byte的数组转换成32位的int
      *
-     * @param buf
-     *            bytes buffer
-     * @param pos
-     *            byte[]中开始转换的位置
+     * @param buf bytes buffer
+     * @param pos byte[]中开始转换的位置
      * @return convert result
      */
     protected long unsigned4BytesToInt(byte[] buf, int pos) {
@@ -373,7 +385,7 @@ public class DataConversionUtils {
 
     /**
      * 将一个字符串命令反序排列
-     *
+     * <p>
      * 如：a8d1c8df4edf64---->64df4edfc8d1a8
      *
      * @param ss

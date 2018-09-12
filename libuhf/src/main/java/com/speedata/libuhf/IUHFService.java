@@ -29,6 +29,7 @@ public interface IUHFService {
     public static final int LOW_POWER_MODE = 2;
     public static final int USER_MODE = 3;
     public static final String SERIALPORT = "/dev/ttyMT2";
+    public static final String SERIALPORT_SD60 = "/dev/ttyMT0";
     public static final String POWERCTL = "/sys/class/misc/mtgpio/pin";
 
     //*************************************************共用接口*********************************************************
@@ -106,23 +107,26 @@ public interface IUHFService {
 
     /**
      * 锁卡
+     *
      * @param type
      * @param area
      * @param passwd
      * @return
      */
-    public int setLock(int type, int area, String passwd) ;
+    public int setLock(int type, int area, String passwd);
 
 
     public int setQueryTagGroup(int selected, int session, int target);
+
     public int getQueryTagGroup();
 
 
     /**
      * 掩码
-     * @param area 区域
-     * @param addr 起始地址 bit
-     * @param length 长度 bit
+     *
+     * @param area    区域
+     * @param addr    起始地址 bit
+     * @param length  长度 bit
      * @param content 掩码内容
      * @return
      */
@@ -130,12 +134,14 @@ public interface IUHFService {
 
     /**
      * 取消选卡
+     *
      * @return
      */
     public int cancelMask();
 
     /**
      * 获取掩码信息
+     *
      * @return
      */
     public SelectCriteria getMask();

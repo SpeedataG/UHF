@@ -2,6 +2,8 @@ package android.serialport;
 
 import android.os.SystemClock;
 
+import com.power.control.DeviceControl;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -12,6 +14,10 @@ public class UHFDeviceControl {
     public static final String POWER_MAIN = "/sys/class/misc/mtgpio/pin";
     //tt系列
     public static final String POWER_EXTERNAL = "/sys/class/misc/aw9523/gpio";
+    //sk80 新添加
+    public static final String POWER_EXTERNAL2 = "/sys/class/misc/aw9524/gpio";
+    //新设备上电路径
+    public static final String POWER_NEWMAIN = "/sys/bus/platform/drivers/mediatek-pinctrl/10005000.pinctrl/mt_gpio";
 
     /**
      * 上电类型
@@ -28,7 +34,21 @@ public class UHFDeviceControl {
         /**
          * 主板和外部扩展
          */
-        MAIN_AND_EXPAND
+        MAIN_AND_EXPAND,
+        /**
+         * 新设备 sd55上电
+         */
+        NEW_MAIN,
+        /**
+         * 9524上电sk80使用
+         */
+        EXPAND2,
+        /**
+         * 主板和9524上电
+         */
+        MAIN_AND_EXPAND2
+
+
     }
 
     private BufferedWriter CtrlFile;
@@ -37,11 +57,18 @@ public class UHFDeviceControl {
     private String poweroff = "";
     private String currentPath = "";
 
+    public UHFDeviceControl() throws IOException {
+
+    }
+
     public UHFDeviceControl(String path) throws IOException {
         File DeviceName = new File(path);
         CtrlFile = new BufferedWriter(new FileWriter(DeviceName, false));    //open file
         currentPath = path;
     }
+
+
+    private int[] gpios;
 
     /**
      * 此方法可单独设置gpio
@@ -49,16 +76,17 @@ public class UHFDeviceControl {
      * @param gpio 设置gpio
      */
     public void setGpio(int gpio) {
-        if (currentPath.equals(POWER_EXTERNAL)) {
+        if (currentPath.equals(POWER_EXTERNAL) || currentPath.equals(POWER_EXTERNAL2)) {
             poweron = gpio + "on";
             poweroff = gpio + "off";
         } else {
+            poweron = "-wmode " + gpio + " 0";//将GPIO99设置为GPIO模式
+            poweron = "-wdir " + gpio + " 1";//将GPIO99设置为输出模式
             poweron = "-wdout " + gpio + " 1";
             poweroff = "-wdout " + gpio + " 0";
         }
     }
 
-    int[] gpios;
     private PowerType power_type;
 
     /**
@@ -88,6 +116,16 @@ public class UHFDeviceControl {
             case "MAIN_AND_EXPAND":
                 this.power_type = PowerType.MAIN_AND_EXPAND;
                 break;
+            case "NEW_MAIN":
+                this.power_type = PowerType.NEW_MAIN;
+                break;
+            case "EXPAND2":
+                this.power_type = PowerType.EXPAND2;
+                break;
+            case "MAIN_AND_EXPAND2":
+                this.power_type = PowerType.MAIN_AND_EXPAND2;
+                break;
+
         }
     }
 
@@ -98,10 +136,10 @@ public class UHFDeviceControl {
      * @throws IOException
      */
     public void MainPowerOn(int gpio) throws IOException {
-        UHFDeviceControl UHFDeviceControl = new UHFDeviceControl(POWER_MAIN);
-        UHFDeviceControl.setGpio(gpio);
-        UHFDeviceControl.writeON();
-        UHFDeviceControl.DeviceClose();
+        UHFDeviceControl deviceControl = new UHFDeviceControl(UHFDeviceControl.POWER_MAIN);
+        deviceControl.setGpio(gpio);
+        deviceControl.writeON();
+        deviceControl.DeviceClose();
     }
 
     /**
@@ -111,10 +149,10 @@ public class UHFDeviceControl {
      * @throws IOException
      */
     public void MainPowerOff(int gpio) throws IOException {
-        UHFDeviceControl UHFDeviceControl = new UHFDeviceControl(POWER_MAIN);
-        UHFDeviceControl.setGpio(gpio);
-        UHFDeviceControl.WriteOff();
-        UHFDeviceControl.DeviceClose();
+        UHFDeviceControl deviceControl = new UHFDeviceControl(UHFDeviceControl.POWER_MAIN);
+        deviceControl.setGpio(gpio);
+        deviceControl.WriteOff();
+        deviceControl.DeviceClose();
     }
 
     /**
@@ -124,10 +162,17 @@ public class UHFDeviceControl {
      * @throws IOException
      */
     public void ExpandPowerOn(int gpio) throws IOException {
-        UHFDeviceControl UHFDeviceControl = new UHFDeviceControl(POWER_EXTERNAL);
-        UHFDeviceControl.setGpio(gpio);
-        UHFDeviceControl.writeON();
-        UHFDeviceControl.DeviceClose();
+        UHFDeviceControl deviceControl = new UHFDeviceControl(UHFDeviceControl.POWER_EXTERNAL);
+        deviceControl.setGpio(gpio);
+        deviceControl.writeON();
+        deviceControl.DeviceClose();
+    }
+
+    public void Expand2PowerOn(int gpio) throws IOException {
+        UHFDeviceControl deviceControl = new UHFDeviceControl(UHFDeviceControl.POWER_EXTERNAL2);
+        deviceControl.setGpio(gpio);
+        deviceControl.writeON();
+        deviceControl.DeviceClose();
     }
 
     /**
@@ -137,10 +182,17 @@ public class UHFDeviceControl {
      * @throws IOException
      */
     public void ExpandPowerOff(int gpio) throws IOException {
-        UHFDeviceControl UHFDeviceControl = new UHFDeviceControl(POWER_EXTERNAL);
-        UHFDeviceControl.setGpio(gpio);
-        UHFDeviceControl.WriteOff();
-        UHFDeviceControl.DeviceClose();
+        UHFDeviceControl deviceControl = new UHFDeviceControl(UHFDeviceControl.POWER_EXTERNAL);
+        deviceControl.setGpio(gpio);
+        deviceControl.WriteOff();
+        deviceControl.DeviceClose();
+    }
+
+    public void Expand2PowerOff(int gpio) throws IOException {
+        UHFDeviceControl deviceControl = new UHFDeviceControl(UHFDeviceControl.POWER_EXTERNAL2);
+        deviceControl.setGpio(gpio);
+        deviceControl.WriteOff();
+        deviceControl.DeviceClose();
     }
 
 
@@ -173,23 +225,43 @@ public class UHFDeviceControl {
     {
         switch (power_type) {
             case MAIN:
-//                MainPowerOn(gpios[0]);
-//                SystemClock.sleep(200);
                 for (int i = 0; i < gpios.length; i++) {
                     MainPowerOn(gpios[i]);
-                    SystemClock.sleep(200);
+                    SystemClock.sleep(100);
                 }
                 break;
             case EXPAND:
-                ExpandPowerOn(gpios[0]);
-                SystemClock.sleep(200);
+                for (int i = 0; i < gpios.length; i++) {
+                    ExpandPowerOn(gpios[i]);
+                    SystemClock.sleep(100);
+                }
                 break;
             case MAIN_AND_EXPAND:
                 MainPowerOn(gpios[0]);
-                SystemClock.sleep(200);
+                SystemClock.sleep(100);
                 for (int i = 1; i < gpios.length; i++) {
                     ExpandPowerOn(gpios[i]);
-                    SystemClock.sleep(200);
+                    SystemClock.sleep(100);
+                }
+                break;
+            case NEW_MAIN:
+                for (int i = 0; i < gpios.length; i++) {
+                    newSetGpioOn(gpios[i]);
+                    SystemClock.sleep(100);
+                }
+                break;
+            case EXPAND2:
+                for (int i = 0; i < gpios.length; i++) {
+                    Expand2PowerOn(gpios[i]);
+                    SystemClock.sleep(100);
+                }
+                break;
+            case MAIN_AND_EXPAND2:
+                MainPowerOn(gpios[0]);
+                SystemClock.sleep(100);
+                for (int i = 1; i < gpios.length; i++) {
+                    Expand2PowerOn(gpios[i]);
+                    SystemClock.sleep(100);
                 }
                 break;
             default:
@@ -207,15 +279,38 @@ public class UHFDeviceControl {
     {
         switch (power_type) {
             case MAIN:
-                MainPowerOff(gpios[0]);
+                for (int i = 0; i < gpios.length; i++) {
+                    MainPowerOff(gpios[i]);
+                    SystemClock.sleep(100);
+                }
                 break;
             case EXPAND:
-                ExpandPowerOff(gpios[0]);
+                for (int i = 0; i < gpios.length; i++) {
+                    ExpandPowerOff(gpios[i]);
+                    SystemClock.sleep(100);
+                }
+                break;
+            case EXPAND2:
+                for (int i = 0; i < gpios.length; i++) {
+                    Expand2PowerOff(gpios[i]);
+                    SystemClock.sleep(100);
+                }
                 break;
             case MAIN_AND_EXPAND:
                 MainPowerOff(gpios[0]);
                 for (int i = 1; i < gpios.length; i++) {
                     ExpandPowerOff(gpios[i]);
+                }
+                break;
+            case MAIN_AND_EXPAND2:
+                MainPowerOff(gpios[0]);
+                for (int i = 1; i < gpios.length; i++) {
+                    Expand2PowerOff(gpios[i]);
+                }
+                break;
+            case NEW_MAIN:
+                for (int i = 0; i < gpios.length; i++) {
+                    newSetGpioOff(gpios[i]);
                 }
                 break;
             default:
@@ -275,5 +370,62 @@ public class UHFDeviceControl {
         CtrlFile.flush();
         CtrlFile.write("-wpen" + num + " " + mode);   //设置为输入输出
         CtrlFile.flush();
+    }
+
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    /**
+     * 设置新设备上电 例如sd55 sd60
+     *
+     * @param gpio
+     * @throws IOException
+     */
+    public void newSetGpioOn(int gpio) throws IOException {
+        UHFDeviceControl deviceControl = new UHFDeviceControl(POWER_NEWMAIN);
+        deviceControl.CtrlFile.write("out " + gpio + " 1");//将GPIO设置为高电平
+        deviceControl.CtrlFile.flush();
+        newSetMode(gpio);
+        newSetDir(gpio, 1);
+
+    }
+
+    /**
+     * 设置新设备下点 例如sd55 sd60
+     *
+     * @param gpio
+     * @throws IOException
+     */
+    public void newSetGpioOff(int gpio) throws IOException {
+        UHFDeviceControl deviceControl = new UHFDeviceControl(POWER_NEWMAIN);
+        deviceControl.CtrlFile.write("out " + gpio + " 0");//将GPIO设置为低电平
+        deviceControl.CtrlFile.flush();
+
+    }
+
+    /**
+     * 设置gpio为 gpio模式 例如sd55 sd60
+     *
+     * @param gpio
+     * @throws IOException
+     */
+    public void newSetMode(int gpio) throws IOException {
+        UHFDeviceControl deviceControl = new UHFDeviceControl(POWER_NEWMAIN);
+        deviceControl.CtrlFile.write("mode " + gpio + " 0");//将GPIO设置为GPIO模式
+        deviceControl.CtrlFile.flush();
+
+    }
+
+    /**
+     * 设置gpio为输入/输出模式 例如sd55 sd60
+     *
+     * @param gpio 要操作的gpio
+     * @param dir  0：输入模式  1：输出模式
+     * @throws IOException
+     */
+    public void newSetDir(int gpio, int dir) throws IOException {
+        UHFDeviceControl deviceControl = new UHFDeviceControl(POWER_NEWMAIN);
+        deviceControl.CtrlFile.write("dir " + gpio + " " + dir);//将GPIO99设置为输出模式
+        deviceControl.CtrlFile.flush();
+
     }
 }
