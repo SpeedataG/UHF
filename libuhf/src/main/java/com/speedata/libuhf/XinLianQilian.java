@@ -125,7 +125,7 @@ public class XinLianQilian implements IUHFService {
             }
         } else {
             String xinghao = Build.MODEL;
-            if (xinghao.equalsIgnoreCase("SD60RT")) {
+            if (xinghao.equalsIgnoreCase("SD60RT")||xinghao.equalsIgnoreCase("SD60")) {
                 try {
                     deviceControl = new UHFDeviceControl(UHFDeviceControl.PowerType.NEW_MAIN, 86);
                     deviceControl.PowerOnDevice();
@@ -139,9 +139,9 @@ public class XinLianQilian implements IUHFService {
                 } else {
                     return -1;
                 }
-            } else if (xinghao.contains("SD55")) {
+            } else if (xinghao.contains("SD55L")) {
                 try {
-                    deviceControl = new UHFDeviceControl(UHFDeviceControl.PowerType.NEW_MAIN, 128);
+                    deviceControl = new UHFDeviceControl(UHFDeviceControl.PowerType.MAIN, 128);
                     deviceControl.PowerOnDevice();
                 } catch (IOException e) {
                     e.printStackTrace();

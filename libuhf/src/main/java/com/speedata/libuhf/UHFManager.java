@@ -184,10 +184,10 @@ public class UHFManager {
                 powerOn(UHFDeviceControl.PowerType.MAIN, 64);
             } else {
                 String xinghao = Build.MODEL;
-                if (xinghao.equalsIgnoreCase("SD60RT")) {
+                if (xinghao.equalsIgnoreCase("SD60RT")||xinghao.equalsIgnoreCase("SD60")) {
                     powerOn(UHFDeviceControl.PowerType.NEW_MAIN, 86);
-                } else if (xinghao.contains("SD55")) {
-                    powerOn(UHFDeviceControl.PowerType.NEW_MAIN, 128);
+                } else if (xinghao.contains("SD55L")) {
+                    powerOn(UHFDeviceControl.PowerType.MAIN, 128);
                 } else if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")
                         || xinghao.equals("Biowolf LE") || xinghao.equals("FC-PK80")
                         || xinghao.equals("FC-K80") || xinghao.equals("T80") || xinghao.contains("80")) {
@@ -236,9 +236,9 @@ public class UHFManager {
         String factory = "";
         SerialPortBackup serialPort = new SerialPortBackup();
         String xinghao = Build.MODEL;
-        if (xinghao.equalsIgnoreCase("SD60RT")) {
+        if (xinghao.equalsIgnoreCase("SD60RT")||xinghao.equalsIgnoreCase("SD60")) {
             try {
-                serialPort.OpenSerial("/dev/ttyMT0", 115200);
+                serialPort.OpenSerial("/dev/ttyMT1", 115200);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -270,6 +270,14 @@ public class UHFManager {
             factory = bytesToHexString(bytes);
         }
         if (factory.equals("7E002A240349006D00700069006E006A00530065007200690061006C004E0075006D003000310006A97E") || factory.contains("A0A0A0")) {
+            serialPort.CloseSerial(fd);
+            try {
+                pw.PowerOffDevice();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return FACTORY_R2000;
+        } else if (factory.equals("7E0028220342004C0046005F00320030003100380030003300310033005F0030003000310004027E")) {
             serialPort.CloseSerial(fd);
             try {
                 pw.PowerOffDevice();
