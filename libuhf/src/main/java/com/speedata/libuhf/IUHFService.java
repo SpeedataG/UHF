@@ -2,10 +2,12 @@ package com.speedata.libuhf;
 
 
 import android.os.Handler;
+import android.text.TextUtils;
 
 import com.speedata.libuhf.interfaces.OnSpdInventoryListener;
 import com.speedata.libuhf.interfaces.OnSpdReadListener;
 import com.speedata.libuhf.interfaces.OnSpdWriteListener;
+import com.uhf.structures.DynamicQParams;
 import com.uhf.structures.SelectCriteria;
 
 /**
@@ -217,4 +219,10 @@ public interface IUHFService {
 
     //载波测试接口
     public int enableEngTest(int gain);
+
+    /**
+     * 设置反转 与 设置算法
+     * @return
+     */
+    public int setDynamicAlgorithm();
 }

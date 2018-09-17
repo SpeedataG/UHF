@@ -1299,6 +1299,11 @@ public class XinLianQilian implements IUHFService {
         return 0;
     }
 
+    @Override
+    public int setDynamicAlgorithm() {
+        return -1;
+    }
+
     //获得模式
     public int get_inventory_mode() {
 //        int[] val = new int[]{-1};

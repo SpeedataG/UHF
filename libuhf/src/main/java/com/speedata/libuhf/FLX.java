@@ -21,6 +21,7 @@ import com.speedata.libuhf.utils.ConfigUtils;
 import com.speedata.libuhf.utils.ReadBean;
 import com.speedata.libuhf.utils.StringUtils;
 import com.uhf.linkage.Linkage;
+import com.uhf.structures.DynamicQParams;
 import com.uhf.structures.InventoryData;
 import com.uhf.structures.InventoryParams;
 import com.uhf.structures.OnInventoryListener;
@@ -791,6 +792,65 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
     public int enableEngTest(int gain) {
 //        return getLinkage().enableEngTest(gain);
         return 0;
+    }
+
+    @Override
+    public int setDynamicAlgorithm() {
+//        if (TextUtils.isEmpty(etTry.getText().toString())) {
+//            MyApp.getToast().showShortToast(this, "请输入重试次数");
+//            return;
+//
+//        } else if (TextUtils.isEmpty(etStartQ.getText().toString())) {
+//            MyApp.getToast().showShortToast(this, "请输入起始Q值");
+//            return;
+//        } else if (TextUtils.isEmpty(etMinValue.getText().toString())) {
+//            MyApp.getToast().showShortToast(this, "请输入最小Q值");
+//            return;
+//        } else if (TextUtils.isEmpty(etMaxValue.getText().toString())) {
+//            MyApp.getToast().showShortToast(this, "请输入最大Q值");
+//            return;
+//        } else if (TextUtils.isEmpty(etThreshold.getText().toString())) {
+//            MyApp.getToast().showShortToast(this, "请输入阀值");
+//            return;
+//        }
+        int tryCount = 0;
+        int start_Q = 4;
+        int minQ = 0;
+        int maxQ = 15;
+        int threshold = 4;
+//        if (start_Q < 0 || start_Q > 15 || minQ < 0 || minQ > 15 || maxQ < 0 || maxQ > 15 || threshold < 0 || threshold > 255) {
+//            MyApp.getToast().showShortToast(this, "不在Q值0～15的取值范围内，无效Q值");
+//            return;
+//        }
+//
+//        if (minQ > maxQ) {
+//            MyApp.getToast().showShortToast(this, "Q值范围设置错误");
+//            return;
+//        }
+//        if (threshold < 0 || threshold > 255) {
+//            MyApp.getToast().showShortToast(this, "不在阀值0～255的取值范围内，无效阀值");
+//            return;
+//        }
+//        if (tryCount < 0 || tryCount > 10) {
+//            MyApp.getToast().showShortToast(this, "不在重试次数0～10的取值范围内，无效重试次数");
+//            return;
+//        }
+
+        DynamicQParams dp = new DynamicQParams();
+        dp.setValue(start_Q, minQ, maxQ, tryCount, 1, threshold);
+        int dynamicResult = getLinkage().Radio_SetSingulationAlgorithmDyParameters(dp);
+
+        if (dynamicResult == 0) {
+            return 0;
+//            MyApp.getToast().showShortToast(this, "设置成功");
+        } else if (dynamicResult == -1000) {
+            return  -1000;
+//            MyApp.getToast().showShortToast(this, "正在盘点");
+        } else {
+//            MyApp.getToast().showShortToast(this, "设置失败");
+            return -1;
+        }
+
     }
 
     public int getFreqRegion() {

@@ -270,19 +270,30 @@ public class MainActivity extends Activity implements OnClickListener {
             writeTag.show();
 
         } else if (arg0 == Search_Tag) {
-
+            int i=iuhfService.setQueryTagGroup(0, 0, 0);
+            if (i==0) {
+                //设置通话项成功
+            }
+           i = iuhfService.setDynamicAlgorithm();
+            if (i == 0) {
+                //设置成功
+            }
             //盘点选卡
             SearchTagDialog searchTag = new SearchTagDialog(this, iuhfService, modle);
             searchTag.setTitle(R.string.Item_Choose);
             searchTag.show();
 
-        } else if (arg0 == Set_Tag) {
+        } else if (arg0 == Set_Tag)
+
+        {
             //设置频率频段
             SetModuleDialog setDialog = new SetModuleDialog(this, iuhfService, modle);
             setDialog.setTitle(R.string.Item_Set_Title);
             setDialog.show();
 
-        } else if (arg0 == Set_Password) {
+        } else if (arg0 == Set_Password)
+
+        {
             if (current_tag_epc == null) {
                 Status.setText(R.string.Status_No_Card_Select);
                 Toast.makeText(this, R.string.Status_No_Card_Select, Toast.LENGTH_SHORT).show();
@@ -293,7 +304,9 @@ public class MainActivity extends Activity implements OnClickListener {
                     , iuhfService, current_tag_epc, modle);
             setPasswordDialog.setTitle(R.string.SetPasswd_Btn);
             setPasswordDialog.show();
-        } else if (arg0 == Set_EPC) {
+        } else if (arg0 == Set_EPC)
+
+        {
             if (current_tag_epc == null) {
                 Status.setText(R.string.Status_No_Card_Select);
                 Toast.makeText(this, R.string.Status_No_Card_Select, Toast.LENGTH_SHORT).show();
@@ -303,7 +316,9 @@ public class MainActivity extends Activity implements OnClickListener {
             SetEPCDialog setEPCDialog = new SetEPCDialog(this, iuhfService, current_tag_epc);
             setEPCDialog.setTitle(R.string.SetEPC_Btn);
             setEPCDialog.show();
-        } else if (arg0 == Lock_Tag) {
+        } else if (arg0 == Lock_Tag)
+
+        {
             if (current_tag_epc == null) {
                 Status.setText(R.string.Status_No_Card_Select);
                 Toast.makeText(this, R.string.Status_No_Card_Select, Toast.LENGTH_SHORT).show();
@@ -314,12 +329,15 @@ public class MainActivity extends Activity implements OnClickListener {
                     , current_tag_epc, modle);
             lockTagDialog.setTitle(R.string.Lock_Btn);
             lockTagDialog.show();
-        } else if (arg0 == btn_inv_set) {
+        } else if (arg0 == btn_inv_set)
+
+        {
             //盘点内容设置
             InvSetDialog invSetDialog = new InvSetDialog(this, iuhfService);
             invSetDialog.setTitle("Inv Set");
             invSetDialog.show();
         }
+
     }
 
     private long mkeyTime = 0;
