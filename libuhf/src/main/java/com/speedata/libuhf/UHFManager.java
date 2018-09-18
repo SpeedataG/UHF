@@ -269,7 +269,7 @@ public class UHFManager {
         if (bytes != null) {
             factory = bytesToHexString(bytes);
         }
-        if (factory.equals("7E002A240349006D00700069006E006A00530065007200690061006C004E0075006D003000310006A97E") || factory.contains("A0A0A0")) {
+        if (factory.equals("7E002A240349006D00700069006E006A00530065007200690061006C004E0075006D003000310006A97E")) {
             serialPort.CloseSerial(fd);
             try {
                 pw.PowerOffDevice();

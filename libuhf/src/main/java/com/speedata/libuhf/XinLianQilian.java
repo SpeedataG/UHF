@@ -1420,7 +1420,11 @@ public class XinLianQilian implements IUHFService {
                         } else {
                             errCode = 20;
                         }
-                        handler_inventer.sendMessage(handler_inventer.obtainMessage(2, errCode));
+                        if (handler_inventer == null) {
+                            inventoryCallBack(null);
+                        } else {
+                            handler_inventer.sendMessage(handler_inventer.obtainMessage(2, errCode));
+                        }
                         inventory_stop();
 //                        return;
                     }
