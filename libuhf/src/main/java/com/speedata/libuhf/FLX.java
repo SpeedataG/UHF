@@ -995,7 +995,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
     }
 
     private final int ANTENNA_P_MIN = 10;
-    private final int ANTENNA_P_MAX = 30;
+    private final int ANTENNA_P_MAX = 32;
 
     public int setAntennaPower(int power) {
         int res = -1;

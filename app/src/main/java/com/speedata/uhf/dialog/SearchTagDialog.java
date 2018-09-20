@@ -119,7 +119,7 @@ public class SearchTagDialog extends Dialog implements
                 case 1:
                     scant++;
                     if (!cbb.isChecked()) {
-                        if (scant % 10 == 0) {
+                        if (scant % 1 == 0) {
                             soundPool.play(soundId, 1, 1, 0, 0, 1);
                         }
                     }

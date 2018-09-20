@@ -179,8 +179,8 @@ public class SetModuleDialog extends Dialog implements View.OnClickListener {
             dismiss();
         } else if (v == setp) {
             int ivp = Integer.parseInt(pv.getText().toString());
-            if ((ivp < 0) || (ivp > 30)) {
-                status.setText("value range is 0 ~ 30");
+            if ((ivp < 0) || (ivp > 32)) {
+                status.setText("value range is 0 ~ 32");
             } else {
                 int rv = iuhfService.setAntennaPower(ivp);
                 if (rv < 0) {
