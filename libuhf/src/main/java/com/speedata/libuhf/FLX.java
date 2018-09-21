@@ -295,7 +295,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            } else if (xinghao.contains("55")) {
+            } else if (xinghao.contains("55")|| xinghao.equals("W2H")) {
                 String readEm55 = readEm55();
                 if (readEm55.equals("80")) {
                     try {

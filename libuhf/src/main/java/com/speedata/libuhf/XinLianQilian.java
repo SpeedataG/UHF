@@ -153,7 +153,7 @@ public class XinLianQilian implements IUHFService {
                 } else {
                     return -1;
                 }
-            } else if (xinghao.contains("55")) {
+            } else if (xinghao.contains("55")|| xinghao.equals("W2H")) {
                 String readEm55 = readEm55();
                 if (readEm55.equals("80")) {
                     try {

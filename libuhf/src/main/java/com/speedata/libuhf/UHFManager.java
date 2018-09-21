@@ -184,7 +184,7 @@ public class UHFManager {
                 powerOn(UHFDeviceControl.PowerType.MAIN, 64);
             } else {
                 String xinghao = Build.MODEL;
-                if (xinghao.equalsIgnoreCase("SD60RT")||xinghao.equalsIgnoreCase("SD60")) {
+                if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")) {
                     powerOn(UHFDeviceControl.PowerType.NEW_MAIN, 86);
                 } else if (xinghao.contains("SD55L")) {
                     powerOn(UHFDeviceControl.PowerType.MAIN, 128);
@@ -192,7 +192,7 @@ public class UHFManager {
                         || xinghao.equals("Biowolf LE") || xinghao.equals("FC-PK80")
                         || xinghao.equals("FC-K80") || xinghao.equals("T80") || xinghao.contains("80")) {
                     powerOn(UHFDeviceControl.PowerType.MAIN, 119);
-                } else if (xinghao.contains("55")) {
+                } else if (xinghao.contains("55") || xinghao.equals("W2H")) {
                     String readEm55 = readEm55();
                     if (readEm55.equals("80")) {
                         powerOn(UHFDeviceControl.PowerType.MAIN_AND_EXPAND, 88, 7, 5);
@@ -236,7 +236,7 @@ public class UHFManager {
         String factory = "";
         SerialPortBackup serialPort = new SerialPortBackup();
         String xinghao = Build.MODEL;
-        if (xinghao.equalsIgnoreCase("SD60RT")||xinghao.equalsIgnoreCase("SD60")) {
+        if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")) {
             try {
                 serialPort.OpenSerial("/dev/ttyMT1", 115200);
             } catch (IOException e) {
