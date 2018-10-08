@@ -185,7 +185,9 @@ public class UHFManager {
             } else {
                 String xinghao = Build.MODEL;
                 if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")) {
-                    powerOn(UHFDeviceControl.PowerType.NEW_MAIN, 86);
+//                    powerOn(UHFDeviceControl.PowerType.NEW_MAIN, 86);
+                    powerOn(UHFDeviceControl.PowerType.EXPAND, 9,14);
+
                 } else if (xinghao.contains("SD55L")) {
                     powerOn(UHFDeviceControl.PowerType.MAIN, 128);
                 } else if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")
@@ -238,7 +240,7 @@ public class UHFManager {
         String xinghao = Build.MODEL;
         if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")) {
             try {
-                serialPort.OpenSerial("/dev/ttyMT1", 115200);
+                serialPort.OpenSerial("/dev/ttyMT0", 115200);
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -277,7 +277,8 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             String xinghao = Build.MODEL;
             if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")) {
                 try {
-                    pw = new UHFDeviceControl(UHFDeviceControl.PowerType.NEW_MAIN, 86);
+//                    pw = new UHFDeviceControl(UHFDeviceControl.PowerType.NEW_MAIN, 86);
+                    pw = new UHFDeviceControl(UHFDeviceControl.PowerType.EXPAND, 9,14);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

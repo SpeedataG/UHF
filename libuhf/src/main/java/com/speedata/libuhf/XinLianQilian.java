@@ -127,7 +127,8 @@ public class XinLianQilian implements IUHFService {
             String xinghao = Build.MODEL;
             if (xinghao.equalsIgnoreCase("SD60RT")||xinghao.equalsIgnoreCase("SD60")) {
                 try {
-                    deviceControl = new UHFDeviceControl(UHFDeviceControl.PowerType.NEW_MAIN, 86);
+//                    deviceControl = new UHFDeviceControl(UHFDeviceControl.PowerType.NEW_MAIN, 86);
+                    deviceControl = new UHFDeviceControl(UHFDeviceControl.PowerType.EXPAND, 9,14);
                     deviceControl.PowerOnDevice();
                 } catch (IOException e) {
                     e.printStackTrace();
