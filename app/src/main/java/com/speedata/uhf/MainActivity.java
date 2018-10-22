@@ -20,6 +20,7 @@ import com.speedata.libuhf.IUHFService;
 import com.speedata.libuhf.UHFManager;
 import com.speedata.libuhf.utils.CommonUtils;
 import com.speedata.libuhf.utils.SharedXmlUtil;
+import com.speedata.uhf.dialog.DirectionalTagDialog;
 import com.speedata.uhf.dialog.InvSetDialog;
 import com.speedata.uhf.dialog.LockTagDialog;
 import com.speedata.uhf.dialog.ReadTagDialog;
@@ -45,6 +46,7 @@ public class MainActivity extends Activity implements OnClickListener {
     private ArrayAdapter<String> adapter;
     private Button Search_Tag;
     private Button Read_Tag;
+    private Button Directional_Tag;
     private Button Write_Tag;
     private Button Set_Tag;
     private Button Set_Password;
@@ -233,6 +235,8 @@ public class MainActivity extends Activity implements OnClickListener {
         Write_Tag.setOnClickListener(this);
         Read_Tag = (Button) findViewById(R.id.btn_read);
         Read_Tag.setOnClickListener(this);
+        Directional_Tag = (Button) findViewById(R.id.btn_direction);
+        Directional_Tag.setOnClickListener(this);
         Search_Tag = (Button) findViewById(R.id.btn_search);
         Search_Tag.setOnClickListener(this);
         Set_Tag = (Button) findViewById(R.id.btn_check);
@@ -323,6 +327,10 @@ public class MainActivity extends Activity implements OnClickListener {
             searchTag.setTitle(R.string.Item_Choose);
             searchTag.show();
 
+        } else if (arg0 == Directional_Tag) {
+            //方向判断
+            DirectionalTagDialog directionalTagDialog = new DirectionalTagDialog(this, iuhfService);
+            directionalTagDialog.show();
         } else if (arg0 == Set_Tag)
 
         {
