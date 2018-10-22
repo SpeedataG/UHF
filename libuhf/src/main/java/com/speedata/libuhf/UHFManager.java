@@ -186,7 +186,7 @@ public class UHFManager {
                 String xinghao = Build.MODEL;
                 if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")) {
 //                    powerOn(UHFDeviceControl.PowerType.NEW_MAIN, 86);
-                    powerOn(UHFDeviceControl.PowerType.EXPAND, 9,14);
+                    powerOn(UHFDeviceControl.PowerType.EXPAND, 9, 14);
 
                 } else if (xinghao.contains("SD55L")) {
                     powerOn(UHFDeviceControl.PowerType.MAIN, 128);
@@ -204,6 +204,13 @@ public class UHFManager {
                         powerOn(UHFDeviceControl.PowerType.MAIN, 88);
                     }
 
+                } else if (xinghao.contains("SD100")) {
+                    try {
+                        pw = new UHFDeviceControl(UHFDeviceControl.PowerType.GAOTONG_MAIN);
+                        pw.PowerOnDevice();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 } else {
                     powerOn(UHFDeviceControl.PowerType.MAIN, 94);
                 }
@@ -244,6 +251,12 @@ public class UHFManager {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else if (xinghao.equalsIgnoreCase("SD100")) {
+            try {
+                serialPort.OpenSerial("/dev/ttyHSL2", 115200);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else {
             try {
                 serialPort.OpenSerial("/dev/ttyMT2", 115200);
@@ -273,19 +286,11 @@ public class UHFManager {
         }
         if (factory.equals("7E002A240349006D00700069006E006A00530065007200690061006C004E0075006D003000310006A97E")) {
             serialPort.CloseSerial(fd);
-            try {
-                pw.PowerOffDevice();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            powerOff();
             return FACTORY_R2000;
         } else if (factory.equals("7E0028220342004C0046005F00320030003100380030003300310033005F0030003000310004027E")) {
             serialPort.CloseSerial(fd);
-            try {
-                pw.PowerOffDevice();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            powerOff();
             return FACTORY_R2000;
         }
 
@@ -307,11 +312,7 @@ public class UHFManager {
             length = bytes.length;
             if (length == 27) {
                 serialPort.CloseSerial(fd);
-                try {
-                    pw.PowerOffDevice();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                powerOff();
                 return FACTORY_XINLIAN;
             }
         }
@@ -333,23 +334,23 @@ public class UHFManager {
             factory = bytesToHexString(bytes);
             if (factory.equals("BB0103000A025261794D6174726978B17E")) {
                 serialPort.CloseSerial(fd);
-                try {
-                    pw.PowerOffDevice();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                powerOff();
                 return FACTORY_FEILIXIN;
             }
         }
 
 
         serialPort.CloseSerial(fd);
+        powerOff();
+        return null;
+    }
+
+    private static void powerOff() {
         try {
             pw.PowerOffDevice();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
     }
 
     //byte转string

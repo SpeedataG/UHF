@@ -32,6 +32,11 @@ import com.speedata.uhf.dialog.WriteTagDialog;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 public class MainActivity extends Activity implements OnClickListener {
     private static final String[] list = {"Reserved", "EPC", "TID", "USER"};
     private TextView Cur_Tag_Info;
@@ -57,7 +62,12 @@ public class MainActivity extends Activity implements OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        SharedXmlUtil.getInstance(this).write("modle", "xinlian");
+//        SharedXmlUtil.getInstance(this).write("modle", "r2k");
+//        try {
+//            DeviceControl(63, 1);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         try {
             iuhfService = UHFManager.getUHFService(MainActivity.this);
         } catch (Exception e) {
@@ -70,7 +80,6 @@ public class MainActivity extends Activity implements OnClickListener {
             }
             return;
         }
-//        UHFManager.unregisterReceiver();
         modle = SharedXmlUtil.getInstance(MainActivity.this).read("modle", "");
         initUI();
         Version.append("-" + modle);
@@ -91,6 +100,37 @@ public class MainActivity extends Activity implements OnClickListener {
 
 
         UHFManager.setStipulationLevel(0);
+    }
+
+    private BufferedWriter CtrlFile;
+
+    public void DeviceControl(int gpionum, int dout) throws IOException {
+        File DeviceGpio = new File("/sys/class/switch/app_switch/app_state");
+        CtrlFile = new BufferedWriter(new FileWriter(DeviceGpio, false));    //open file
+        CtrlFile.write("open");
+        CtrlFile.flush();
+        CtrlFile.close();
+//        File DeviceGpio = new File("/sys/class/gpio/export");
+//        CtrlFile = new BufferedWriter(new FileWriter(DeviceGpio, false));	//open file
+//        CtrlFile.write(String.valueOf(gpionum));
+//        CtrlFile.flush();
+//        CtrlFile.close();
+//        String sGpio = "/sys/class/gpio/gpio";
+//        String sGpioDir = "/direction";
+//        File DeviceNameGpioDir = new File(sGpio + String.valueOf(gpionum) + sGpioDir);
+//        CtrlFile = new BufferedWriter(new FileWriter(DeviceNameGpioDir, false));
+//        CtrlFile.write("out");
+//        CtrlFile.flush();
+//        CtrlFile.close();
+//        String sGpioVal = "/value";
+//        File DeviceNameGpioVal = new File(sGpio + String.valueOf(gpionum) + sGpioVal);
+//        CtrlFile = new BufferedWriter(new FileWriter(DeviceNameGpioVal, false));
+//        if(dout > 0)
+//            CtrlFile.write("1");
+//        else
+//            CtrlFile.write("0");
+//        CtrlFile.flush();
+//        CtrlFile.close();
     }
 
     @Override
@@ -270,11 +310,11 @@ public class MainActivity extends Activity implements OnClickListener {
             writeTag.show();
 
         } else if (arg0 == Search_Tag) {
-            int i=iuhfService.setQueryTagGroup(0, 0, 0);
-            if (i==0) {
+            int i = iuhfService.setQueryTagGroup(0, 0, 0);
+            if (i == 0) {
                 //设置通话项成功
             }
-           i = iuhfService.setDynamicAlgorithm();
+            i = iuhfService.setDynamicAlgorithm();
             if (i == 0) {
                 //设置成功
             }

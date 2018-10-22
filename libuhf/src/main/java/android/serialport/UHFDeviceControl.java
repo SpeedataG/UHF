@@ -18,6 +18,10 @@ public class UHFDeviceControl {
     public static final String POWER_EXTERNAL2 = "/sys/class/misc/aw9524/gpio";
     //新设备上电路径
     public static final String POWER_NEWMAIN = "/sys/bus/platform/drivers/mediatek-pinctrl/10005000.pinctrl/mt_gpio";
+    /**
+     * 高通平台上电
+     */
+    public static final String POWER_GAOTONG = "/sys/class/switch/app_switch/app_state";
 
     /**
      * 上电类型
@@ -46,7 +50,11 @@ public class UHFDeviceControl {
         /**
          * 主板和9524上电
          */
-        MAIN_AND_EXPAND2
+        MAIN_AND_EXPAND2,
+        /**
+         * 高通平台上电
+         */
+        GAOTONG_MAIN
 
 
     }
@@ -58,6 +66,24 @@ public class UHFDeviceControl {
     private String currentPath = "";
 
     public UHFDeviceControl() throws IOException {
+
+    }
+
+    /**
+     * 高通平台 uhf上电下电
+     *
+     * @param s open uhf上电； close uhf下电
+     */
+    public void gtUhfPower(String s) {
+        try {
+            File DeviceName = new File(POWER_GAOTONG);
+            CtrlFile = new BufferedWriter(new FileWriter(DeviceName, false));    //open file
+            CtrlFile.write(s);
+            CtrlFile.flush();
+            CtrlFile.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -101,6 +127,14 @@ public class UHFDeviceControl {
 
     /**
      * @param power_type 上电类型
+     * @throws IOException
+     */
+    public UHFDeviceControl(PowerType power_type) throws IOException {
+        this.power_type = power_type;
+    }
+
+    /**
+     * @param power_type 上电类型
      * @param gpios      若为主板上电 gpio[0]需为主板gpio 扩展gpio可以有多个
      * @throws IOException
      */
@@ -125,7 +159,11 @@ public class UHFDeviceControl {
             case "MAIN_AND_EXPAND2":
                 this.power_type = PowerType.MAIN_AND_EXPAND2;
                 break;
-
+            case "GAOTONG_MAIN":
+                this.power_type = PowerType.GAOTONG_MAIN;
+                break;
+            default:
+                break;
         }
     }
 
@@ -264,6 +302,9 @@ public class UHFDeviceControl {
                     SystemClock.sleep(100);
                 }
                 break;
+            case GAOTONG_MAIN:
+                gtUhfPower("open");
+                break;
             default:
                 break;
         }
@@ -312,6 +353,9 @@ public class UHFDeviceControl {
                 for (int i = 0; i < gpios.length; i++) {
                     newSetGpioOff(gpios[i]);
                 }
+                break;
+            case GAOTONG_MAIN:
+                gtUhfPower("close");
                 break;
             default:
                 break;

@@ -125,10 +125,10 @@ public class XinLianQilian implements IUHFService {
             }
         } else {
             String xinghao = Build.MODEL;
-            if (xinghao.equalsIgnoreCase("SD60RT")||xinghao.equalsIgnoreCase("SD60")) {
+            if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")) {
                 try {
 //                    deviceControl = new UHFDeviceControl(UHFDeviceControl.PowerType.NEW_MAIN, 86);
-                    deviceControl = new UHFDeviceControl(UHFDeviceControl.PowerType.EXPAND, 9,14);
+                    deviceControl = new UHFDeviceControl(UHFDeviceControl.PowerType.EXPAND, 9, 14);
                     deviceControl.PowerOnDevice();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -154,7 +154,7 @@ public class XinLianQilian implements IUHFService {
                 } else {
                     return -1;
                 }
-            } else if (xinghao.contains("55")|| xinghao.equals("W2H")) {
+            } else if (xinghao.contains("55") || xinghao.equals("W2H")) {
                 String readEm55 = readEm55();
                 if (readEm55.equals("80")) {
                     try {
@@ -199,6 +199,21 @@ public class XinLianQilian implements IUHFService {
                     e.printStackTrace();
                 }
                 Reader.READER_ERR er = Mreader.InitReader_Notype(SERIALPORT, 1);
+                if (er == Reader.READER_ERR.MT_OK_ERR) {
+                    antportc = 1;
+                    return 0;
+                } else {
+                    return -1;
+                }
+
+            } else if (xinghao.contains("SD100")) {
+                try {
+                    deviceControl = new UHFDeviceControl(UHFDeviceControl.PowerType.GAOTONG_MAIN);
+                    deviceControl.PowerOnDevice();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Reader.READER_ERR er = Mreader.InitReader_Notype(SERIALPORT_SD100, 1);
                 if (er == Reader.READER_ERR.MT_OK_ERR) {
                     antportc = 1;
                     return 0;
