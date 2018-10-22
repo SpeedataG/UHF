@@ -31,6 +31,7 @@ public interface IUHFService {
     public static final int LOW_POWER_MODE = 2;
     public static final int USER_MODE = 3;
     public static final String SERIALPORT = "/dev/ttyMT2";
+    public static final String SERIALPORT_SD100 = "/dev/ttyHSL2";
     public static final String SERIALPORT_SD60 = "/dev/ttyMT0";
     public static final String POWERCTL = "/sys/class/misc/mtgpio/pin";
 
@@ -222,6 +223,7 @@ public interface IUHFService {
 
     /**
      * 设置反转 与 设置算法
+     *
      * @return
      */
     public int setDynamicAlgorithm();

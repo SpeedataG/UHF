@@ -278,7 +278,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")) {
                 try {
 //                    pw = new UHFDeviceControl(UHFDeviceControl.PowerType.NEW_MAIN, 86);
-                    pw = new UHFDeviceControl(UHFDeviceControl.PowerType.EXPAND, 9,14);
+                    pw = new UHFDeviceControl(UHFDeviceControl.PowerType.EXPAND, 9, 14);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -296,7 +296,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            } else if (xinghao.contains("55")|| xinghao.equals("W2H")) {
+            } else if (xinghao.contains("55") || xinghao.equals("W2H")) {
                 String readEm55 = readEm55();
                 if (readEm55.equals("80")) {
                     try {
@@ -321,6 +321,14 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
                     }
                 }
 
+            } else if (xinghao.contains("SD100")) {
+                // TODO: 2018/10/10   上电处理
+                try {
+                    pw = new UHFDeviceControl(UHFDeviceControl.PowerType.GAOTONG_MAIN);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             } else {
                 try {
                     pw = new UHFDeviceControl(UHFDeviceControl.PowerType.MAIN, 94);
@@ -334,12 +342,15 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             pw.PowerOnDevice();
         } catch (IOException e) {
             e.printStackTrace();
+
         }
         SystemClock.sleep(20);
         int result;
         String xinghao = Build.MODEL;
         if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")) {
             result = getLinkage().open_serial(SERIALPORT_SD60);
+        } else if (xinghao.contains("SD100")) {
+            result = getLinkage().open_serial(SERIALPORT_SD100);
         } else {
             result = getLinkage().open_serial(SERIALPORT);
         }
@@ -361,12 +372,13 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else {
             try {
                 pw.PowerOffDevice();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+
         }
         lk = null;
     }
@@ -845,7 +857,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             return 0;
 //            MyApp.getToast().showShortToast(this, "设置成功");
         } else if (dynamicResult == -1000) {
-            return  -1000;
+            return -1000;
 //            MyApp.getToast().showShortToast(this, "正在盘点");
         } else {
 //            MyApp.getToast().showShortToast(this, "设置失败");
