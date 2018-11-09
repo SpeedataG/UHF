@@ -1,11 +1,11 @@
 package com.speedata.uhf.dialog;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
@@ -19,23 +19,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.kaopiz.kprogresshud.KProgressHUD;
 import com.speedata.libuhf.IUHFService;
 import com.speedata.libuhf.bean.SpdInventoryData;
 import com.speedata.libuhf.interfaces.OnSpdInventoryListener;
 import com.speedata.libuhf.utils.SharedXmlUtil;
 import com.speedata.uhf.MsgEvent;
 import com.speedata.uhf.R;
-import com.speedata.uhf.excel.EPCBean;
-import com.speedata.uhf.libutils.excel.ExcelUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import jxl.write.Colour;
 
 /**
  * Created by 张明_ on 2016/12/28.
@@ -108,6 +102,7 @@ public class DirectionalTagDialog extends Dialog implements
     }
 
     //新的Listener回调参考代码
+    @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -162,6 +157,8 @@ public class DirectionalTagDialog extends Dialog implements
                             Toast.makeText(cont, "Please fill out the EPC for the card", Toast.LENGTH_SHORT).show();
                         }
                     }
+                    break;
+                default:
                     break;
             }
 

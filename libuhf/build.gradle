@@ -110,18 +110,14 @@ bintray {
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    api fileTree(include: ['*.jar'], dir: 'libs')
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     //noinspection GradleCompatible
     implementation 'com.android.support:appcompat-v7:25.0.1'
-    //    compile 'com.android.support:appcompat-v7:23.4.0'
     testImplementation 'junit:junit:4.12'
     implementation 'com.alibaba:fastjson:1.2.24'
-    implementation files('libs/R2K.jar')
-    implementation files('libs/Module_Android_Power.jar')
-    implementation files('libs/ModuleAPI_J.jar')
 }
 
 //打包

@@ -303,6 +303,7 @@ public class UHFDeviceControl {
                 }
                 break;
             case GAOTONG_MAIN:
+                gtUhfPower("uhf_open");
                 gtUhfPower("open");
                 break;
             default:
@@ -355,6 +356,7 @@ public class UHFDeviceControl {
                 }
                 break;
             case GAOTONG_MAIN:
+                gtUhfPower("uhf_close");
                 gtUhfPower("close");
                 break;
             default:
