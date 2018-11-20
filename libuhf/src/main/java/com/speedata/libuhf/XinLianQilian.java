@@ -713,6 +713,30 @@ public class XinLianQilian implements IUHFService {
         return null;
     }
 
+    @Override
+    public int setQT(byte[] rpaswd, int cmdType, int memType, int persistType, int rangeType) {
+        // m4 qt
+        try {
+            Reader.IMPINJM4QtPara CustomPara = Mreader.new IMPINJM4QtPara();
+            CustomPara.TimeOut = 1000;
+            CustomPara.CmdType = cmdType;
+            if (CustomPara.CmdType == 1) {
+                CustomPara.MemType = memType;
+                CustomPara.PersistType = persistType;
+                CustomPara.RangeType = rangeType;
+            }
+            CustomPara.AccessPwd = rpaswd;
+
+            Reader.IMPINJM4QtResult CustomRet = Mreader.new IMPINJM4QtResult();
+            Mreader.CustomCmd(Rparams.opant, Reader.CustomCmdType.IMPINJ_M4_Qt, CustomPara, CustomRet);
+            return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+
+    }
+
     //********************************************老版接口（不再维护）******************************************
 
     //注册过 Handler 后调用此函数开始盘点过程

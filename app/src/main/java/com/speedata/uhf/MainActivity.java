@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import com.speedata.libuhf.IUHFService;
 import com.speedata.libuhf.UHFManager;
+import com.speedata.libuhf.bean.SpdInventoryData;
+import com.speedata.libuhf.interfaces.OnSpdInventoryListener;
 import com.speedata.libuhf.utils.CommonUtils;
 import com.speedata.libuhf.utils.SharedXmlUtil;
 import com.speedata.uhf.dialog.DirectionalTagDialog;
@@ -64,6 +66,7 @@ public class MainActivity extends Activity implements OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        UHFManager.setStipulationLevel(0);
 //        SharedXmlUtil.getInstance(this).write("modle", "r2k");
 //        try {
 //            DeviceControl(63, 1);
@@ -100,8 +103,6 @@ public class MainActivity extends Activity implements OnClickListener {
             btn_inv_set.setEnabled(true);
         }
 
-
-        UHFManager.setStipulationLevel(0);
     }
 
     private BufferedWriter CtrlFile;

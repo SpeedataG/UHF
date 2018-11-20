@@ -149,6 +149,17 @@ public interface IUHFService {
      */
     public SelectCriteria getMask();
 
+    /**
+     *
+     * @param rpaswd 密码 16进制byte
+     * @param cmdType 命令类型 0为读 1为写
+     * @param memType 内存视图 0为私密 1为公共
+     * @param persistType 识别距离 0为远场 1为近场
+     * @param rangeType 状态类型 0为临时 1为永久
+     * @return
+     */
+    public int setQT(byte[] rpaswd,int cmdType,int memType,int persistType,int rangeType);
+
     //********************************************老版接口（不再维护）***************************************************
 
 

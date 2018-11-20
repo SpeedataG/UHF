@@ -602,6 +602,11 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         return null;
     }
 
+    @Override
+    public int setQT(byte[] rpaswd, int cmdType, int memType, int persistType, int rangeType) {
+        return 0;
+    }
+
     //********************************************老版接口（不再维护）******************************************
 
 
