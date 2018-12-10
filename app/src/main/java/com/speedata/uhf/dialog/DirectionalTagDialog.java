@@ -143,11 +143,11 @@ public class DirectionalTagDialog extends Dialog implements
                                 if (rssi > -30) {
                                     soundPool.play(soundId1, 1, 1, 0, 0, 3);
                                 } else {
-                                    soundPool.play(soundId1, 1, 1, 0, 0, 2);
+                                    soundPool.play(soundId1, 0.6F, 0.6F, 0, 0, 2);
                                 }
 
                             } else {
-                                soundPool.play(soundId1, 1, 1, 0, 0, 1);
+                                soundPool.play(soundId1, 0.3F, 0.3F, 0, 0, 1);
                             }
                         }
                     } else {
