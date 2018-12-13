@@ -160,6 +160,17 @@ public interface IUHFService {
      */
     public int setQT(byte[] rpaswd,int cmdType,int memType,int persistType,int rangeType);
 
+    /**
+     * 设置4QT标签的模式切换
+     *
+     * @param memMap:0       私有区域，1 公有区域
+     * @param maskFlag       0-----禁用掩码，2----启用掩码
+     * @param accessPassword 访问密码
+     * @return 0--成功 非零--失败
+     */
+    public  int setMonzaQtTagMode(int memMap, int maskFlag, byte[] accessPassword);
+
+
     //********************************************老版接口（不再维护）***************************************************
 
 

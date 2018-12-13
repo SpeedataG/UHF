@@ -5,10 +5,11 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
-import android.serialport.UHFDeviceControl;
+import android.serialport.DeviceControlSpd;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.power.control.DeviceControl;
 import com.speedata.libuhf.bean.SpdInventoryData;
 import com.speedata.libuhf.bean.SpdReadData;
 import com.speedata.libuhf.bean.SpdWriteData;
@@ -46,10 +47,10 @@ import java.util.ArrayList;
 public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListener {
     private Linkage lk = null;
     private Handler h = null;
-    private UHFDeviceControl pw = null;
+    private DeviceControlSpd pw = null;
     private Context mContext = null;
     private ReadBean mRead = null;
-    private UHFDeviceControl newUHFDeviceControl = null;
+    private DeviceControlSpd newUHFDeviceControl = null;
     private byte[] epcData;
     private volatile boolean isReadOutTime = false;
     private volatile boolean isReadSuccess = false;
@@ -233,7 +234,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
                 intArray[i] = mRead.getUhf().getGpio().get(i);
             }
             try {
-                newUHFDeviceControl = new UHFDeviceControl(powerType, intArray);
+                newUHFDeviceControl = new DeviceControlSpd(powerType, intArray);
                 newUHFDeviceControl.PowerOffDevice();
                 newUHFDeviceControl.PowerOnDevice();
                 int result = getLinkage().open_serial(mRead.getUhf().getSerialPort());
@@ -269,7 +270,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
     private int NoXmlopenDev() {
         if (Build.VERSION.RELEASE.equals("4.4.2")) {
             try {
-                pw = new UHFDeviceControl(UHFDeviceControl.PowerType.MAIN, 64);
+                pw = new DeviceControlSpd(DeviceControlSpd.PowerType.MAIN, 64);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -278,13 +279,13 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")) {
                 try {
 //                    pw = new UHFDeviceControl(UHFDeviceControl.PowerType.NEW_MAIN, 86);
-                    pw = new UHFDeviceControl(UHFDeviceControl.PowerType.EXPAND, 9, 14);
+                    pw = new DeviceControlSpd(DeviceControlSpd.PowerType.EXPAND, 9, 14);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             } else if (xinghao.contains("SD55L")) {
                 try {
-                    pw = new UHFDeviceControl(UHFDeviceControl.PowerType.MAIN, 128);
+                    pw = new DeviceControlSpd(DeviceControlSpd.PowerType.MAIN, 128);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -292,7 +293,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
                     || xinghao.equals("Biowolf LE") || xinghao.equals("FC-PK80")
                     || xinghao.equals("FC-K80") || xinghao.equals("T80") || xinghao.contains("80")) {
                 try {
-                    pw = new UHFDeviceControl(UHFDeviceControl.PowerType.MAIN, 119);
+                    pw = new DeviceControlSpd(DeviceControlSpd.PowerType.MAIN, 119);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -300,7 +301,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
                 String readEm55 = readEm55();
                 if (readEm55.equals("80")) {
                     try {
-                        pw = new UHFDeviceControl(UHFDeviceControl.PowerType.MAIN_AND_EXPAND
+                        pw = new DeviceControlSpd(DeviceControlSpd.PowerType.MAIN_AND_EXPAND
                                 , 88, 7, 5);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -308,14 +309,14 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
 
                 } else if (readEm55.equals("48") || readEm55.equals("81")) {
                     try {
-                        pw = new UHFDeviceControl(UHFDeviceControl.PowerType.MAIN_AND_EXPAND
+                        pw = new DeviceControlSpd(DeviceControlSpd.PowerType.MAIN_AND_EXPAND
                                 , 88, 7, 6);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 } else {
                     try {
-                        pw = new UHFDeviceControl(UHFDeviceControl.PowerType.MAIN, 88);
+                        pw = new DeviceControlSpd(DeviceControlSpd.PowerType.MAIN, 88);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -324,14 +325,14 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             } else if (xinghao.contains("SD100")) {
                 // TODO: 2018/10/10   上电处理
                 try {
-                    pw = new UHFDeviceControl(UHFDeviceControl.PowerType.GAOTONG_MAIN);
+                    pw = new DeviceControlSpd(DeviceControlSpd.PowerType.GAOTONG_MAIN);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
             } else {
                 try {
-                    pw = new UHFDeviceControl(UHFDeviceControl.PowerType.MAIN, 94);
+                    pw = new DeviceControlSpd(DeviceControlSpd.PowerType.MAIN, 94);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -604,7 +605,12 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
 
     @Override
     public int setQT(byte[] rpaswd, int cmdType, int memType, int persistType, int rangeType) {
-        return 0;
+        return -1;
+    }
+
+    @Override
+    public int setMonzaQtTagMode(int memMap, int maskFlag, byte[] accessPassword) {
+        return getLinkage().setMonzaQtTagMode(memMap, maskFlag, accessPassword);
     }
 
     //********************************************老版接口（不再维护）******************************************

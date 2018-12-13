@@ -140,7 +140,7 @@ public class DirectionalTagDialog extends Dialog implements
                         if (epc.equals(epcToStr)) {
                             int rssi = Integer.parseInt(spdInventoryData.getRssi());
                             if (rssi > -60) {
-                                if (rssi > -30) {
+                                if (rssi > -40) {
                                     soundPool.play(soundId1, 1, 1, 0, 0, 3);
                                 } else {
                                     soundPool.play(soundId1, 0.6F, 0.6F, 0, 0, 2);

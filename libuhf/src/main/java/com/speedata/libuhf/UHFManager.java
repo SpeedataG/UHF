@@ -8,12 +8,13 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.serialport.UHFDeviceControl;
-import android.serialport.SerialPortBackup;
+import android.serialport.DeviceControlSpd;
+import android.serialport.SerialPortSpd;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.power.control.DeviceControl;
 import com.speedata.libuhf.utils.CommonUtils;
 import com.speedata.libuhf.utils.ConfigUtils;
 import com.speedata.libuhf.utils.ReadBean;
@@ -47,7 +48,7 @@ public class UHFManager {
     private final static String FACTORY_R2000 = "r2k";
     private final static String FACTORY_3992 = "as3992";
     private static int fd;
-    private static UHFDeviceControl pw;
+    private static DeviceControlSpd pw;
     private static Context mContext;
     private static BatteryReceiver batteryReceiver;
     private static ReadBean mRead;
@@ -181,38 +182,38 @@ public class UHFManager {
         if (TextUtils.isEmpty(factory)) {
             Log.d("getModle_start", String.valueOf(System.currentTimeMillis()));
             if (Build.VERSION.RELEASE.equals("4.4.2")) {
-                powerOn(UHFDeviceControl.PowerType.MAIN, 64);
+                powerOn(DeviceControlSpd.PowerType.MAIN, 64);
             } else {
                 String xinghao = Build.MODEL;
                 if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")) {
 //                    powerOn(UHFDeviceControl.PowerType.NEW_MAIN, 86);
-                    powerOn(UHFDeviceControl.PowerType.EXPAND, 9, 14);
+                    powerOn(DeviceControlSpd.PowerType.EXPAND, 9, 14);
 
                 } else if (xinghao.contains("SD55L")) {
-                    powerOn(UHFDeviceControl.PowerType.MAIN, 128);
+                    powerOn(DeviceControlSpd.PowerType.MAIN, 128);
                 } else if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")
                         || xinghao.equals("Biowolf LE") || xinghao.equals("FC-PK80")
                         || xinghao.equals("FC-K80") || xinghao.equals("T80") || xinghao.contains("80")) {
-                    powerOn(UHFDeviceControl.PowerType.MAIN, 119);
+                    powerOn(DeviceControlSpd.PowerType.MAIN, 119);
                 } else if (xinghao.contains("55") || xinghao.equals("W2H")) {
                     String readEm55 = readEm55();
                     if (readEm55.equals("80")) {
-                        powerOn(UHFDeviceControl.PowerType.MAIN_AND_EXPAND, 88, 7, 5);
+                        powerOn(DeviceControlSpd.PowerType.MAIN_AND_EXPAND, 88, 7, 5);
                     } else if (readEm55.equals("48") || readEm55.equals("81")) {
-                        powerOn(UHFDeviceControl.PowerType.MAIN_AND_EXPAND, 88, 6, 7);
+                        powerOn(DeviceControlSpd.PowerType.MAIN_AND_EXPAND, 88, 6, 7);
                     } else {
-                        powerOn(UHFDeviceControl.PowerType.MAIN, 88);
+                        powerOn(DeviceControlSpd.PowerType.MAIN, 88);
                     }
 
                 } else if (xinghao.contains("SD100")) {
                     try {
-                        pw = new UHFDeviceControl(UHFDeviceControl.PowerType.GAOTONG_MAIN);
+                        pw = new DeviceControlSpd(DeviceControlSpd.PowerType.GAOTONG_MAIN);
                         pw.PowerOnDevice();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 } else {
-                    powerOn(UHFDeviceControl.PowerType.MAIN, 94);
+                    powerOn(DeviceControlSpd.PowerType.MAIN, 94);
                 }
             }
 
@@ -228,9 +229,9 @@ public class UHFManager {
         }
     }
 
-    private static void powerOn(UHFDeviceControl.PowerType POWERCTL, int... gpios) {
+    private static void powerOn(DeviceControlSpd.PowerType POWERCTL, int... gpios) {
         try {
-            pw = new UHFDeviceControl(POWERCTL, gpios);
+            pw = new DeviceControlSpd(POWERCTL, gpios);
             pw.PowerOnDevice();
         } catch (IOException e) {
             e.printStackTrace();
@@ -243,7 +244,7 @@ public class UHFManager {
      */
     private static String getModle() {
         String factory = "";
-        SerialPortBackup serialPort = new SerialPortBackup();
+        SerialPortSpd serialPort = new SerialPortSpd();
         String xinghao = Build.MODEL;
         if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")) {
             try {
