@@ -341,7 +341,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             }
         }
         try {
-            if (!Build.MODEL.contains("SD100")){
+            if (!Build.MODEL.contains("SD100")) {
                 pw.PowerOffDevice();
                 pw.PowerOnDevice();
             }
@@ -379,10 +379,10 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
                 e.printStackTrace();
             }
             try {
-                if (Build.MODEL.contains("SD100")){
+                if (Build.MODEL.contains("SD100")) {
                     pw.gtPower("uhf_close");
                     pw.gtPower("close");
-                }else {
+                } else {
                     pw.PowerOffDevice();
                 }
             } catch (IOException e) {
@@ -621,6 +621,26 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
     @Override
     public int setMonzaQtTagMode(int memMap, int maskFlag, byte[] accessPassword) {
         return getLinkage().setMonzaQtTagMode(memMap, maskFlag, accessPassword);
+    }
+
+    @Override
+    public int readMonzaQtTag(int memMap, byte[] pwd, int bank, int address, int length) {
+        return getLinkage().readMonzaQtTag(memMap, pwd, bank, address, length);
+    }
+
+    @Override
+    public int readMonzaQtTagSync(int memMap, byte[] pwd, int bank, int address, int length, int timeOutMs, RW_Params rw_params) {
+        return getLinkage().readMonzaQtTagSync(memMap, pwd, bank, address, length, timeOutMs, rw_params);
+    }
+
+    @Override
+    public int writeMonzaQtTag(int memMap, byte[] pwd, int bank, int address, int length, byte[] writeData) {
+        return getLinkage().writeMonzaQtTag(memMap, pwd, bank, address, length, writeData);
+    }
+
+    @Override
+    public int writeMonzaQtTagSync(int memMap, byte[] pwd, int bank, int address, int length, byte[] writeData, int timeOutMs, RW_Params rw_params) {
+        return getLinkage().writeMonzaQtTagSync(memMap, pwd, bank, address, length, writeData, timeOutMs, rw_params);
     }
 
     //********************************************老版接口（不再维护）******************************************

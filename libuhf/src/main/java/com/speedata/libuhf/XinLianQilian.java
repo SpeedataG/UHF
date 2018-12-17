@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import android.serialport.DeviceControlSpd;
+
 import com.speedata.libuhf.bean.SpdInventoryData;
 import com.speedata.libuhf.bean.SpdReadData;
 import com.speedata.libuhf.bean.SpdWriteData;
@@ -23,6 +24,7 @@ import com.speedata.libuhf.utils.ReadBean;
 import com.speedata.libuhf.utils.StringUtils;
 import com.uhf.api.cls.ErrInfo;
 import com.uhf.api.cls.Reader;
+import com.uhf.structures.RW_Params;
 import com.uhf.structures.SelectCriteria;
 
 import java.io.BufferedReader;
@@ -255,10 +257,10 @@ public class XinLianQilian implements IUHFService {
             }
         } else {
             try {
-                if (Build.MODEL.contains("SD100")){
+                if (Build.MODEL.contains("SD100")) {
                     deviceControl.gtPower("uhf_close");
                     deviceControl.gtPower("close");
-                }else {
+                } else {
                     deviceControl.PowerOffDevice();
                 }
             } catch (IOException e) {
@@ -745,6 +747,26 @@ public class XinLianQilian implements IUHFService {
 
     @Override
     public int setMonzaQtTagMode(int memMap, int maskFlag, byte[] accessPassword) {
+        return -1;
+    }
+
+    @Override
+    public int readMonzaQtTag(int memMap, byte[] pwd, int bank, int address, int length) {
+        return -1;
+    }
+
+    @Override
+    public int readMonzaQtTagSync(int memMap, byte[] pwd, int bank, int address, int length, int timeOutMs, RW_Params rw_params) {
+        return -1;
+    }
+
+    @Override
+    public int writeMonzaQtTag(int memMap, byte[] pwd, int bank, int address, int length, byte[] writeData) {
+        return -1;
+    }
+
+    @Override
+    public int writeMonzaQtTagSync(int memMap, byte[] pwd, int bank, int address, int length, byte[] writeData, int timeOutMs, RW_Params rw_params) {
         return -1;
     }
 

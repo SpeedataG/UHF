@@ -8,6 +8,7 @@ import com.speedata.libuhf.interfaces.OnSpdInventoryListener;
 import com.speedata.libuhf.interfaces.OnSpdReadListener;
 import com.speedata.libuhf.interfaces.OnSpdWriteListener;
 import com.uhf.structures.DynamicQParams;
+import com.uhf.structures.RW_Params;
 import com.uhf.structures.SelectCriteria;
 
 /**
@@ -150,15 +151,14 @@ public interface IUHFService {
     public SelectCriteria getMask();
 
     /**
-     *
-     * @param rpaswd 密码 16进制byte
-     * @param cmdType 命令类型 0为读 1为写
-     * @param memType 内存视图 0为私密 1为公共
+     * @param rpaswd      密码 16进制byte
+     * @param cmdType     命令类型 0为读 1为写
+     * @param memType     内存视图 0为私密 1为公共
      * @param persistType 识别距离 0为远场 1为近场
-     * @param rangeType 状态类型 0为临时 1为永久
+     * @param rangeType   状态类型 0为临时 1为永久
      * @return
      */
-    public int setQT(byte[] rpaswd,int cmdType,int memType,int persistType,int rangeType);
+    public int setQT(byte[] rpaswd, int cmdType, int memType, int persistType, int rangeType);
 
     /**
      * 设置4QT标签的模式切换
@@ -168,9 +168,53 @@ public interface IUHFService {
      * @param accessPassword 访问密码
      * @return 0--成功 非零--失败
      */
-    public  int setMonzaQtTagMode(int memMap, int maskFlag, byte[] accessPassword);
+    public int setMonzaQtTagMode(int memMap, int maskFlag, byte[] accessPassword);
 
+    /**
+     * @param memMap  0私有区域，1 公有区域
+     * @param pwd     访问密码
+     * @param bank    区域
+     * @param address 起始地址
+     * @param length  读取长度
+     * @return 0--成功 非0失败
+     */
+    public int readMonzaQtTag(int memMap, byte[] pwd, int bank, int address, int length);
 
+    /**
+     * @param memMap    0私有区域，1 公有区域
+     * @param pwd       访问密码
+     * @param bank      区域
+     * @param address   起始地址
+     * @param length    读取长度
+     * @param timeOutMs 超时时间
+     * @param rw_params 读取的信息
+     * @return 0--成功 非0失败
+     */
+    public int readMonzaQtTagSync(int memMap, byte[] pwd, int bank, int address, int length, int timeOutMs, RW_Params rw_params);
+
+    /**
+     * @param memMap    0私有区域，1 公有区域
+     * @param pwd       访问密码
+     * @param bank      区域
+     * @param address   起始地址
+     * @param length    长度
+     * @param writeData 写入的数据
+     * @return 0--成功 非0失败
+     */
+    public int writeMonzaQtTag(int memMap, byte[] pwd, int bank, int address, int length, byte[] writeData);
+
+    /**
+     * @param memMap    0私有区域，1 公有区域
+     * @param pwd       访问密码
+     * @param bank      区域
+     * @param address   起始地址
+     * @param length    长度
+     * @param writeData 写入的数据
+     * @param timeOutMs 超时时间
+     * @param rw_params 信息
+     * @return 0--成功 非0失败
+     */
+    public int writeMonzaQtTagSync(int memMap, byte[] pwd, int bank, int address, int length, byte[] writeData, int timeOutMs, RW_Params rw_params);
     //********************************************老版接口（不再维护）***************************************************
 
 
