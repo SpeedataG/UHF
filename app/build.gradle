@@ -14,7 +14,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 28
         versionCode 1
-        versionName "NEW1.9.5"
+        versionName "NEW1.9.6"
         ndk {
             //选择要添加的对应cpu类型的.so库。
             abiFilters 'armeabi'
@@ -46,6 +46,7 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:28.0.0'
     testImplementation 'junit:junit:4.12'
     implementation project(path: ':libuhf')
+    implementation 'com.github.SpeedataG:Device:1.6.3'
     implementation 'com.kaopiz:kprogresshud:1.2.0'
     implementation 'org.greenrobot:eventbus:3.1.1'
     //引用超高频不需要引用下面

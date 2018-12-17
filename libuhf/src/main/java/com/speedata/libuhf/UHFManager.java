@@ -180,11 +180,12 @@ public class UHFManager {
     private static void noXmlJudgeModule() {
         factory = SharedXmlUtil.getInstance(mContext).read("modle", "");
         if (TextUtils.isEmpty(factory)) {
-            Log.d("getModle_start", String.valueOf(System.currentTimeMillis()));
+            Log.d("ZM", String.valueOf(System.currentTimeMillis()));
             if (Build.VERSION.RELEASE.equals("4.4.2")) {
                 powerOn(DeviceControlSpd.PowerType.MAIN, 64);
             } else {
                 String xinghao = Build.MODEL;
+                Log.d("ZM", "Build.MODEL: "+xinghao);
                 if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")) {
 //                    powerOn(UHFDeviceControl.PowerType.NEW_MAIN, 86);
                     powerOn(DeviceControlSpd.PowerType.EXPAND, 9, 14);
@@ -207,10 +208,12 @@ public class UHFManager {
 
                 } else if (xinghao.contains("SD100")) {
                     try {
-                        pw = new DeviceControlSpd(DeviceControlSpd.PowerType.GAOTONG_MAIN);
-                        pw.PowerOnDevice();
+                        pw = new DeviceControlSpd(DeviceControlSpd.POWER_GAOTONG);
+                        pw.gtPower("uhf_open");
+                        pw.gtPower("open");
                     } catch (IOException e) {
                         e.printStackTrace();
+                        Log.d("ZM", "SD100 powerOn-Exception: "+e.toString());
                     }
                 } else {
                     powerOn(DeviceControlSpd.PowerType.MAIN, 94);
@@ -225,7 +228,7 @@ public class UHFManager {
 
             factory = getModle();
             SharedXmlUtil.getInstance(mContext).write("modle", factory);
-            Log.d("getModle_end", String.valueOf(System.currentTimeMillis()));
+            Log.d("ZM", String.valueOf(System.currentTimeMillis()));
         }
     }
 
@@ -235,6 +238,7 @@ public class UHFManager {
             pw.PowerOnDevice();
         } catch (IOException e) {
             e.printStackTrace();
+            Log.d("ZM", "powerOn-Exception: "+e.toString());
         }
     }
 
@@ -285,6 +289,7 @@ public class UHFManager {
         if (bytes != null) {
             factory = bytesToHexString(bytes);
         }
+        Log.d("ZM", "判断是不是R2000: "+factory);
         if (factory.equals("7E002A240349006D00700069006E006A00530065007200690061006C004E0075006D003000310006A97E")) {
             serialPort.CloseSerial(fd);
             powerOff();
@@ -311,6 +316,7 @@ public class UHFManager {
         int length = 0;
         if (bytes != null) {
             length = bytes.length;
+            Log.d("ZM", "判断是不是旗联-芯联 length: "+length);
             if (length == 27) {
                 serialPort.CloseSerial(fd);
                 powerOff();
@@ -333,6 +339,7 @@ public class UHFManager {
         }
         if (bytes != null) {
             factory = bytesToHexString(bytes);
+            Log.d("ZM", "判断是不是旗联-飞利信: "+factory);
             if (factory.equals("BB0103000A025261794D6174726978B17E")) {
                 serialPort.CloseSerial(fd);
                 powerOff();
@@ -348,9 +355,15 @@ public class UHFManager {
 
     private static void powerOff() {
         try {
-            pw.PowerOffDevice();
+            if (Build.MODEL.contains("SD100")){
+                pw.gtPower("uhf_close");
+                pw.gtPower("close");
+            }else {
+                pw.PowerOffDevice();
+            }
         } catch (IOException e) {
             e.printStackTrace();
+            Log.d("ZM", "powerOff-Exception: "+e.toString());
         }
     }
 

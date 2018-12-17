@@ -208,8 +208,9 @@ public class XinLianQilian implements IUHFService {
 
             } else if (xinghao.contains("SD100")) {
                 try {
-                    deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.GAOTONG_MAIN);
-                    deviceControl.PowerOnDevice();
+                    deviceControl = new DeviceControlSpd(DeviceControlSpd.POWER_GAOTONG);
+                    deviceControl.gtPower("uhf_open");
+                    deviceControl.gtPower("open");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -254,7 +255,12 @@ public class XinLianQilian implements IUHFService {
             }
         } else {
             try {
-                deviceControl.PowerOffDevice();
+                if (Build.MODEL.contains("SD100")){
+                    deviceControl.gtPower("uhf_close");
+                    deviceControl.gtPower("close");
+                }else {
+                    deviceControl.PowerOffDevice();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

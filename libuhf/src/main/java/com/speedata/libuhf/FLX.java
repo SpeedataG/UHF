@@ -325,7 +325,9 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             } else if (xinghao.contains("SD100")) {
                 // TODO: 2018/10/10   上电处理
                 try {
-                    pw = new DeviceControlSpd(DeviceControlSpd.PowerType.GAOTONG_MAIN);
+                    pw = new DeviceControlSpd(DeviceControlSpd.POWER_GAOTONG);
+                    pw.gtPower("uhf_open");
+                    pw.gtPower("open");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -339,8 +341,10 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             }
         }
         try {
-            pw.PowerOffDevice();
-            pw.PowerOnDevice();
+            if (!Build.MODEL.contains("SD100")){
+                pw.PowerOffDevice();
+                pw.PowerOnDevice();
+            }
         } catch (IOException e) {
             e.printStackTrace();
 
@@ -351,6 +355,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")) {
             result = getLinkage().open_serial(SERIALPORT_SD60);
         } else if (xinghao.contains("SD100")) {
+            SystemClock.sleep(240);
             result = getLinkage().open_serial(SERIALPORT_SD100);
         } else {
             result = getLinkage().open_serial(SERIALPORT);
@@ -374,7 +379,12 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
                 e.printStackTrace();
             }
             try {
-                pw.PowerOffDevice();
+                if (Build.MODEL.contains("SD100")){
+                    pw.gtPower("uhf_close");
+                    pw.gtPower("close");
+                }else {
+                    pw.PowerOffDevice();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
