@@ -21,6 +21,7 @@ import com.speedata.libuhf.utils.ByteCharStrUtils;
 import com.speedata.libuhf.utils.CommonUtils;
 import com.speedata.libuhf.utils.ConfigUtils;
 import com.speedata.libuhf.utils.ReadBean;
+import com.speedata.libuhf.utils.SharedXmlUtil;
 import com.speedata.libuhf.utils.StringUtils;
 import com.uhf.api.cls.ErrInfo;
 import com.uhf.api.cls.Reader;
@@ -1143,6 +1144,7 @@ public class XinLianQilian implements IUHFService {
             } else {
                 Rparams.rpow = rpow;
                 Rparams.wpow = wpow;
+                SharedXmlUtil.getInstance(mContext).write("AntennaPower", power);
             }
         } catch (Exception e) {
             e.printStackTrace();

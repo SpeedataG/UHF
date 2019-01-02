@@ -22,10 +22,15 @@ import com.speedata.libuhf.utils.SharedXmlUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static android.content.ContentValues.TAG;
 
@@ -54,9 +59,17 @@ public class UHFManager {
     private static ReadBean mRead;
     private static String factory;
     private static volatile int stipulationLevel = 15;
+    private static Timer timer;
 
 
     public static IUHFService getUHFService(Context context) {
+        if (Build.MODEL.contains("SD60")) {
+            if (timer == null) {
+                timer = new Timer();
+                timer.schedule(myTimerTask, 10000, 60000);
+            }
+
+        }
         //  判断模块   返回不同的模块接口对象
         mContext = context.getApplicationContext();
         //注册广播接受者java代码
@@ -72,8 +85,41 @@ public class UHFManager {
         return iuhfService;
     }
 
+    private static TimerTask myTimerTask = new TimerTask() {
+        @Override
+        public void run() {
+            InputStream batt_volt_file = null;
+            try {
+                batt_volt_file = new FileInputStream("sys/class/power_supply/battery/batt_vol");
+                String battVoltFile = convertStreamToString(batt_volt_file);
+                double v = Integer.parseInt(battVoltFile) / 1000000.0;
+                int antennaPower = SharedXmlUtil.getInstance(mContext).read("AntennaPower", 30);
+                Log.d("ZM", "battVolt: " + v + "antennaPower：" + antennaPower);
+                if (antennaPower > 30 && v < 3.85) {
+                    stopUseUHF();
+                    stopTimer();
+                } else if (v < 3.7) {
+                    stopUseUHF();
+                    stopTimer();
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+        }
+    };
+
+    private static void stopTimer() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+    }
+
+
     public static void closeUHFService() {
         iuhfService = null;
+        stopTimer();
         unregisterReceiver();
     }
 
@@ -103,22 +149,7 @@ public class UHFManager {
                     //获取当前电量
                     int level = intent.getIntExtra("level", 0);
                     if (level < stipulationLevel) {
-                        if (iuhfService != null) {
-                            iuhfService.closeDev();
-                        }
-                        Handler handler = new Handler(Looper.getMainLooper());
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                boolean cn = mContext.getResources().getConfiguration().locale.getCountry().equals("CN");
-                                if (cn) {
-                                    Toast.makeText(mContext, "电量低禁用超高频", Toast.LENGTH_LONG).show();
-                                } else {
-                                    Toast.makeText(mContext, "Low power UHF is forbidden", Toast.LENGTH_LONG).show();
-                                }
-
-                            }
-                        });
+                        stopUseUHF();
 
                     }
                 } catch (Exception e) {
@@ -127,6 +158,25 @@ public class UHFManager {
             }
         }
 
+    }
+
+    private static void stopUseUHF() {
+        if (iuhfService != null) {
+            iuhfService.closeDev();
+        }
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                boolean cn = mContext.getResources().getConfiguration().locale.getCountry().equals("CN");
+                if (cn) {
+                    Toast.makeText(mContext, "电量低禁用超高频", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(mContext, "Low power UHF is forbidden", Toast.LENGTH_LONG).show();
+                }
+
+            }
+        });
     }
 
     private static boolean judgeModle() {
@@ -185,7 +235,7 @@ public class UHFManager {
                 powerOn(DeviceControlSpd.PowerType.MAIN, 64);
             } else {
                 String xinghao = Build.MODEL;
-                Log.d("ZM", "Build.MODEL: "+xinghao);
+                Log.d("ZM", "Build.MODEL: " + xinghao);
                 if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")) {
 //                    powerOn(UHFDeviceControl.PowerType.NEW_MAIN, 86);
                     powerOn(DeviceControlSpd.PowerType.EXPAND, 9, 14);
@@ -213,7 +263,7 @@ public class UHFManager {
                         pw.gtPower("open");
                     } catch (IOException e) {
                         e.printStackTrace();
-                        Log.d("ZM", "SD100 powerOn-Exception: "+e.toString());
+                        Log.d("ZM", "SD100 powerOn-Exception: " + e.toString());
                     }
                 } else {
                     powerOn(DeviceControlSpd.PowerType.MAIN, 94);
@@ -238,7 +288,7 @@ public class UHFManager {
             pw.PowerOnDevice();
         } catch (IOException e) {
             e.printStackTrace();
-            Log.d("ZM", "powerOn-Exception: "+e.toString());
+            Log.d("ZM", "powerOn-Exception: " + e.toString());
         }
     }
 
@@ -289,7 +339,7 @@ public class UHFManager {
         if (bytes != null) {
             factory = bytesToHexString(bytes);
         }
-        Log.d("ZM", "判断是不是R2000: "+factory);
+        Log.d("ZM", "判断是不是R2000: " + factory);
         if (factory.equals("7E002A240349006D00700069006E006A00530065007200690061006C004E0075006D003000310006A97E")) {
             serialPort.CloseSerial(fd);
             powerOff();
@@ -316,7 +366,7 @@ public class UHFManager {
         int length = 0;
         if (bytes != null) {
             length = bytes.length;
-            Log.d("ZM", "判断是不是旗联-芯联 length: "+length);
+            Log.d("ZM", "判断是不是旗联-芯联 length: " + length);
             if (length == 27) {
                 serialPort.CloseSerial(fd);
                 powerOff();
@@ -339,7 +389,7 @@ public class UHFManager {
         }
         if (bytes != null) {
             factory = bytesToHexString(bytes);
-            Log.d("ZM", "判断是不是旗联-飞利信: "+factory);
+            Log.d("ZM", "判断是不是旗联-飞利信: " + factory);
             if (factory.equals("BB0103000A025261794D6174726978B17E")) {
                 serialPort.CloseSerial(fd);
                 powerOff();
@@ -355,15 +405,15 @@ public class UHFManager {
 
     private static void powerOff() {
         try {
-            if (Build.MODEL.contains("SD100")){
+            if (Build.MODEL.contains("SD100")) {
                 pw.gtPower("uhf_close");
                 pw.gtPower("close");
-            }else {
+            } else {
                 pw.PowerOffDevice();
             }
         } catch (IOException e) {
             e.printStackTrace();
-            Log.d("ZM", "powerOff-Exception: "+e.toString());
+            Log.d("ZM", "powerOff-Exception: " + e.toString());
         }
     }
 
@@ -376,6 +426,30 @@ public class UHFManager {
             if (sTemp.length() < 2)
                 sb.append(0);
             sb.append(sTemp.toUpperCase());
+        }
+        return sb.toString();
+    }
+
+    public static String convertStreamToString(InputStream is) {
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        try {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return sb.toString();
     }

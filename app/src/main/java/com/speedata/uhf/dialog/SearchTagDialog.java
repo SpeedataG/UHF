@@ -186,6 +186,7 @@ public class SearchTagDialog extends Dialog implements
                 inSearch = false;
                 this.setCancelable(true);
                 iuhfService.inventoryStop();
+//                iuhfService.inventoryStart();
 
                 Action.setText(R.string.Start_Search_Btn);
                 Cancle.setEnabled(true);

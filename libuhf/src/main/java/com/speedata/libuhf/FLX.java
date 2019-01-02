@@ -20,6 +20,7 @@ import com.speedata.libuhf.utils.ByteCharStrUtils;
 import com.speedata.libuhf.utils.CommonUtils;
 import com.speedata.libuhf.utils.ConfigUtils;
 import com.speedata.libuhf.utils.ReadBean;
+import com.speedata.libuhf.utils.SharedXmlUtil;
 import com.speedata.libuhf.utils.StringUtils;
 import com.uhf.linkage.Linkage;
 import com.uhf.structures.DynamicQParams;
@@ -1055,6 +1056,9 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         int res = -1;
         if ((power >= ANTENNA_P_MIN) && (power <= ANTENNA_P_MAX)) {
             res = getLinkage().Radio_SetAntennaPower(power * 10);
+        }
+        if (res == 0) {
+            SharedXmlUtil.getInstance(mContext).write("AntennaPower", power);
         }
         return res;
     }

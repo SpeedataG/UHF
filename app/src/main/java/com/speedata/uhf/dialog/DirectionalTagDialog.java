@@ -55,6 +55,7 @@ public class DirectionalTagDialog extends Dialog implements
     private IUHFService iuhfService;
     private Button mBtnSeek;
     private EditText mEtEpc;
+    private List<SpdInventoryData> inventoryDataList = new ArrayList<>();
 
     public DirectionalTagDialog(Context context, IUHFService iuhfService) {
         super(context);
@@ -138,17 +139,28 @@ public class DirectionalTagDialog extends Dialog implements
                         SpdInventoryData spdInventoryData = (SpdInventoryData) msg.obj;
                         String epc = spdInventoryData.getEpc();
                         if (epc.equals(epcToStr)) {
-                            int rssi = Integer.parseInt(spdInventoryData.getRssi());
-                            if (rssi > -60) {
-                                if (rssi > -40) {
-                                    soundPool.play(soundId1, 1, 1, 0, 0, 3);
+                            inventoryDataList.add(spdInventoryData);
+                            if (inventoryDataList.size() == 10) {
+                                int rssiNum = 0;
+                                for (SpdInventoryData inventoryData : inventoryDataList) {
+                                    rssiNum = rssiNum + Integer.parseInt(inventoryData.getRssi());
+                                }
+                                int rssi = rssiNum / 10;
+                                Log.e("ZM", "rssi: " + rssi);
+                                if (rssi > -70) {
+                                    if (rssi > -50) {
+                                        soundPool.play(soundId2, 1, 1, 0, 0, 1);
+                                    } else {
+                                        soundPool.play(soundId2, 0.6F, 0.6F, 0, 0, 0.8F);
+                                    }
+
                                 } else {
-                                    soundPool.play(soundId1, 0.6F, 0.6F, 0, 0, 2);
+                                    soundPool.play(soundId2, 0.3F, 0.3F, 0, 0, 0.5F);
                                 }
 
-                            } else {
-                                soundPool.play(soundId1, 0.3F, 0.3F, 0, 0, 1);
+                                inventoryDataList.clear();
                             }
+
                         }
                     } else {
                         if (cn) {
