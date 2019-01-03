@@ -236,7 +236,7 @@ public class UHFManager {
             } else {
                 String xinghao = Build.MODEL;
                 Log.d("ZM", "Build.MODEL: " + xinghao);
-                if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")) {
+                if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")||xinghao.contains("SC60")) {
 //                    powerOn(UHFDeviceControl.PowerType.NEW_MAIN, 86);
                     powerOn(DeviceControlSpd.PowerType.EXPAND, 9, 14);
 
@@ -300,7 +300,7 @@ public class UHFManager {
         String factory = "";
         SerialPortSpd serialPort = new SerialPortSpd();
         String xinghao = Build.MODEL;
-        if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")) {
+        if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")||xinghao.contains("SC60")) {
             try {
                 serialPort.OpenSerial("/dev/ttyMT0", 115200);
             } catch (IOException e) {
