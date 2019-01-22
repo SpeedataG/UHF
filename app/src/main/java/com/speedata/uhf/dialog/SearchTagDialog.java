@@ -343,9 +343,9 @@ public class SearchTagDialog extends Dialog implements
 
         speedTv.setText(String.format("%s次/秒", String.valueOf(Rate)));
 
-        tagNumTv.setText(String.format("%s个", String.valueOf(firm.size())));
+        tagNumTv.setText("已盘" + String.format("%s个", String.valueOf(firm.size())));
 
-        totalTv.setText(String.format("%s次", String.valueOf(scant)));
+        totalTv.setText("总数" + String.format("%s次", String.valueOf(scant)));
 
         totalTime.setText(String.valueOf(getTimeFromMillisecond(total_time_count)));
 
