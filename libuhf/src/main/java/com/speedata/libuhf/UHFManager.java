@@ -15,6 +15,11 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.power.control.DeviceControl;
+import com.speedata.libuhf.bean.SpdInventoryData;
+import com.speedata.libuhf.interfaces.OnSpdBanMsgListener;
+import com.speedata.libuhf.interfaces.OnSpdInventoryListener;
+import com.speedata.libuhf.interfaces.OnSpdReadListener;
+import com.speedata.libuhf.interfaces.OnSpdWriteListener;
 import com.speedata.libuhf.utils.CommonUtils;
 import com.speedata.libuhf.utils.ConfigUtils;
 import com.speedata.libuhf.utils.ReadBean;
@@ -63,7 +68,7 @@ public class UHFManager {
 
 
     public static IUHFService getUHFService(Context context) {
-        if (Build.MODEL.contains("SD60")) {
+        if (Build.MODEL.contains("SD60") || Build.MODEL.contains("SC60")) {
             if (timer == null) {
                 timer = new Timer();
                 timer.schedule(myTimerTask, 10000, 60000);
@@ -164,6 +169,9 @@ public class UHFManager {
         if (iuhfService != null) {
             iuhfService.closeDev();
         }
+        if (onSpdBanMsgListener != null) {
+            callBack("Low power UHF is forbidden");
+        }
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(new Runnable() {
             @Override
@@ -178,6 +186,24 @@ public class UHFManager {
             }
         });
     }
+
+    private static OnSpdBanMsgListener onSpdBanMsgListener = null;
+
+    public void setOnBanMsgListener(OnSpdBanMsgListener onSpdBanMsgListener) {
+        this.onSpdBanMsgListener = onSpdBanMsgListener;
+    }
+
+    private static OnSpdBanMsgListener getOnBanMsgListener() {
+        return onSpdBanMsgListener;
+    }
+
+    private static void callBack(String msg) {
+        if (onSpdBanMsgListener != null && getOnBanMsgListener() != null) {
+            getOnBanMsgListener().getBanMsg(msg);
+        }
+
+    }
+
 
     private static boolean judgeModle() {
         if (ConfigUtils.isConfigFileExists() && !CommonUtils.subDeviceType().contains("55")) {
@@ -236,7 +262,7 @@ public class UHFManager {
             } else {
                 String xinghao = Build.MODEL;
                 Log.d("ZM", "Build.MODEL: " + xinghao);
-                if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")||xinghao.contains("SC60")) {
+                if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60") || xinghao.contains("SC60")) {
 //                    powerOn(UHFDeviceControl.PowerType.NEW_MAIN, 86);
                     powerOn(DeviceControlSpd.PowerType.EXPAND, 9, 14);
 
@@ -300,7 +326,7 @@ public class UHFManager {
         String factory = "";
         SerialPortSpd serialPort = new SerialPortSpd();
         String xinghao = Build.MODEL;
-        if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")||xinghao.contains("SC60")) {
+        if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60") || xinghao.contains("SC60")) {
             try {
                 serialPort.OpenSerial("/dev/ttyMT0", 115200);
             } catch (IOException e) {
