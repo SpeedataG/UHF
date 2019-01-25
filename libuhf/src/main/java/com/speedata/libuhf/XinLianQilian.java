@@ -159,7 +159,7 @@ public class XinLianQilian implements IUHFService {
                 }
             } else if (xinghao.contains("SD55")) {
                 try {
-                    deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.MAIN, 12);
+                    deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.MAIN, 128);
                     deviceControl.PowerOnDevice();
                 } catch (IOException e) {
                     e.printStackTrace();

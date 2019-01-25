@@ -269,7 +269,7 @@ public class UHFManager {
                 } else if (xinghao.contains("SD55L")) {
                     powerOn(DeviceControlSpd.PowerType.MAIN, 128);
                 } else if (xinghao.contains("SD55")) {
-                    powerOn(DeviceControlSpd.PowerType.MAIN, 12);
+                    powerOn(DeviceControlSpd.PowerType.MAIN, 128);
                 } else if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")
                         || xinghao.equals("Biowolf LE") || xinghao.equals("FC-PK80")
                         || xinghao.equals("FC-K80") || xinghao.equals("T80") || xinghao.contains("80")) {

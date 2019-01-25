@@ -292,7 +292,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
                 }
             } else if (xinghao.contains("SD55")) {
                 try {
-                    pw = new DeviceControlSpd(DeviceControlSpd.PowerType.MAIN, 12);
+                    pw = new DeviceControlSpd(DeviceControlSpd.PowerType.MAIN, 128);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
