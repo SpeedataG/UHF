@@ -10,7 +10,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 28
         versionCode 2
-        versionName "7.7.0"
+        versionName "7.7.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
@@ -125,7 +125,7 @@ dependencies {
 //打包
 task buildJar(type: Jar, dependsOn: ['build']) {
 //导出的jar文件名称
-    archiveName = 'uhf_7.6.9.jar'
+    archiveName = 'uhf_7.7.0.jar'
 //从哪个目录打包jar
     from('build/intermediates/classes/debug')
 //导出的jar文件的存放目录（未指定则默认存放在buildbs下）

@@ -277,7 +277,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             }
         } else {
             String xinghao = Build.MODEL;
-            if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")||xinghao.contains("SC60")) {
+            if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60") || xinghao.contains("SC60")) {
                 try {
 //                    pw = new UHFDeviceControl(UHFDeviceControl.PowerType.NEW_MAIN, 86);
                     pw = new DeviceControlSpd(DeviceControlSpd.PowerType.EXPAND, 9, 14);
@@ -287,6 +287,12 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             } else if (xinghao.contains("SD55L")) {
                 try {
                     pw = new DeviceControlSpd(DeviceControlSpd.PowerType.MAIN, 128);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else if (xinghao.contains("SD55")) {
+                try {
+                    pw = new DeviceControlSpd(DeviceControlSpd.PowerType.MAIN, 12);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -353,7 +359,10 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         SystemClock.sleep(20);
         int result;
         String xinghao = Build.MODEL;
-        if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")||xinghao.contains("SC60")) {
+        if (xinghao.contains("SD55L")) {
+            result = getLinkage().open_serial(SERIALPORT);
+        } else if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60") || xinghao.contains("SC60")
+                || xinghao.contains("SD55")) {
             result = getLinkage().open_serial(SERIALPORT_SD60);
         } else if (xinghao.contains("SD100")) {
             SystemClock.sleep(240);

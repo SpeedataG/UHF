@@ -128,7 +128,7 @@ public class XinLianQilian implements IUHFService {
             }
         } else {
             String xinghao = Build.MODEL;
-            if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60")||xinghao.contains("SC60")) {
+            if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60") || xinghao.contains("SC60")) {
                 try {
 //                    deviceControl = new UHFDeviceControl(UHFDeviceControl.PowerType.NEW_MAIN, 86);
                     deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.EXPAND, 9, 14);
@@ -151,6 +151,20 @@ public class XinLianQilian implements IUHFService {
                     e.printStackTrace();
                 }
                 Reader.READER_ERR er = Mreader.InitReader_Notype(SERIALPORT, 1);
+                if (er == Reader.READER_ERR.MT_OK_ERR) {
+                    antportc = 1;
+                    return 0;
+                } else {
+                    return -1;
+                }
+            } else if (xinghao.contains("SD55")) {
+                try {
+                    deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.MAIN, 12);
+                    deviceControl.PowerOnDevice();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Reader.READER_ERR er = Mreader.InitReader_Notype(SERIALPORT_SD60, 1);
                 if (er == Reader.READER_ERR.MT_OK_ERR) {
                     antportc = 1;
                     return 0;
