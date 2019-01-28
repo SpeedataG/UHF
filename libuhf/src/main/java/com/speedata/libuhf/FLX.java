@@ -284,12 +284,6 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            } else if (xinghao.contains("SD55L")) {
-                try {
-                    pw = new DeviceControlSpd(DeviceControlSpd.PowerType.MAIN, 128);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             } else if (xinghao.contains("SD55")) {
                 try {
                     pw = new DeviceControlSpd(DeviceControlSpd.PowerType.MAIN, 128);
@@ -359,10 +353,9 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         SystemClock.sleep(20);
         int result;
         String xinghao = Build.MODEL;
-        if (xinghao.contains("SD55L")) {
+        if (xinghao.contains("SD55")) {
             result = getLinkage().open_serial(SERIALPORT);
-        } else if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60") || xinghao.contains("SC60")
-                || xinghao.contains("SD55")) {
+        } else if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60") || xinghao.contains("SC60")) {
             result = getLinkage().open_serial(SERIALPORT_SD60);
         } else if (xinghao.contains("SD100")) {
             SystemClock.sleep(240);
