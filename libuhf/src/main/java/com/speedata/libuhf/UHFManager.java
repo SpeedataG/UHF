@@ -65,15 +65,12 @@ public class UHFManager {
     private static String factory;
     private static volatile int stipulationLevel = 15;
     private static Timer timer;
+    private static TimerTask myTimerTask;
 
 
     public static IUHFService getUHFService(Context context) {
         if (Build.MODEL.contains("SD60") || Build.MODEL.contains("SC60")) {
-            if (timer == null) {
-                timer = new Timer();
-                timer.schedule(myTimerTask, 10000, 60000);
-            }
-
+            createTimer();
         }
         //  判断模块   返回不同的模块接口对象
         mContext = context.getApplicationContext();
@@ -90,41 +87,55 @@ public class UHFManager {
         return iuhfService;
     }
 
-    private static TimerTask myTimerTask = new TimerTask() {
-        @Override
-        public void run() {
-            InputStream batt_volt_file = null;
-            try {
-                batt_volt_file = new FileInputStream("sys/class/power_supply/battery/batt_vol");
-                String battVoltFile = convertStreamToString(batt_volt_file);
-                double v = Integer.parseInt(battVoltFile) / 1000000.0;
-                int antennaPower = SharedXmlUtil.getInstance(mContext).read("AntennaPower", 30);
-                Log.d("ZM", "battVolt: " + v + "antennaPower：" + antennaPower);
-                if (antennaPower > 30 && v < 3.85) {
-                    stopUseUHF();
-                    stopTimer();
-                } else if (v < 3.7) {
-                    stopUseUHF();
-                    stopTimer();
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
+    private static void createTimer() {
+        if (timer == null) {
+            timer = new Timer();
+            if (myTimerTask != null) {
+                myTimerTask.cancel();
             }
+            myTimerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    InputStream batt_volt_file = null;
+                    try {
+                        batt_volt_file = new FileInputStream("sys/class/power_supply/battery/batt_vol");
+                        String battVoltFile = convertStreamToString(batt_volt_file);
+                        double v = Integer.parseInt(battVoltFile) / 1000000.0;
+                        int antennaPower = SharedXmlUtil.getInstance(mContext).read("AntennaPower", 30);
+                        Log.d("ZM", "battVolt: " + v + "antennaPower：" + antennaPower);
+                        if (antennaPower > 30 && v < 3.85) {
+                            stopUseUHF();
+                            stopTimer();
+                        } else if (v < 3.7) {
+                            stopUseUHF();
+                            stopTimer();
+                        }
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
 
+                }
+            };
+            timer.schedule(myTimerTask, 10000, 60000);
         }
-    };
+    }
+
 
     private static void stopTimer() {
         if (timer != null) {
             timer.cancel();
             timer = null;
         }
+
     }
 
 
     public static void closeUHFService() {
         iuhfService = null;
         stopTimer();
+        if (myTimerTask != null) {
+            myTimerTask.cancel();
+        }
         unregisterReceiver();
     }
 
