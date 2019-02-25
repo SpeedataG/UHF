@@ -1,5 +1,6 @@
 package com.speedata.uhf;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -105,36 +106,6 @@ public class MainActivity extends Activity implements OnClickListener {
 
     }
 
-    private BufferedWriter CtrlFile;
-
-    public void DeviceControl(int gpionum, int dout) throws IOException {
-        File DeviceGpio = new File("/sys/class/switch/app_switch/app_state");
-        CtrlFile = new BufferedWriter(new FileWriter(DeviceGpio, false));    //open file
-        CtrlFile.write("open");
-        CtrlFile.flush();
-        CtrlFile.close();
-//        File DeviceGpio = new File("/sys/class/gpio/export");
-//        CtrlFile = new BufferedWriter(new FileWriter(DeviceGpio, false));	//open file
-//        CtrlFile.write(String.valueOf(gpionum));
-//        CtrlFile.flush();
-//        CtrlFile.close();
-//        String sGpio = "/sys/class/gpio/gpio";
-//        String sGpioDir = "/direction";
-//        File DeviceNameGpioDir = new File(sGpio + String.valueOf(gpionum) + sGpioDir);
-//        CtrlFile = new BufferedWriter(new FileWriter(DeviceNameGpioDir, false));
-//        CtrlFile.write("out");
-//        CtrlFile.flush();
-//        CtrlFile.close();
-//        String sGpioVal = "/value";
-//        File DeviceNameGpioVal = new File(sGpio + String.valueOf(gpionum) + sGpioVal);
-//        CtrlFile = new BufferedWriter(new FileWriter(DeviceNameGpioVal, false));
-//        if(dout > 0)
-//            CtrlFile.write("1");
-//        else
-//            CtrlFile.write("0");
-//        CtrlFile.flush();
-//        CtrlFile.close();
-    }
 
     @Override
     protected void onResume() {
@@ -193,6 +164,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
     }
 
+    @SuppressLint("InvalidWakeLockTag")
     private void newWakeLock() {
         init_progress++;
         pM = (PowerManager) getSystemService(POWER_SERVICE);
