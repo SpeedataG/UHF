@@ -15,7 +15,10 @@ import java.io.IOException;
  */
 
 public class MyApp extends Application {
-    private static MyApp m_application; // 单例
+    /**
+     * 单例
+     */
+    private static MyApp m_application;
 
 
     public static MyApp getInstance() {

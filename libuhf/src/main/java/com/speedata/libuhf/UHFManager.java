@@ -1,6 +1,7 @@
 package com.speedata.libuhf;
 
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,12 +15,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.power.control.DeviceControl;
-import com.speedata.libuhf.bean.SpdInventoryData;
 import com.speedata.libuhf.interfaces.OnSpdBanMsgListener;
-import com.speedata.libuhf.interfaces.OnSpdInventoryListener;
-import com.speedata.libuhf.interfaces.OnSpdReadListener;
-import com.speedata.libuhf.interfaces.OnSpdWriteListener;
 import com.speedata.libuhf.utils.CommonUtils;
 import com.speedata.libuhf.utils.ConfigUtils;
 import com.speedata.libuhf.utils.ReadBean;
@@ -36,21 +32,30 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import static android.content.ContentValues.TAG;
 
 /**
- * Created by brxu on 2016/12/13.
+ *
+ * @author brxu
+ * @date 2016/12/13
  */
 
 public class UHFManager {
     private static IUHFService iuhfService;
-    //飞利信读取制造商指令
+    /**
+     * 飞利信读取制造商指令
+     */
     private static byte[] feilixin_cmd = {(byte) 0xbb, 0x00, 0x03, 0x00, 0x01, 0x02, 0x06, 0x7e};
-    //R2000获取版本号
+    /**
+     * R2000获取版本号
+     */
     private static byte[] r2000_cmd = {(byte) 0x7e, 0x00, 0x0e, (byte) 0xC0, 0x06, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00, (byte) 0xd4, 0X7e};
-    //芯联
+    /**
+     * 芯联
+     */
     private static byte[] xinlian_cmd = {(byte) 0xFF, 0x00, 0x03, 0x1d, 0x0C};
 
     private final static String FACTORY_FEILIXIN = "feilixin";
@@ -59,6 +64,7 @@ public class UHFManager {
     private final static String FACTORY_3992 = "as3992";
     private static int fd;
     private static DeviceControlSpd pw;
+    @SuppressLint("StaticFieldLeak")
     private static Context mContext;
     private static BatteryReceiver batteryReceiver;
     private static ReadBean mRead;
@@ -66,7 +72,15 @@ public class UHFManager {
     private static volatile int stipulationLevel = 15;
     private static Timer timer;
     private static TimerTask myTimerTask;
+    private static Boolean isFirst = false;
 
+    public static void setIsFirst(Boolean isFirst) {
+        UHFManager.isFirst = isFirst;
+    }
+
+    public static Boolean getIsFirst() {
+        return isFirst;
+    }
 
     public static IUHFService getUHFService(Context context) {
         if (Build.MODEL.contains("SD60") || Build.MODEL.contains("SC60")) {
@@ -81,8 +95,9 @@ public class UHFManager {
         //注册receiver
         mContext.registerReceiver(batteryReceiver, intentFilter);
         if (iuhfService == null) {
-            if (!judgeModle())
+            if (!judgeModel()) {
                 return null;
+            }
         }
         return iuhfService;
     }
@@ -96,17 +111,17 @@ public class UHFManager {
             myTimerTask = new TimerTask() {
                 @Override
                 public void run() {
-                    InputStream batt_volt_file = null;
+                    InputStream battVoltFile;
                     try {
-                        batt_volt_file = new FileInputStream("sys/class/power_supply/battery/batt_vol");
-                        String battVoltFile = convertStreamToString(batt_volt_file);
-                        double v = Integer.parseInt(battVoltFile) / 1000000.0;
+                        battVoltFile = new FileInputStream("sys/class/power_supply/battery/batt_vol");
+                        String battVoltFileStr = convertStreamToString(battVoltFile);
+                        double v = Integer.parseInt(battVoltFileStr) / 1000000.0;
                         int antennaPower = SharedXmlUtil.getInstance(mContext).read("AntennaPower", 30);
                         Log.d("ZM", "battVolt: " + v + "antennaPower：" + antennaPower);
-                        if (antennaPower > 30 && v < 3.85) {
+                        if (isFirst && antennaPower > 30 && v < 3.85) {
                             stopUseUHF();
                             stopTimer();
-                        } else if (v < 3.7) {
+                        } else if (v < 3.5) {
                             stopUseUHF();
                             stopTimer();
                         }
@@ -187,7 +202,7 @@ public class UHFManager {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                boolean cn = mContext.getResources().getConfiguration().locale.getCountry().equals("CN");
+                boolean cn = "CN".equals(mContext.getResources().getConfiguration().locale.getCountry());
                 if (cn) {
                     Toast.makeText(mContext, "电量低禁用超高频", Toast.LENGTH_LONG).show();
                 } else {
@@ -201,7 +216,7 @@ public class UHFManager {
     private static OnSpdBanMsgListener onSpdBanMsgListener = null;
 
     public void setOnBanMsgListener(OnSpdBanMsgListener onSpdBanMsgListener) {
-        this.onSpdBanMsgListener = onSpdBanMsgListener;
+        UHFManager.onSpdBanMsgListener = onSpdBanMsgListener;
     }
 
     private static OnSpdBanMsgListener getOnBanMsgListener() {
@@ -216,11 +231,11 @@ public class UHFManager {
     }
 
 
-    private static boolean judgeModle() {
+    private static boolean judgeModel() {
         if (ConfigUtils.isConfigFileExists() && !CommonUtils.subDeviceType().contains("55")) {
             mRead = ConfigUtils.readConfig(mContext);
             factory = mRead.getUhf().getModule();
-            SharedXmlUtil.getInstance(mContext).write("modle", factory);
+            SharedXmlUtil.getInstance(mContext).write("model", factory);
         } else {
             //沒有配置文件判断模块
             noXmlJudgeModule();
@@ -265,7 +280,7 @@ public class UHFManager {
     }
 
     private static void noXmlJudgeModule() {
-        factory = SharedXmlUtil.getInstance(mContext).read("modle", "");
+        factory = SharedXmlUtil.getInstance(mContext).read("model", "");
         if (TextUtils.isEmpty(factory)) {
             Log.d("ZM", String.valueOf(System.currentTimeMillis()));
             if (Build.VERSION.RELEASE.equals("4.4.2")) {
@@ -314,8 +329,8 @@ public class UHFManager {
                 e.printStackTrace();
             }
 
-            factory = getModle();
-            SharedXmlUtil.getInstance(mContext).write("modle", factory);
+            factory = getModel();
+            SharedXmlUtil.getInstance(mContext).write("model", factory);
             Log.d("ZM", String.valueOf(System.currentTimeMillis()));
         }
     }
@@ -334,7 +349,7 @@ public class UHFManager {
     /**
      * @return 返回厂家信息
      */
-    private static String getModle() {
+    private static String getModel() {
         String factory = "";
         SerialPortSpd serialPort = new SerialPortSpd();
         String xinghao = Build.MODEL;
@@ -385,11 +400,11 @@ public class UHFManager {
             factory = bytesToHexString(bytes);
         }
         Log.d("ZM", "判断是不是R2000: " + factory);
-        if (factory.equals("7E002A240349006D00700069006E006A00530065007200690061006C004E0075006D003000310006A97E")) {
+        if ("7E002A240349006D00700069006E006A00530065007200690061006C004E0075006D003000310006A97E".equals(factory)) {
             serialPort.CloseSerial(fd);
             powerOff();
             return FACTORY_R2000;
-        } else if (factory.equals("7E0028220342004C0046005F00320030003100380030003300310033005F0030003000310004027E")) {
+        } else if ("7E0028220342004C0046005F00320030003100380030003300310033005F0030003000310004027E".equals(factory)) {
             serialPort.CloseSerial(fd);
             powerOff();
             return FACTORY_R2000;
@@ -408,7 +423,7 @@ public class UHFManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        int length = 0;
+        int length;
         if (bytes != null) {
             length = bytes.length;
             Log.d("ZM", "判断是不是旗联-芯联 length: " + length);
@@ -435,7 +450,7 @@ public class UHFManager {
         if (bytes != null) {
             factory = bytesToHexString(bytes);
             Log.d("ZM", "判断是不是旗联-飞利信: " + factory);
-            if (factory.equals("BB0103000A025261794D6174726978B17E")) {
+            if ("BB0103000A025261794D6174726978B17E".equals(factory)) {
                 serialPort.CloseSerial(fd);
                 powerOff();
                 return FACTORY_FEILIXIN;
@@ -464,23 +479,24 @@ public class UHFManager {
 
     //byte转string
     private static String bytesToHexString(byte[] bArray) {
-        StringBuffer sb = new StringBuffer(bArray.length);
+        StringBuilder sb = new StringBuilder(bArray.length);
         String sTemp;
-        for (int i = 0; i < bArray.length; i++) {
-            sTemp = Integer.toHexString(0xFF & bArray[i]);
-            if (sTemp.length() < 2)
+        for (byte aBArray : bArray) {
+            sTemp = Integer.toHexString(0xFF & aBArray);
+            if (sTemp.length() < 2) {
                 sb.append(0);
+            }
             sb.append(sTemp.toUpperCase());
         }
         return sb.toString();
     }
 
-    public static String convertStreamToString(InputStream is) {
+    private static String convertStreamToString(InputStream is) {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
         StringBuilder sb = new StringBuilder();
-        String line = null;
+        String line;
         try {
             while ((line = reader.readLine()) != null) {
                 sb.append(line);

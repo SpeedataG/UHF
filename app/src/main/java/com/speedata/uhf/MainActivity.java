@@ -19,8 +19,6 @@ import android.widget.Toast;
 
 import com.speedata.libuhf.IUHFService;
 import com.speedata.libuhf.UHFManager;
-import com.speedata.libuhf.bean.SpdInventoryData;
-import com.speedata.libuhf.interfaces.OnSpdInventoryListener;
 import com.speedata.libuhf.utils.CommonUtils;
 import com.speedata.libuhf.utils.SharedXmlUtil;
 import com.speedata.uhf.dialog.DirectionalTagDialog;
@@ -41,44 +39,40 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/**
+ * @author My_PC
+ */
 public class MainActivity extends Activity implements OnClickListener {
-    private static final String[] list = {"Reserved", "EPC", "TID", "USER"};
-    private TextView Cur_Tag_Info;
-    private TextView Status, Version;
-    private Spinner Area_Select;
-    private ArrayAdapter<String> adapter;
-    private Button Search_Tag;
-    private Button Read_Tag;
-    private Button Directional_Tag;
-    private Button Write_Tag;
-    private Button Set_Tag;
-    private Button Set_Password;
-    private Button Set_EPC;
-    private Button Lock_Tag;
-    private Button btn_inv_set;
+    private static final String[] LIST = {"Reserved", "EPC", "TID", "USER"};
+    private TextView curTagInfo;
+    private TextView status, version;
+    private Spinner areaSelect;
+    private Button searchTag;
+    private Button readTag;
+    private Button directionalTag;
+    private Button writeTag;
+    private Button setTag;
+    private Button setPassword;
+    private Button setEpc;
+    private Button lockTag;
+    private Button btnInvSet;
     private IUHFService iuhfService;
-    private String current_tag_epc = null;
-    private Button Speedt;
-    private PowerManager pM = null;
+    private String currentTagEpc = null;
     private WakeLock wK = null;
-    private int init_progress = 0;
-    private String modle;
+    private int initProgress = 0;
+    private String model;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         UHFManager.setStipulationLevel(0);
-//        SharedXmlUtil.getInstance(this).write("modle", "r2k");
-//        try {
-//            DeviceControl(63, 1);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
         try {
+            //第一次启动
+            UHFManager.setIsFirst(true);
             iuhfService = UHFManager.getUHFService(MainActivity.this);
         } catch (Exception e) {
             e.printStackTrace();
-            boolean cn = getApplicationContext().getResources().getConfiguration().locale.getCountry().equals("CN");
+            boolean cn = "CN".equals(getApplicationContext().getResources().getConfiguration().locale.getCountry());
             if (cn) {
                 Toast.makeText(getApplicationContext(), "模块不存在", Toast.LENGTH_SHORT).show();
             } else {
@@ -86,22 +80,22 @@ public class MainActivity extends Activity implements OnClickListener {
             }
             return;
         }
-        modle = SharedXmlUtil.getInstance(MainActivity.this).read("modle", "");
+        model = SharedXmlUtil.getInstance(MainActivity.this).read("model", "");
         initUI();
-        Version.append("-" + modle);
+        version.append("-" + model);
         newWakeLock();
         EventBus.getDefault().register(this);
-        Set_Tag.setEnabled(true);
-        Search_Tag.setEnabled(true);
-        Read_Tag.setEnabled(true);
-        Write_Tag.setEnabled(true);
-        Set_EPC.setEnabled(true);
-        Set_Password.setEnabled(true);
-        Lock_Tag.setEnabled(true);
-        Area_Select.setEnabled(true);
-        if ("r2k".equals(modle)) {
-            btn_inv_set.setVisibility(View.VISIBLE);
-            btn_inv_set.setEnabled(true);
+        setTag.setEnabled(true);
+        searchTag.setEnabled(true);
+        readTag.setEnabled(true);
+        writeTag.setEnabled(true);
+        setEpc.setEnabled(true);
+        setPassword.setEnabled(true);
+        lockTag.setEnabled(true);
+        areaSelect.setEnabled(true);
+        if ("r2k".equals(model)) {
+            btnInvSet.setVisibility(View.VISIBLE);
+            btnInvSet.setEnabled(true);
         }
 
     }
@@ -112,7 +106,7 @@ public class MainActivity extends Activity implements OnClickListener {
         super.onResume();
         try {
             if (iuhfService != null) {
-                if (openDev()) return;
+                openDev();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -121,62 +115,62 @@ public class MainActivity extends Activity implements OnClickListener {
 
     @Override
     protected void onStop() {
-        super.onStop();
         try {
             if (iuhfService != null) {
                 iuhfService.closeDev();
                 //断点后选卡操作会失效，需要重新选卡（掩码）
-                current_tag_epc = null;
-                Cur_Tag_Info.setText("");
+                currentTagEpc = null;
+                curTagInfo.setText("");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        super.onStop();
     }
 
     @org.greenrobot.eventbus.Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(MsgEvent mEvent) {
         String type = mEvent.getType();
         String msg = (String) mEvent.getMsg();
-        if (type.equals("set_current_tag_epc")) {
-            current_tag_epc = msg;
-            Cur_Tag_Info.setText(msg);
-            MainActivity.this.Status
+        if ("set_current_tag_epc".equals(type)) {
+            currentTagEpc = msg;
+            curTagInfo.setText(msg);
+            MainActivity.this.status
                     .setText(R.string.Status_Select_Card_Ok);
         }
-        if (type.equals("setPWD_Status")) {
-            MainActivity.this.Status
+        if ("setPWD_Status".equals(type)) {
+            MainActivity.this.status
                     .setText(R.string.Status_Write_Card_Ok);
         }
-        if (type.equals("lock_Status")) {
-            MainActivity.this.Status
+        if ("lock_Status".equals(type)) {
+            MainActivity.this.status
                     .setText(R.string.set_success);
         }
-        if (type.equals("SetEPC_Status")) {
-            MainActivity.this.Status
+        if ("SetEPC_Status".equals(type)) {
+            MainActivity.this.status
                     .setText(R.string.Status_Write_Card_Ok);
         }
-        if (type.equals("CancelSelectCard")) {
+        if ("CancelSelectCard".equals(type)) {
             //断点后选卡操作会失效，需要重新选卡（掩码）
-            current_tag_epc = null;
-            Cur_Tag_Info.setText("");
+            currentTagEpc = null;
+            curTagInfo.setText("");
         }
 
     }
 
     @SuppressLint("InvalidWakeLockTag")
     private void newWakeLock() {
-        init_progress++;
-        pM = (PowerManager) getSystemService(POWER_SERVICE);
+        initProgress++;
+        PowerManager pM = (PowerManager) getSystemService(POWER_SERVICE);
         if (pM != null) {
             wK = pM.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK
                     | PowerManager.ON_AFTER_RELEASE, "lock3992");
             if (wK != null) {
                 wK.acquire();
-                init_progress++;
+                initProgress++;
             }
         }
-        if (init_progress == 1) {
+        if (initProgress == 1) {
             Log.w("3992_6C", "wake lock init failed");
         }
     }
@@ -186,9 +180,10 @@ public class MainActivity extends Activity implements OnClickListener {
      *
      * @return
      */
+    @SuppressLint("SetTextI18n")
     private boolean openDev() {
         if (iuhfService.openDev() != 0) {
-            Cur_Tag_Info.setText("Open serialport failed");
+            curTagInfo.setText("Open serialport failed");
             new AlertDialog.Builder(this).setTitle(R.string.DIA_ALERT).setMessage(R.string.DEV_OPEN_ERR).setPositiveButton(R.string.DIA_CHECK, new DialogInterface.OnClickListener() {
 
                 @Override
@@ -204,44 +199,44 @@ public class MainActivity extends Activity implements OnClickListener {
 
     private void initUI() {
         setContentView(R.layout.main);
-        Write_Tag = (Button) findViewById(R.id.btn_write);
-        Write_Tag.setOnClickListener(this);
-        Read_Tag = (Button) findViewById(R.id.btn_read);
-        Read_Tag.setOnClickListener(this);
-        Directional_Tag = (Button) findViewById(R.id.btn_direction);
-        Directional_Tag.setOnClickListener(this);
-        Search_Tag = (Button) findViewById(R.id.btn_search);
-        Search_Tag.setOnClickListener(this);
-        Set_Tag = (Button) findViewById(R.id.btn_check);
-        Set_Tag.setOnClickListener(this);
-        Set_Password = (Button) findViewById(R.id.btn_setpasswd);
-        Set_Password.setOnClickListener(this);
-        Set_EPC = (Button) findViewById(R.id.btn_setepc);
-        Set_EPC.setOnClickListener(this);
-        btn_inv_set = (Button) findViewById(R.id.btn_inv_set);
-        btn_inv_set.setOnClickListener(this);
-        Lock_Tag = (Button) findViewById(R.id.btn_lock);
-        Lock_Tag.setOnClickListener(this);
-        Speedt = (Button) findViewById(R.id.button_spt);
-        Speedt.setOnClickListener(this);
-        Cur_Tag_Info = (TextView) findViewById(R.id.textView_epc);
-        Cur_Tag_Info.setText("");
-        Status = (TextView) findViewById(R.id.textView_status);
-        Version = (TextView) findViewById(R.id.textView_version);
-        Version.setText(CommonUtils.getAppVersionName(this));
-        adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, list);
+        writeTag = findViewById(R.id.btn_write);
+        writeTag.setOnClickListener(this);
+        readTag = findViewById(R.id.btn_read);
+        readTag.setOnClickListener(this);
+        directionalTag = findViewById(R.id.btn_direction);
+        directionalTag.setOnClickListener(this);
+        searchTag = findViewById(R.id.btn_search);
+        searchTag.setOnClickListener(this);
+        setTag = findViewById(R.id.btn_check);
+        setTag.setOnClickListener(this);
+        setPassword = findViewById(R.id.btn_setpasswd);
+        setPassword.setOnClickListener(this);
+        setEpc = findViewById(R.id.btn_setepc);
+        setEpc.setOnClickListener(this);
+        btnInvSet = findViewById(R.id.btn_inv_set);
+        btnInvSet.setOnClickListener(this);
+        lockTag = findViewById(R.id.btn_lock);
+        lockTag.setOnClickListener(this);
+        Button speedt = findViewById(R.id.button_spt);
+        speedt.setOnClickListener(this);
+        curTagInfo = findViewById(R.id.textView_epc);
+        curTagInfo.setText("");
+        status = findViewById(R.id.textView_status);
+        version = findViewById(R.id.textView_version);
+        version.setText(CommonUtils.getAppVersionName(this));
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, LIST);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        Area_Select = (Spinner) findViewById(R.id.spinner_area);
-        Area_Select.setAdapter(adapter);
-        Set_Tag.setEnabled(false);
-        Search_Tag.setEnabled(false);
-        Read_Tag.setEnabled(false);
-        Write_Tag.setEnabled(false);
-        Set_EPC.setEnabled(false);
-        Set_Password.setEnabled(false);
-        Lock_Tag.setEnabled(false);
-        Area_Select.setEnabled(false);
+        areaSelect = findViewById(R.id.spinner_area);
+        areaSelect.setAdapter(adapter);
+        setTag.setEnabled(false);
+        searchTag.setEnabled(false);
+        readTag.setEnabled(false);
+        writeTag.setEnabled(false);
+        setEpc.setEnabled(false);
+        setPassword.setEnabled(false);
+        lockTag.setEnabled(false);
+        areaSelect.setEnabled(false);
 
     }
 
@@ -261,96 +256,88 @@ public class MainActivity extends Activity implements OnClickListener {
     @Override
     public void onClick(View arg0) {
         // TODO Auto-generated method stub
-        if (arg0 == Read_Tag) {
-            if (current_tag_epc == null) {
-                Status.setText(R.string.Status_No_Card_Select);
+        if (arg0 == readTag) {
+            if (currentTagEpc == null) {
+                status.setText(R.string.Status_No_Card_Select);
                 Toast.makeText(this, R.string.Status_No_Card_Select, Toast.LENGTH_SHORT).show();
                 return;
             }
             //读卡
             ReadTagDialog readTag = new ReadTagDialog(this, iuhfService
-                    , Area_Select.getSelectedItemPosition(), current_tag_epc, modle);
+                    , areaSelect.getSelectedItemPosition(), currentTagEpc, model);
             readTag.setTitle(R.string.Item_Read);
             readTag.show();
 
-        } else if (arg0 == Write_Tag) {
-            if (current_tag_epc == null) {
-                Status.setText(R.string.Status_No_Card_Select);
+        } else if (arg0 == writeTag) {
+            if (currentTagEpc == null) {
+                status.setText(R.string.Status_No_Card_Select);
                 Toast.makeText(this, R.string.Status_No_Card_Select, Toast.LENGTH_SHORT).show();
                 return;
             }
             //写卡
             WriteTagDialog writeTag = new WriteTagDialog(this, iuhfService,
-                    Area_Select.getSelectedItemPosition()
-                    , current_tag_epc, modle);
+                    areaSelect.getSelectedItemPosition()
+                    , currentTagEpc, model);
             writeTag.setTitle(R.string.Item_Write);
             writeTag.show();
 
-        } else if (arg0 == Search_Tag) {
-            int i = iuhfService.setQueryTagGroup(0, 0, 0);
-            if (i == 0) {
-                //设置通话项成功
-            }
-            i = iuhfService.setDynamicAlgorithm();
-            if (i == 0) {
-                //设置成功
-            }
+        } else if (arg0 == searchTag) {
             //盘点选卡
-            SearchTagDialog searchTag = new SearchTagDialog(this, iuhfService, modle);
+            SearchTagDialog searchTag = new SearchTagDialog(this, iuhfService, model);
             searchTag.setTitle(R.string.Item_Choose);
             searchTag.show();
 
-        } else if (arg0 == Directional_Tag) {
+        } else if (arg0 == directionalTag) {
             //方向判断
             DirectionalTagDialog directionalTagDialog = new DirectionalTagDialog(this, iuhfService);
             directionalTagDialog.show();
-        } else if (arg0 == Set_Tag)
+        } else if (arg0 == setTag)
 
         {
             //设置频率频段
-            SetModuleDialog setDialog = new SetModuleDialog(this, iuhfService, modle);
+            SetModuleDialog setDialog = new SetModuleDialog(this, iuhfService, model);
             setDialog.setTitle(R.string.Item_Set_Title);
             setDialog.show();
 
-        } else if (arg0 == Set_Password)
+        } else if (arg0 == setPassword)
 
         {
-            if (current_tag_epc == null) {
-                Status.setText(R.string.Status_No_Card_Select);
+            if (currentTagEpc == null) {
+                status.setText(R.string.Status_No_Card_Select);
                 Toast.makeText(this, R.string.Status_No_Card_Select, Toast.LENGTH_SHORT).show();
                 return;
             }
             //设置密码
             SetPasswordDialog setPasswordDialog = new SetPasswordDialog(this
-                    , iuhfService, current_tag_epc, modle);
+                    , iuhfService, currentTagEpc, model);
             setPasswordDialog.setTitle(R.string.SetPasswd_Btn);
             setPasswordDialog.show();
-        } else if (arg0 == Set_EPC)
+        } else if (arg0 == setEpc)
 
         {
-            if (current_tag_epc == null) {
-                Status.setText(R.string.Status_No_Card_Select);
+            if (currentTagEpc == null) {
+                status.setText(R.string.Status_No_Card_Select);
                 Toast.makeText(this, R.string.Status_No_Card_Select, Toast.LENGTH_SHORT).show();
                 return;
             }
             //写EPC
-            SetEPCDialog setEPCDialog = new SetEPCDialog(this, iuhfService, current_tag_epc);
+            SetEPCDialog setEPCDialog = new SetEPCDialog(this, iuhfService, currentTagEpc);
             setEPCDialog.setTitle(R.string.SetEPC_Btn);
             setEPCDialog.show();
-        } else if (arg0 == Lock_Tag)
+        } else if (arg0 == lockTag)
 
         {
-            if (current_tag_epc == null) {
-                Status.setText(R.string.Status_No_Card_Select);
+            if (currentTagEpc == null) {
+                status.setText(R.string.Status_No_Card_Select);
                 Toast.makeText(this, R.string.Status_No_Card_Select, Toast.LENGTH_SHORT).show();
                 return;
             }
             //锁
             LockTagDialog lockTagDialog = new LockTagDialog(this, iuhfService
-                    , current_tag_epc, modle);
+                    , currentTagEpc, model);
             lockTagDialog.setTitle(R.string.Lock_Btn);
             lockTagDialog.show();
-        } else if (arg0 == btn_inv_set)
+        } else if (arg0 == btnInvSet)
 
         {
             //盘点内容设置
@@ -370,7 +357,7 @@ public class MainActivity extends Activity implements OnClickListener {
             case KeyEvent.ACTION_DOWN:
                 if ((System.currentTimeMillis() - mkeyTime) > 2000) {
                     mkeyTime = System.currentTimeMillis();
-                    boolean cn = getApplicationContext().getResources().getConfiguration().locale.getCountry().equals("CN");
+                    boolean cn = "CN".equals(getApplicationContext().getResources().getConfiguration().locale.getCountry());
                     if (cn) {
                         Toast.makeText(getApplicationContext(), "再按一次退出", Toast.LENGTH_SHORT).show();
                     } else {
@@ -384,6 +371,8 @@ public class MainActivity extends Activity implements OnClickListener {
                     }
                 }
                 return false;
+            default:
+                break;
         }
         return super.onKeyDown(keyCode, event);
     }

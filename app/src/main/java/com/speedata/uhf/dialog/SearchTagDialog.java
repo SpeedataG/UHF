@@ -1,5 +1,6 @@
 package com.speedata.uhf.dialog;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.media.AudioManager;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -15,13 +17,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.speedata.libuhf.IUHFService;
+import com.speedata.libuhf.UHFManager;
 import com.speedata.libuhf.bean.SpdInventoryData;
 import com.speedata.libuhf.interfaces.OnSpdInventoryListener;
 import com.speedata.libuhf.utils.SharedXmlUtil;
@@ -39,18 +41,19 @@ import java.util.List;
 import jxl.write.Colour;
 
 /**
- * Created by 张明_ on 2016/12/28.
+ *
+ * @author 张明_
+ * @date 2016/12/28
  */
 
 public class SearchTagDialog extends Dialog implements
         View.OnClickListener, AdapterView.OnItemClickListener {
 
-    private Button Cancle;
-    private Button Action;
-    private TextView Status;
-    private ListView EpcList;
+    private Button cancel;
+    private Button action;
+    private TextView status;
     private boolean inSearch = false;
-    private List<EpcDataBase> firm = new ArrayList<EpcDataBase>();
+    private List<EpcDataBase> firm = new ArrayList<>();
     private ArrayAdapter<EpcDataBase> adapter;
     private Context cont;
     private SoundPool soundPool;
@@ -58,22 +61,20 @@ public class SearchTagDialog extends Dialog implements
     private long scant = 0;
     private CheckBox cbb;
     private IUHFService iuhfService;
-    private String model;
     private Button export;
     private KProgressHUD kProgressHUD;
-    private LinearLayout showLayout;
     private TextView tagNumTv;
     private TextView speedTv;
     private TextView totalTv;
     private TextView totalTime;
-    private long startCheckingTime;//盘点命令下发后截取的系统时间
+    private long startCheckingTime;
+    //盘点命令下发后截取的系统时间
 
     public SearchTagDialog(Context context, IUHFService iuhfService, String model) {
         super(context);
         // TODO Auto-generated constructor stub
         cont = context;
         this.iuhfService = iuhfService;
-        this.model = model;
     }
 
     @Override
@@ -82,32 +83,29 @@ public class SearchTagDialog extends Dialog implements
         setContentView(R.layout.setreader);
 
         initView();
-        Cancle = (Button) findViewById(R.id.btn_search_cancle);
-        Cancle.setOnClickListener(this);
-        Action = (Button) findViewById(R.id.btn_search_action);
-        Action.setOnClickListener(this);
+        cancel =  findViewById(R.id.btn_search_cancle);
+        cancel.setOnClickListener(this);
+        action = findViewById(R.id.btn_search_action);
+        action.setOnClickListener(this);
 
-        export = (Button) findViewById(R.id.btn_export);
+        export = findViewById(R.id.btn_export);
         export.setOnClickListener(this);
-        cbb = (CheckBox) findViewById(R.id.checkBox_beep);
+        cbb =  findViewById(R.id.checkBox_beep);
 
-        Status = (TextView) findViewById(R.id.textView_search_status);
-        EpcList = (ListView) findViewById(R.id.listView_search_epclist);
-        EpcList.setOnItemClickListener(this);
+        status =  findViewById(R.id.textView_search_status);
+        ListView epcList =  findViewById(R.id.listView_search_epclist);
+        epcList.setOnItemClickListener(this);
 
         soundPool = new SoundPool(2, AudioManager.STREAM_MUSIC, 0);
-        if (soundPool == null) {
-            Log.e("as3992", "Open sound failed");
-        }
         soundId = soundPool.load("/system/media/audio/ui/VideoRecord.ogg", 0);
         Log.w("as3992_6C", "id is " + soundId);
 
 
         //新的Listener回调参考代码
 
-        adapter = new ArrayAdapter<EpcDataBase>(
+        adapter = new ArrayAdapter<>(
                 cont, android.R.layout.simple_list_item_1, firm);
-        EpcList.setAdapter(adapter);
+        epcList.setAdapter(adapter);
 
         iuhfService.setOnInventoryListener(new OnSpdInventoryListener() {
             @Override
@@ -118,18 +116,19 @@ public class SearchTagDialog extends Dialog implements
     }
 
     //新的Listener回调参考代码
+
+    @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
+        @SuppressLint("SetTextI18n")
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            boolean cn = cont.getApplicationContext().getResources().getConfiguration().locale.getCountry().equals("CN");
+            boolean cn = "CN".equals(cont.getApplicationContext().getResources().getConfiguration().locale.getCountry());
             switch (msg.what) {
                 case 1:
                     scant++;
                     if (!cbb.isChecked()) {
-                        if (scant % 1 == 0) {
-                            soundPool.play(soundId, 1, 1, 0, 0, 1);
-                        }
+                        soundPool.play(soundId, 1, 1, 0, 0, 1);
                     }
                     SpdInventoryData var1 = (SpdInventoryData) msg.obj;
                     int j;
@@ -148,8 +147,8 @@ public class SearchTagDialog extends Dialog implements
                         }
                     }
                     adapter.notifyDataSetChanged();
-                    Status.setText("Total: " + firm.size());
-                    UpdateRateCount();
+                    status.setText("Total: " + firm.size());
+                    updateratecount();
                     break;
 
                 case 2:
@@ -169,6 +168,8 @@ public class SearchTagDialog extends Dialog implements
                         Toast.makeText(cont, "There is a problem in exporting! Please try again", Toast.LENGTH_SHORT).show();
                     }
                     break;
+                default:
+                    break;
             }
 
         }
@@ -187,16 +188,16 @@ public class SearchTagDialog extends Dialog implements
 
     @Override
     public void onClick(View v) {
-        if (v == Cancle) {
+        if (v == cancel) {
             soundPool.release();
             dismiss();
-        } else if (v == Action) {
+        } else if (v == action) {
             if (inSearch) {
                 inSearch = false;
                 this.setCancelable(true);
                 iuhfService.inventoryStop();
-                Action.setText(R.string.Start_Search_Btn);
-                Cancle.setEnabled(true);
+                action.setText(R.string.Start_Search_Btn);
+                cancel.setEnabled(true);
                 export.setEnabled(true);
             } else {
                 inSearch = true;
@@ -206,10 +207,14 @@ public class SearchTagDialog extends Dialog implements
                 //取消掩码
                 iuhfService.selectCard(1, "", false);
                 EventBus.getDefault().post(new MsgEvent("CancelSelectCard", ""));
+                //改变限制电压标志位
+                if (UHFManager.getIsFirst()) {
+                    UHFManager.setIsFirst(false);
+                }
                 iuhfService.inventoryStart();
                 startCheckingTime = System.currentTimeMillis();
-                Action.setText(R.string.Stop_Search_Btn);
-                Cancle.setEnabled(false);
+                action.setText(R.string.Stop_Search_Btn);
+                cancel.setEnabled(false);
                 export.setEnabled(false);
             }
         } else if (v == export) {
@@ -227,7 +232,7 @@ public class SearchTagDialog extends Dialog implements
                         for (EpcDataBase epcDataBase : firm) {
                             EPCBean epcBean = new EPCBean();
                             epcBean.setEPC(epcDataBase.epc);
-                            epcBean.setTID_USER(epcDataBase.tid_user);
+                            epcBean.setTID_USER(epcDataBase.tidUser);
                             epcBeanList.add(epcBean);
                         }
                         if (epcBeanList.size() > 0) {
@@ -255,7 +260,7 @@ public class SearchTagDialog extends Dialog implements
                 }).start();
             } else {
                 kProgressHUD.dismiss();
-                boolean cn = cont.getApplicationContext().getResources().getConfiguration().locale.getCountry().equals("CN");
+                boolean cn = "CN".equals(cont.getApplicationContext().getResources().getConfiguration().locale.getCountry());
                 if (cn) {
                     Toast.makeText(cont, "没有数据，请先盘点", Toast.LENGTH_SHORT).show();
                 } else {
@@ -267,7 +272,6 @@ public class SearchTagDialog extends Dialog implements
     }
 
     private void initView() {
-        showLayout = findViewById(R.id.show_layout);
         tagNumTv = findViewById(R.id.tagNum_tv);
         speedTv = findViewById(R.id.speed_tv);
         totalTv = findViewById(R.id.total_tv);
@@ -278,32 +282,33 @@ public class SearchTagDialog extends Dialog implements
         String epc;
         int valid;
         String rssi;
-        String tid_user;
+        String tidUser;
 
-        public EpcDataBase(String e, int v, String rssi, String tid_user) {
+        EpcDataBase(String e, int v, String rssi, String tidUser) {
             // TODO Auto-generated constructor stub
             epc = e;
             valid = v;
             this.rssi = rssi;
-            this.tid_user = tid_user;
+            this.tidUser = tidUser;
         }
 
         public String getRssi() {
             return rssi;
         }
 
-        public void setRssi(String rssi) {
+        void setRssi(String rssi) {
             this.rssi = rssi;
         }
 
+        @NonNull
         @Override
         public String toString() {
-            if (TextUtils.isEmpty(tid_user)) {
+            if (TextUtils.isEmpty(tidUser)) {
                 return "EPC:" + epc + "\n"
                         + "(" + "COUNT:" + valid + ")" + " RSSI:" + rssi + "\n";
             } else {
                 return "EPC:" + epc + "\n"
-                        + "T/U:" + tid_user + "\n"
+                        + "T/U:" + tidUser + "\n"
                         + "(" + "COUNT:" + valid + ")" + " RSSI:" + rssi + "\n";
             }
         }
@@ -328,26 +333,26 @@ public class SearchTagDialog extends Dialog implements
             EventBus.getDefault().post(new MsgEvent("set_current_tag_epc", epcStr));
             dismiss();
         } else {
-            Status.setText(R.string.Status_Select_Card_Faild);
+            status.setText(R.string.Status_Select_Card_Faild);
         }
     }
 
 
-    private void UpdateRateCount() {
+    private void updateratecount() {
 
-        long m_lEndTime = System.currentTimeMillis();
+        long mLendtime = System.currentTimeMillis();
 
-        double Rate = Math.ceil((scant * 1.0) * 1000 / (m_lEndTime - startCheckingTime));
+        double rate = Math.ceil((scant * 1.0) * 1000 / (mLendtime - startCheckingTime));
 
-        long total_time_count = m_lEndTime - startCheckingTime;
+        long totalTimeCount = mLendtime - startCheckingTime;
 
-        speedTv.setText(String.format("%s次/秒", String.valueOf(Rate)));
+        speedTv.setText(String.format("%s次/秒", String.valueOf(rate)));
 
-        tagNumTv.setText("已盘" + String.format("%s个", String.valueOf(firm.size())));
+        tagNumTv.setText(String.format("已盘%s个", String.valueOf(firm.size())));
 
-        totalTv.setText("总数" + String.format("%s次", String.valueOf(scant)));
+        totalTv.setText(String.format("总数%s次", String.valueOf(scant)));
 
-        totalTime.setText(String.valueOf(getTimeFromMillisecond(total_time_count)));
+        totalTime.setText(String.valueOf(getTimeFromMillisecond(totalTimeCount)));
 
 
     }
@@ -359,12 +364,16 @@ public class SearchTagDialog extends Dialog implements
      * @param millisecond 毫秒
      * @return 时间字符串
      */
-    public static String getTimeFromMillisecond(Long millisecond) {
+    private static String getTimeFromMillisecond(Long millisecond) {
         String milli;
-        long hours = millisecond / (60 * 60 * 1000); //根据时间差来计算小时数
-        long minutes = (millisecond - hours * (60 * 60 * 1000)) / (60 * 1000);   //根据时间差来计算分钟数
-        long second = (millisecond - hours * (60 * 60 * 1000) - minutes * (60 * 1000)) / 1000;   //根据时间差来计算秒数
-        long milliSecond = millisecond - hours * (60 * 60 * 1000) - minutes * (60 * 1000) - second * 1000;   //根据时间差来计算秒数
+        long hours = millisecond / (60 * 60 * 1000);
+        //根据时间差来计算小时数
+        long minutes = (millisecond - hours * (60 * 60 * 1000)) / (60 * 1000);
+        //根据时间差来计算分钟数
+        long second = (millisecond - hours * (60 * 60 * 1000) - minutes * (60 * 1000)) / 1000;
+        //根据时间差来计算秒数
+        long milliSecond = millisecond - hours * (60 * 60 * 1000) - minutes * (60 * 1000) - second * 1000;
+        //根据时间差来计算秒数
         if (milliSecond < 100) {
             milli = "0" + milliSecond;
         } else {

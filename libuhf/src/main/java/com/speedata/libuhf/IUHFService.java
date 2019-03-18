@@ -2,17 +2,17 @@ package com.speedata.libuhf;
 
 
 import android.os.Handler;
-import android.text.TextUtils;
 
 import com.speedata.libuhf.interfaces.OnSpdInventoryListener;
 import com.speedata.libuhf.interfaces.OnSpdReadListener;
 import com.speedata.libuhf.interfaces.OnSpdWriteListener;
-import com.uhf.structures.DynamicQParams;
 import com.uhf.structures.RW_Params;
 import com.uhf.structures.SelectCriteria;
 
 /**
- * Created by brxu on 2016/12/13.
+ *
+ * @author brxu
+ * @date 2016/12/13
  */
 
 public interface IUHFService {
@@ -38,10 +38,15 @@ public interface IUHFService {
 
     //*************************************************共用接口*********************************************************
 
-    //默认参数初始化模块上电
+    /**
+     * 默认参数初始化模块上电
+     * @return
+     */
     public int openDev();
 
-    //释放模块下电
+    /**
+     * 释放模块下电
+     */
     public void closeDev();
 
     //*************************************************新版接口*********************************************************
@@ -93,9 +98,10 @@ public interface IUHFService {
      *
      * @param area    区域
      * @param addr    起始地址
+     * @param count   块数
      * @param passwd  密码
      * @param content 内容
-     * @return
+     * @return 返回状态码
      */
     public int writeArea(int area, int addr, int count, String passwd, byte[] content);
 

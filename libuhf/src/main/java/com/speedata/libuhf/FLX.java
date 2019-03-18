@@ -226,6 +226,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
      *
      * @return 0成功-1失败
      */
+    @Override
     public int openDev() {
         if (ConfigUtils.isConfigFileExists() && !CommonUtils.subDeviceType().contains("55")) {
             mRead = ConfigUtils.readConfig(mContext);
@@ -375,6 +376,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
     /**
      * 下电关串口
      */
+    @Override
     public void closeDev() {
         getLinkage().close_serial();
         if (ConfigUtils.isConfigFileExists() && !CommonUtils.subDeviceType().contains("55")) {
@@ -440,6 +442,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
     /**
      * 停止盘点
      */
+    @Override
     public void inventoryStop() {
         getLinkage().stopInventory();
     }
@@ -498,6 +501,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
 
     }
 
+    @Override
     public int writeArea(int area, int addr, int count, String passwd, byte[] content) {
         int length = content.length;
         if ((length % 2) != 0) {
@@ -664,6 +668,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
     }
 
 
+    @Override
     public void inventory_start() {
         getLinkage().startInventory(0);
     }
@@ -674,6 +679,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         inventory_start();
     }
 
+    @Override
     public int inventory_stop() {
         getLinkage().stopInventory();
         return 0;
@@ -1122,6 +1128,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
     }
 
     //设置密码
+    @Override
     public int set_Password(int which, String cur_pass, String new_pass) {
         if (which > 1 || which < 0) {
             return -1;

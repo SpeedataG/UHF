@@ -64,6 +64,7 @@ public class XinLianQilian implements IUHFService {
 
 
     //初始化模块
+    @Override
     public int openDev() {
         Log.d(TAG, "openDev: start");
         if (ConfigUtils.isConfigFileExists() && !CommonUtils.subDeviceType().contains("55")) {
@@ -247,6 +248,7 @@ public class XinLianQilian implements IUHFService {
     }
 
     //关闭模块
+    @Override
     public void closeDev() {
         Log.d(TAG, "closeDev: start");
         if (Mreader != null)
@@ -310,6 +312,7 @@ public class XinLianQilian implements IUHFService {
     /**
      * 停止盘点
      */
+    @Override
     public void inventoryStop() {
         if (!inSearch) {
             return;
@@ -493,6 +496,7 @@ public class XinLianQilian implements IUHFService {
 
     }
 
+    @Override
     public int writeArea(int area, int addr, int count, String passwd, byte[] content) {
         Log.d(TAG, "write_area: start22222");
         try {
@@ -613,6 +617,7 @@ public class XinLianQilian implements IUHFService {
     }
 
     //设定区域锁定状态。
+    @Override
     public int setLock(int type, int area, String passwd) {
         try {
             Reader.Lock_Obj lobj = null;
@@ -775,6 +780,7 @@ public class XinLianQilian implements IUHFService {
     //********************************************老版接口（不再维护）******************************************
 
     //注册过 Handler 后调用此函数开始盘点过程
+    @Override
     public void inventory_start() {
         if (inSearch) {
             return;
@@ -794,6 +800,7 @@ public class XinLianQilian implements IUHFService {
     }
 
     //停止盘点。
+    @Override
     public int inventory_stop() {
         if (!inSearch) {
             return -1;
@@ -1258,6 +1265,7 @@ public class XinLianQilian implements IUHFService {
     }
 
     //设置密码
+    @Override
     public int set_Password(int which, String cur_pass, String new_pass) {
         if (which > 1 || which < 0) {
             return -1;
