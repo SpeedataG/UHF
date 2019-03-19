@@ -67,8 +67,6 @@ public class MainActivity extends Activity implements OnClickListener {
         super.onCreate(savedInstanceState);
         UHFManager.setStipulationLevel(0);
         try {
-            //第一次启动
-            UHFManager.setIsFirst(true);
             iuhfService = UHFManager.getUHFService(MainActivity.this);
         } catch (Exception e) {
             e.printStackTrace();
@@ -107,6 +105,7 @@ public class MainActivity extends Activity implements OnClickListener {
         try {
             if (iuhfService != null) {
                 openDev();
+                Log.e("zzc:","上电");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -118,6 +117,7 @@ public class MainActivity extends Activity implements OnClickListener {
         try {
             if (iuhfService != null) {
                 iuhfService.closeDev();
+                Log.e("zzc:","下电");
                 //断点后选卡操作会失效，需要重新选卡（掩码）
                 currentTagEpc = null;
                 curTagInfo.setText("");
@@ -125,6 +125,7 @@ public class MainActivity extends Activity implements OnClickListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Log.e("zzc:","onStop()执行");
         super.onStop();
     }
 

@@ -37,7 +37,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import static android.content.ContentValues.TAG;
 
 /**
- *
  * @author brxu
  * @date 2016/12/13
  */
@@ -72,14 +71,29 @@ public class UHFManager {
     private static volatile int stipulationLevel = 15;
     private static Timer timer;
     private static TimerTask myTimerTask;
-    private static Boolean isFirst = false;
 
-    public static void setIsFirst(Boolean isFirst) {
-        UHFManager.isFirst = isFirst;
-    }
-
-    public static Boolean getIsFirst() {
-        return isFirst;
+    /**
+     * 立即检测一次电压，电压小于3.85V
+     */
+    public static void startCheckV() {
+        InputStream battVoltFile;
+        try {
+            battVoltFile = new FileInputStream("sys/class/power_supply/battery/batt_vol");
+            String battVoltFileStr = convertStreamToString(battVoltFile);
+            double v = Integer.parseInt(battVoltFileStr) / 1000000.0;
+            int antennaPower = SharedXmlUtil.getInstance(mContext).read("AntennaPower", 30);
+            Log.d("zzc:", "battVolt: " + v + "antennaPower：" + antennaPower + " 第一次：");
+            if (v < 3.85) {
+                stopUseUHF();
+                if (timer != null) {
+                    stopTimer();
+                }
+            }else {
+                createTimer();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public static IUHFService getUHFService(Context context) {
@@ -118,10 +132,8 @@ public class UHFManager {
                         double v = Integer.parseInt(battVoltFileStr) / 1000000.0;
                         int antennaPower = SharedXmlUtil.getInstance(mContext).read("AntennaPower", 30);
                         Log.d("ZM", "battVolt: " + v + "antennaPower：" + antennaPower);
-                        if (isFirst && antennaPower > 30 && v < 3.85) {
-                            stopUseUHF();
-                            stopTimer();
-                        } else if (v < 3.5) {
+                        Log.d("zzc:", "battVolt: " + v + "antennaPower：" + antennaPower + " 一直检测：");
+                        if (v < 3.5) {
                             stopUseUHF();
                             stopTimer();
                         }
@@ -131,7 +143,7 @@ public class UHFManager {
 
                 }
             };
-            timer.schedule(myTimerTask, 10000, 60000);
+            timer.schedule(myTimerTask, 0, 1000);
         }
     }
 
@@ -289,7 +301,7 @@ public class UHFManager {
                 String xinghao = Build.MODEL;
                 Log.d("ZM", "Build.MODEL: " + xinghao);
                 if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60") || xinghao.contains("SC60")
-                        || xinghao.contains("DXD60RT")|| xinghao.contains("C6000")) {
+                        || xinghao.contains("DXD60RT") || xinghao.contains("C6000")) {
 //                    powerOn(UHFDeviceControl.PowerType.NEW_MAIN, 86);
                     powerOn(DeviceControlSpd.PowerType.EXPAND, 9, 14);
 
@@ -360,7 +372,7 @@ public class UHFManager {
                 e.printStackTrace();
             }
         } else if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60") || xinghao.contains("SC60")
-                || xinghao.contains("DXD60RT")|| xinghao.contains("C6000")) {
+                || xinghao.contains("DXD60RT") || xinghao.contains("C6000")) {
             try {
                 serialPort.OpenSerial("/dev/ttyMT0", 115200);
             } catch (IOException e) {
