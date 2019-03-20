@@ -73,7 +73,7 @@ public class UHFManager {
     private static TimerTask myTimerTask;
 
     /**
-     * 立即检测一次电压，电压小于3.85V
+     * 立即检测一次电压，电压小于3.75V
      */
     public static void startCheckV() {
         InputStream battVoltFile;
@@ -83,12 +83,12 @@ public class UHFManager {
             double v = Integer.parseInt(battVoltFileStr) / 1000000.0;
             int antennaPower = SharedXmlUtil.getInstance(mContext).read("AntennaPower", 30);
             Log.d("zzc:", "battVolt: " + v + "antennaPower：" + antennaPower + " 第一次：");
-            if (v < 3.85) {
+            if (v < 3.75) {
                 stopUseUHF();
                 if (timer != null) {
                     stopTimer();
                 }
-            }else {
+            } else {
                 createTimer();
             }
         } catch (FileNotFoundException e) {
@@ -133,7 +133,7 @@ public class UHFManager {
                         int antennaPower = SharedXmlUtil.getInstance(mContext).read("AntennaPower", 30);
                         Log.d("ZM", "battVolt: " + v + "antennaPower：" + antennaPower);
                         Log.d("zzc:", "battVolt: " + v + "antennaPower：" + antennaPower + " 一直检测：");
-                        if (v < 3.5) {
+                        if (v < 3.3) {
                             stopUseUHF();
                             stopTimer();
                         }
@@ -306,8 +306,11 @@ public class UHFManager {
                     powerOn(DeviceControlSpd.PowerType.EXPAND, 9, 14);
 
                 } else if (xinghao.contains("SD55")) {
-//                    powerOn(DeviceControlSpd.PowerType.MAIN, 128);
-                    powerOn(DeviceControlSpd.PowerType.NEW_MAIN, 12);
+                    if (ConfigUtils.getApiVersion() > 23) {
+                        powerOn(DeviceControlSpd.PowerType.NEW_MAIN, 12);
+                    } else {
+                        powerOn(DeviceControlSpd.PowerType.MAIN, 128);
+                    }
                 } else if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")
                         || xinghao.equals("Biowolf LE") || xinghao.equals("FC-PK80")
                         || xinghao.equals("FC-K80") || xinghao.equals("T80") || xinghao.contains("80")) {
@@ -367,10 +370,18 @@ public class UHFManager {
         SerialPortSpd serialPort = new SerialPortSpd();
         String xinghao = Build.MODEL;
         if (xinghao.contains("SD55")) {
-            try {
-                serialPort.OpenSerial("/dev/ttyMT0", 115200);
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (ConfigUtils.getApiVersion() > 23) {
+                try {
+                    serialPort.OpenSerial("/dev/ttyMT0", 115200);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    serialPort.OpenSerial("/dev/ttyMT2", 115200);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         } else if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60") || xinghao.contains("SC60")
                 || xinghao.contains("DXD60RT") || xinghao.contains("C6000")) {
