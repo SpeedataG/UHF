@@ -33,4 +33,7 @@ public class ConfigUtils {
         }
         return mRead;
     }
+    public static int getApiVersion() {
+        return android.os.Build.VERSION.SDK_INT;
+    }
 }

@@ -130,7 +130,7 @@ public class XinLianQilian implements IUHFService {
         } else {
             String xinghao = Build.MODEL;
             if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60") || xinghao.contains("SC60")
-                    || xinghao.contains("DXD60RT")|| xinghao.contains("C6000")) {
+                    || xinghao.contains("DXD60RT") || xinghao.contains("C6000")) {
                 try {
 //                    deviceControl = new UHFDeviceControl(UHFDeviceControl.PowerType.NEW_MAIN, 86);
                     deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.EXPAND, 9, 14);
@@ -145,19 +145,35 @@ public class XinLianQilian implements IUHFService {
                 } else {
                     return -1;
                 }
-            }  else if (xinghao.contains("SD55")) {
-                try {
-                    deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.MAIN, 128);
-                    deviceControl.PowerOnDevice();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                Reader.READER_ERR er = Mreader.InitReader_Notype(SERIALPORT, 1);
-                if (er == Reader.READER_ERR.MT_OK_ERR) {
-                    antportc = 1;
-                    return 0;
+            } else if (xinghao.contains("SD55")) {
+                if (ConfigUtils.getApiVersion() > 23) {
+                    try {
+                        deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 12);
+                        deviceControl.PowerOnDevice();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Reader.READER_ERR er = Mreader.InitReader_Notype(SERIALPORT0, 1);
+                    if (er == Reader.READER_ERR.MT_OK_ERR) {
+                        antportc = 1;
+                        return 0;
+                    } else {
+                        return -1;
+                    }
                 } else {
-                    return -1;
+                    try {
+                        deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.MAIN, 128);
+                        deviceControl.PowerOnDevice();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Reader.READER_ERR er = Mreader.InitReader_Notype(SERIALPORT, 1);
+                    if (er == Reader.READER_ERR.MT_OK_ERR) {
+                        antportc = 1;
+                        return 0;
+                    } else {
+                        return -1;
+                    }
                 }
             } else if (xinghao.contains("55") || xinghao.equals("W2H")) {
                 String readEm55 = readEm55();
@@ -251,8 +267,9 @@ public class XinLianQilian implements IUHFService {
     @Override
     public void closeDev() {
         Log.d(TAG, "closeDev: start");
-        if (Mreader != null)
+        if (Mreader != null) {
             Mreader.CloseReader();
+        }
         if (ConfigUtils.isConfigFileExists() && !CommonUtils.subDeviceType().contains("55")) {
             try {
                 newUHFDeviceControl.PowerOffDevice();
@@ -373,8 +390,9 @@ public class XinLianQilian implements IUHFService {
                         rdata, rpaswd, (short) Rparams.optime);
 
                 trycount--;
-                if (trycount < 1)
+                if (trycount < 1) {
                     break;
+                }
             } while (er != Reader.READER_ERR.MT_OK_ERR);
             Log.d(TAG, "read_area: end");
             SpdReadData spdReadData = new SpdReadData();
@@ -507,7 +525,7 @@ public class XinLianQilian implements IUHFService {
                 return -3;
             }
             byte[] rpaswd = new byte[4];
-            if (!passwd.equals("")) {
+            if (!"".equals(passwd)) {
                 Mreader.Str2Hex(passwd, passwd.length(), rpaswd);
             }
             Reader.READER_ERR er = Reader.READER_ERR.MT_OK_ERR;
@@ -517,8 +535,9 @@ public class XinLianQilian implements IUHFService {
                         (char) area, addr, content, content.length, rpaswd,
                         (short) Rparams.optime);
                 trycount--;
-                if (trycount < 1)
+                if (trycount < 1) {
                     break;
+                }
             } while (er != Reader.READER_ERR.MT_OK_ERR);
             Log.d(TAG, "write_area: end");
             SpdWriteData spdWriteData = new SpdWriteData();
@@ -624,66 +643,68 @@ public class XinLianQilian implements IUHFService {
             Reader.Lock_Type ltyp = null;
             if (area == 0) {
                 lobj = Reader.Lock_Obj.LOCK_OBJECT_KILL_PASSWORD;
-                if (type == 0)
-
+                if (type == 0) {
                     ltyp = Reader.Lock_Type.KILL_PASSWORD_UNLOCK;
-                else if (type == 1)
-
+                } else if (type == 1) {
                     ltyp = Reader.Lock_Type.KILL_PASSWORD_LOCK;
-                else if (type == 2)
+                } else if (type == 2) {
                     return -1;
-                else if (type == 3) {
-
+                } else if (type == 3) {
                     ltyp = Reader.Lock_Type.KILL_PASSWORD_PERM_LOCK;
                 }
 
             } else if (area == 1) {
                 lobj = Reader.Lock_Obj.LOCK_OBJECT_ACCESS_PASSWD;
-                if (type == 0)
+                if (type == 0) {
                     ltyp = Reader.Lock_Type.ACCESS_PASSWD_UNLOCK;
-                else if (type == 1)
+                } else if (type == 1) {
                     ltyp = Reader.Lock_Type.ACCESS_PASSWD_LOCK;
-                else if (type == 2)
+                } else if (type == 2) {
                     return -1;
-                else if (type == 3) {
+                } else if (type == 3) {
                     ltyp = Reader.Lock_Type.ACCESS_PASSWD_PERM_LOCK;
                 }
             } else if (area == 2) {
                 lobj = Reader.Lock_Obj.LOCK_OBJECT_BANK1;
-                if (type == 0)
+                if (type == 0) {
                     ltyp = Reader.Lock_Type.BANK1_UNLOCK;
-                else if (type == 1)
+                } else if (type == 1) {
                     ltyp = Reader.Lock_Type.BANK1_LOCK;
-                else if (type == 2)
+                } else if (type == 2) {
                     return -1;
-                else if (type == 3)
+                } else if (type == 3) {
                     ltyp = Reader.Lock_Type.BANK1_PERM_LOCK;
+                }
             } else if (area == 3) {
                 lobj = Reader.Lock_Obj.LOCK_OBJECT_BANK2;
-                if (type == 0)
+                if (type == 0) {
                     ltyp = Reader.Lock_Type.BANK2_UNLOCK;
-                else if (type == 1)
+                } else if (type == 1) {
                     ltyp = Reader.Lock_Type.BANK2_LOCK;
-                else if (type == 2)
+                } else if (type == 2) {
                     return -1;
-                else if (type == 3)
+                } else if (type == 3) {
                     ltyp = Reader.Lock_Type.BANK2_PERM_LOCK;
+                }
             } else if (area == 4) {
                 lobj = Reader.Lock_Obj.LOCK_OBJECT_BANK3;
-                if (type == 0)
+                if (type == 0) {
                     ltyp = Reader.Lock_Type.BANK3_UNLOCK;
-                else if (type == 1)
+                } else if (type == 1) {
                     ltyp = Reader.Lock_Type.BANK3_LOCK;
-                else if (type == 2)
+                } else if (type == 2) {
                     return -1;
-                else if (type == 3)
+                } else if (type == 3) {
                     ltyp = Reader.Lock_Type.BANK3_PERM_LOCK;
+                }
             }
             byte[] rpaswd = new byte[4];
-            if (!passwd.equals("")) {
+            if (!"".equals(passwd)) {
                 Mreader.Str2Hex(passwd, passwd.length(), rpaswd);
             }
 
+            assert lobj != null;
+            assert ltyp != null;
             Reader.READER_ERR er = Mreader.LockTag(Rparams.opant,
                     (byte) lobj.value(), (short) ltyp.value(),
                     rpaswd, (short) Rparams.optime);
@@ -870,6 +891,7 @@ public class XinLianQilian implements IUHFService {
 
     //从标签 area 区的 addr 位置（以 word 计算）读取 count 个值（以 byte 计算）
     // passwd 是访问密码，如果区域没被锁就给 0 值。
+    @Override
     public byte[] read_area(int area, int addr, int count, String passwd) {
         Log.d(TAG, "read_area: start22222");
         if ((area > 3) || (area < 0)) {
@@ -878,7 +900,7 @@ public class XinLianQilian implements IUHFService {
         try {
             byte[] rdata = new byte[count * 2];
             byte[] rpaswd = new byte[4];
-            if (!passwd.equals("")) {
+            if (!"".equals(passwd)) {
                 Mreader.Str2Hex(passwd, passwd.length(), rpaswd);
             }
             Reader.READER_ERR er = Reader.READER_ERR.MT_OK_ERR;
@@ -889,8 +911,9 @@ public class XinLianQilian implements IUHFService {
                         rdata, rpaswd, (short) Rparams.optime);
 
                 trycount--;
-                if (trycount < 1)
+                if (trycount < 1) {
                     break;
+                }
             } while (er != Reader.READER_ERR.MT_OK_ERR);
             Log.d(TAG, "read_area: end");
             if (er == Reader.READER_ERR.MT_OK_ERR) {
@@ -944,6 +967,7 @@ public class XinLianQilian implements IUHFService {
         }
     }
 
+    @Override
     public String read_area(int area, String str_addr
             , String str_count, String str_passwd) {
         Log.d(TAG, "read_card: start1111");
@@ -976,6 +1000,7 @@ public class XinLianQilian implements IUHFService {
 
 
     //把 content 中的数据写到标签 area 区中 addr（以 word 计算）开始的位 置。
+    @Override
     public int write_area(int area, int addr, int count, String passwd, byte[] content) {
         Log.d(TAG, "write_area: start22222");
         try {
@@ -996,8 +1021,9 @@ public class XinLianQilian implements IUHFService {
                         (char) area, addr, content, content.length, rpaswd,
                         (short) Rparams.optime);
                 trycount--;
-                if (trycount < 1)
+                if (trycount < 1) {
                     break;
+                }
             } while (er != Reader.READER_ERR.MT_OK_ERR);
             Log.d(TAG, "write_area: end");
             if (er == Reader.READER_ERR.MT_OK_ERR) {
@@ -1051,6 +1077,7 @@ public class XinLianQilian implements IUHFService {
         }
     }
 
+    @Override
     public int write_area(int area, String addr, String pwd, String count, String content) {
         Log.d(TAG, "write_area: start11111");
         if (TextUtils.isEmpty(pwd)) {
@@ -1079,6 +1106,7 @@ public class XinLianQilian implements IUHFService {
 
 
     //选中要进行操作的 epc 标签
+    @Override
     public int selectCard(int bank, byte[] epc, boolean mFlag) {
         Reader.READER_ERR er;
         try {
@@ -1108,6 +1136,7 @@ public class XinLianQilian implements IUHFService {
 
     }
 
+    @Override
     public int selectCard(int bank, String epc, boolean mFlag) {
         Log.d(TAG, "selectCard: start");
         if (!mFlag) {
@@ -1130,6 +1159,7 @@ public class XinLianQilian implements IUHFService {
 
 
     //设置天线功率
+    @Override
     public int setAntennaPower(int power) {
         Reader.AntPowerConf apcf = Mreader.new AntPowerConf();
         apcf.antcnt = antportc;
@@ -1163,6 +1193,7 @@ public class XinLianQilian implements IUHFService {
     }
 
     //读取当前天线功率值
+    @Override
     public int getAntennaPower() {
         int rv = 0;
         try {
@@ -1184,73 +1215,75 @@ public class XinLianQilian implements IUHFService {
     }
 
     //设定区域锁定状态。
+    @Override
     public int setlock(int type, int area, String passwd) {
         try {
             Reader.Lock_Obj lobj = null;
             Reader.Lock_Type ltyp = null;
             if (area == 0) {
                 lobj = Reader.Lock_Obj.LOCK_OBJECT_KILL_PASSWORD;
-                if (type == 0)
-
+                if (type == 0) {
                     ltyp = Reader.Lock_Type.KILL_PASSWORD_UNLOCK;
-                else if (type == 1)
-
+                } else if (type == 1) {
                     ltyp = Reader.Lock_Type.KILL_PASSWORD_LOCK;
-                else if (type == 2)
+                } else if (type == 2) {
                     return -1;
-                else if (type == 3) {
-
+                } else if (type == 3) {
                     ltyp = Reader.Lock_Type.KILL_PASSWORD_PERM_LOCK;
                 }
 
             } else if (area == 1) {
                 lobj = Reader.Lock_Obj.LOCK_OBJECT_ACCESS_PASSWD;
-                if (type == 0)
+                if (type == 0) {
                     ltyp = Reader.Lock_Type.ACCESS_PASSWD_UNLOCK;
-                else if (type == 1)
+                } else if (type == 1) {
                     ltyp = Reader.Lock_Type.ACCESS_PASSWD_LOCK;
-                else if (type == 2)
+                } else if (type == 2) {
                     return -1;
-                else if (type == 3) {
+                } else if (type == 3) {
                     ltyp = Reader.Lock_Type.ACCESS_PASSWD_PERM_LOCK;
                 }
             } else if (area == 2) {
                 lobj = Reader.Lock_Obj.LOCK_OBJECT_BANK1;
-                if (type == 0)
+                if (type == 0) {
                     ltyp = Reader.Lock_Type.BANK1_UNLOCK;
-                else if (type == 1)
+                } else if (type == 1) {
                     ltyp = Reader.Lock_Type.BANK1_LOCK;
-                else if (type == 2)
+                } else if (type == 2) {
                     return -1;
-                else if (type == 3)
+                } else if (type == 3) {
                     ltyp = Reader.Lock_Type.BANK1_PERM_LOCK;
+                }
             } else if (area == 3) {
                 lobj = Reader.Lock_Obj.LOCK_OBJECT_BANK2;
-                if (type == 0)
+                if (type == 0) {
                     ltyp = Reader.Lock_Type.BANK2_UNLOCK;
-                else if (type == 1)
+                } else if (type == 1) {
                     ltyp = Reader.Lock_Type.BANK2_LOCK;
-                else if (type == 2)
+                } else if (type == 2) {
                     return -1;
-                else if (type == 3)
+                } else if (type == 3) {
                     ltyp = Reader.Lock_Type.BANK2_PERM_LOCK;
+                }
             } else if (area == 4) {
                 lobj = Reader.Lock_Obj.LOCK_OBJECT_BANK3;
-                if (type == 0)
+                if (type == 0) {
                     ltyp = Reader.Lock_Type.BANK3_UNLOCK;
-                else if (type == 1)
+                } else if (type == 1) {
                     ltyp = Reader.Lock_Type.BANK3_LOCK;
-                else if (type == 2)
+                } else if (type == 2) {
                     return -1;
-                else if (type == 3)
+                } else if (type == 3) {
                     ltyp = Reader.Lock_Type.BANK3_PERM_LOCK;
+                }
             }
-//            byte[] rpaswd = StringUtils.stringToByte(passwd);
             byte[] rpaswd = new byte[4];
-            if (!passwd.equals("")) {
+            if (!"".equals(passwd)) {
                 Mreader.Str2Hex(passwd, passwd.length(), rpaswd);
             }
 
+            assert lobj != null;
+            assert ltyp != null;
             Reader.READER_ERR er = Mreader.LockTag(Rparams.opant,
                     (byte) lobj.value(), (short) ltyp.value(),
                     rpaswd, (short) Rparams.optime);
@@ -1284,6 +1317,7 @@ public class XinLianQilian implements IUHFService {
 
 
     //设置频率区域
+    @Override
     public int setFreqRegion(int region) {
         try {
             Reader.Region_Conf rre;
@@ -1319,6 +1353,7 @@ public class XinLianQilian implements IUHFService {
         return 0;
     }
 
+    @Override
     public int getFreqRegion() {
         try {
             Reader.Region_Conf[] rcf2 = new Reader.Region_Conf[1];
@@ -1424,10 +1459,11 @@ public class XinLianQilian implements IUHFService {
                                 }
                                 Log.d(TAG, "run: 33333333333");
                                 Reader.TAGINFO tfs = Mreader.new TAGINFO();
-                                if (nostop)
+                                if (nostop) {
                                     er = Mreader.AsyncGetNextTag(tfs);
-                                else
+                                } else {
                                     er = Mreader.GetNextTag(tfs);
+                                }
 
                                 if (er == Reader.READER_ERR.MT_OK_ERR) {
                                     byte[] n_epc = tfs.EpcId;
@@ -1441,11 +1477,9 @@ public class XinLianQilian implements IUHFService {
                                     } else {
                                         cx.add(tagData);
                                         Message msg = new Message();
-                                        if (cx != null) {
-                                            msg.what = 1;
-                                            msg.obj = cx;
-                                            handler_inventer.sendMessage(msg);
-                                        }
+                                        msg.what = 1;
+                                        msg.obj = cx;
+                                        handler_inventer.sendMessage(msg);
                                     }
 
                                 }
@@ -1453,12 +1487,6 @@ public class XinLianQilian implements IUHFService {
                         }
 
                     } else {
-//                        if (nostop && er != Reader.READER_ERR.MT_OK_ERR) {
-//                            handler.removeCallbacks(inv_thread);
-//                        }
-//                        if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_TOO_MANY_RESET) {
-//                            inventory_stop();
-//                        }
                         Log.d(TAG, "run: err");
                         int errCode = -1;
                         if (er == Reader.READER_ERR.MT_IO_ERR) {
@@ -1510,7 +1538,6 @@ public class XinLianQilian implements IUHFService {
                             handler_inventer.sendMessage(handler_inventer.obtainMessage(2, errCode));
                         }
                         inventory_stop();
-//                        return;
                     }
                 }
             }
@@ -1531,6 +1558,7 @@ public class XinLianQilian implements IUHFService {
     // Message.obj 就是保存了 EPC 数据的 Tag_Data类的ArrayList。
     // SpdInventoryData 类有两个byte[ ]型的public 成员，一个是 epc，一个是 tid，如果为 null，
     // 代表对应的值不存在。
+    @Override
     public void reg_handler(Handler hd) {
         handler_inventer = hd;
     }

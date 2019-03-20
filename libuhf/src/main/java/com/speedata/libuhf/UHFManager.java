@@ -306,7 +306,8 @@ public class UHFManager {
                     powerOn(DeviceControlSpd.PowerType.EXPAND, 9, 14);
 
                 } else if (xinghao.contains("SD55")) {
-                    powerOn(DeviceControlSpd.PowerType.MAIN, 128);
+//                    powerOn(DeviceControlSpd.PowerType.MAIN, 128);
+                    powerOn(DeviceControlSpd.PowerType.NEW_MAIN, 12);
                 } else if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")
                         || xinghao.equals("Biowolf LE") || xinghao.equals("FC-PK80")
                         || xinghao.equals("FC-K80") || xinghao.equals("T80") || xinghao.contains("80")) {
@@ -367,7 +368,7 @@ public class UHFManager {
         String xinghao = Build.MODEL;
         if (xinghao.contains("SD55")) {
             try {
-                serialPort.OpenSerial("/dev/ttyMT2", 115200);
+                serialPort.OpenSerial("/dev/ttyMT0", 115200);
             } catch (IOException e) {
                 e.printStackTrace();
             }

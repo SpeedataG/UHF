@@ -118,7 +118,7 @@ dependencies {
     //noinspection GradleCompatible
     compileOnly 'com.android.support:appcompat-v7:28.0.0'
     testImplementation 'junit:junit:4.12'
-    compileOnly 'com.github.SpeedataG:Device:1.6.3'
+    compileOnly 'com.github.SpeedataG:Device:1.6.4'
     compileOnly 'com.alibaba:fastjson:1.2.54'
 }
 
