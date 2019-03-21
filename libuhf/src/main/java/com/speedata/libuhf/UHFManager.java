@@ -133,7 +133,7 @@ public class UHFManager {
                         int antennaPower = SharedXmlUtil.getInstance(mContext).read("AntennaPower", 30);
                         Log.d("ZM", "battVolt: " + v + "antennaPower：" + antennaPower);
                         Log.d("zzc:", "battVolt: " + v + "antennaPower：" + antennaPower + " 一直检测：");
-                        if (v < 3.3) {
+                        if (v < 3.4) {
                             stopUseUHF();
                             stopTimer();
                         }
