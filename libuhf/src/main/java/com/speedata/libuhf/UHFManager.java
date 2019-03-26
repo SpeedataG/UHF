@@ -68,14 +68,19 @@ public class UHFManager {
     private static BatteryReceiver batteryReceiver;
     private static ReadBean mRead;
     private static String factory;
-    private static volatile int stipulationLevel = 15;
+    private static volatile int stipulationLevel = 20;
     private static Timer timer;
     private static TimerTask myTimerTask;
+    private static double VOL;
+    private static int i;
 
     /**
      * 立即检测一次电压，电压小于3.75V
      */
     public static void startCheckV() {
+        if (FACTORY_XINLIAN.equals(factory)) {
+            return;
+        }
         InputStream battVoltFile;
         try {
             battVoltFile = new FileInputStream("sys/class/power_supply/battery/batt_vol");
@@ -97,9 +102,6 @@ public class UHFManager {
     }
 
     public static IUHFService getUHFService(Context context) {
-        if (Build.MODEL.contains("SD60") || Build.MODEL.contains("SC60")) {
-            createTimer();
-        }
         //  判断模块   返回不同的模块接口对象
         mContext = context.getApplicationContext();
         //注册广播接受者java代码
@@ -131,12 +133,20 @@ public class UHFManager {
                         String battVoltFileStr = convertStreamToString(battVoltFile);
                         double v = Integer.parseInt(battVoltFileStr) / 1000000.0;
                         int antennaPower = SharedXmlUtil.getInstance(mContext).read("AntennaPower", 30);
-                        Log.d("ZM", "battVolt: " + v + "antennaPower：" + antennaPower);
-                        Log.d("zzc:", "battVolt: " + v + "antennaPower：" + antennaPower + " 一直检测：");
-                        if (v < 3.4) {
-                            stopUseUHF();
-                            stopTimer();
+                        if (i < 10) {
+                            VOL += v;
+                            i++;
+                        } else {
+                            VOL /= 10;
+                            Log.d("zzc:", "battVolt: " + VOL + " antennaPower：" + antennaPower + " 第10次算平均值");
+                            if (VOL < 3.35) {
+                                stopUseUHF();
+                                stopTimer();
+                            }
+                            i = 0;
+                            VOL = 0;
                         }
+                        Log.d("zzc:", "battVolt: " + v + " antennaPower：" + antennaPower + " 一直检测：");
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
@@ -191,9 +201,9 @@ public class UHFManager {
                 try {
                     //获取当前电量
                     int level = intent.getIntExtra("level", 0);
+                    Log.d("zzc:", "level: " + level + " stipulationLevel:" + stipulationLevel);
                     if (level < stipulationLevel) {
                         stopUseUHF();
-
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -253,6 +263,11 @@ public class UHFManager {
             noXmlJudgeModule();
         }
 
+        if (!FACTORY_XINLIAN.equals(factory)) {
+            if (Build.MODEL.contains("SD60") || Build.MODEL.contains("SC60")) {
+                createTimer();
+            }
+        }
         boolean initResult = true;
         switch (factory) {
             case FACTORY_FEILIXIN:
