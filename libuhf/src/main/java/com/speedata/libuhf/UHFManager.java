@@ -139,7 +139,7 @@ public class UHFManager {
                         } else {
                             VOL /= 10;
                             Log.d("zzc:", "battVolt: " + VOL + " antennaPower：" + antennaPower + " 第10次算平均值");
-                            if (VOL < 3.35) {
+                            if (VOL < 3.4) {
                                 stopUseUHF();
                                 stopTimer();
                             }
