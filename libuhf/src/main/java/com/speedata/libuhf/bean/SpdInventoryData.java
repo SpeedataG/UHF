@@ -7,11 +7,11 @@ import android.os.Parcelable;
  * Created by 张明_ on 2016/12/16.
  */
 
-public class SpdInventoryData implements Parcelable{
+public class SpdInventoryData implements Parcelable {
     public SpdInventoryData(String n_tid, String n_epc, String rssi) {
         tid = n_tid;
         epc = n_epc;
-        this.rssi=rssi;
+        this.rssi = rssi;
     }
 
     public String tid;
@@ -47,6 +47,18 @@ public class SpdInventoryData implements Parcelable{
         dest.writeString(tid);
         dest.writeString(epc);
         dest.writeString(rssi);
+    }
+
+    /**
+     * 参数是一个Parcel,用它来存储与传输数据
+     *
+     * @param dest 手动添加read方法
+     */
+    public void readFromParcel(Parcel dest) {
+        //注意，此处的读值顺序应当是和writeToParcel()方法中一致的
+        tid = dest.readString();
+        epc = dest.readString();
+        rssi = dest.readString();
     }
 
     public String getTid() {

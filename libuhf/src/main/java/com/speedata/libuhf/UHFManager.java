@@ -263,11 +263,11 @@ public class UHFManager {
             noXmlJudgeModule();
         }
 
-        if (!FACTORY_XINLIAN.equals(factory)) {
-            if (Build.MODEL.contains("SD60") || Build.MODEL.contains("SC60")) {
-                createTimer();
-            }
-        }
+//        if (!FACTORY_XINLIAN.equals(factory)) {
+//            if (Build.MODEL.contains("SD60") || Build.MODEL.contains("SC60")) {
+//                createTimer();
+//            }
+//        }
         boolean initResult = true;
         switch (factory) {
             case FACTORY_FEILIXIN:
