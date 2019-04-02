@@ -25,6 +25,8 @@ import com.speedata.libuhf.utils.SharedXmlUtil;
 import com.speedata.libuhf.utils.StringUtils;
 import com.uhf.api.cls.ErrInfo;
 import com.uhf.api.cls.Reader;
+import com.uhf.structures.DynamicQParams;
+import com.uhf.structures.FixedQParams;
 import com.uhf.structures.RW_Params;
 import com.uhf.structures.SelectCriteria;
 
@@ -797,6 +799,27 @@ public class XinLianQilian implements IUHFService {
     public int writeMonzaQtTagSync(int memMap, byte[] pwd, int bank, int address, int length, byte[] writeData, int timeOutMs, RW_Params rw_params) {
         return -1;
     }
+
+    @Override
+    public int setDynamicAlgorithm(int startQ, int minQ, int maxQ, int tryCount, int target, int threshold) {
+        return 0;
+    }
+
+    @Override
+    public int setFixedAlgorithm(int qValue, int tryCount, int target, int repeat) {
+        return 0;
+    }
+
+    @Override
+    public int getDynamicAlgorithm(DynamicQParams dynamicQParams) {
+        return 0;
+    }
+
+    @Override
+    public int getFixedAlgorithm(FixedQParams fixedQParams) {
+        return 0;
+    }
+
 
     //********************************************老版接口（不再维护）******************************************
 

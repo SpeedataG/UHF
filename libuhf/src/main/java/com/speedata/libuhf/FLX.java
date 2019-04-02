@@ -24,6 +24,7 @@ import com.speedata.libuhf.utils.SharedXmlUtil;
 import com.speedata.libuhf.utils.StringUtils;
 import com.uhf.linkage.Linkage;
 import com.uhf.structures.DynamicQParams;
+import com.uhf.structures.FixedQParams;
 import com.uhf.structures.InventoryData;
 import com.uhf.structures.InventoryParams;
 import com.uhf.structures.OnInventoryListener;
@@ -676,6 +677,63 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
     public int writeMonzaQtTagSync(int memMap, byte[] pwd, int bank, int address, int length, byte[] writeData, int timeOutMs, RW_Params rw_params) {
         return getLinkage().writeMonzaQtTagSync(memMap, pwd, bank, address, length, writeData, timeOutMs, rw_params);
     }
+
+    @Override
+    public int setDynamicAlgorithm(int startQ, int minQ, int maxQ, int tryCount, int target, int threshold) {
+        if (startQ < 0 || startQ > 15 || minQ < 0 || minQ > 15 || maxQ < 0 || maxQ > 15) {
+            return -1;
+        }
+        if (minQ > maxQ) {
+            return -2;
+        }
+        if (threshold < 0 || threshold > 255) {
+            return -3;
+        }
+        if (tryCount < 0 || tryCount > 10) {
+            return -4;
+        }
+        DynamicQParams dp = new DynamicQParams();
+        dp.setValue(startQ, minQ, maxQ, tryCount, target, threshold);
+        int dynamicResult = getLinkage().Radio_SetSingulationAlgorithmDyParameters(dp);
+
+        if (dynamicResult == 0) {
+            return 0;
+        } else {
+            return dynamicResult;
+        }
+
+    }
+
+    @Override
+    public int setFixedAlgorithm(int qValue, int tryCount, int target, int repeat) {
+        if (qValue < 0 || qValue > 15) {
+            return -1;
+        }
+        if (tryCount < 0 || tryCount > 10) {
+            return -4;
+        }
+        FixedQParams fd = new FixedQParams();
+        fd.setValue(qValue, tryCount, target, repeat);
+        int fixedResult = getLinkage().Radio_SetSingulationAlgorithmFixedParameters(fd);
+
+        if (fixedResult == 0) {
+            return 0;
+        } else {
+            return fixedResult;
+        }
+
+    }
+
+    @Override
+    public int getDynamicAlgorithm(DynamicQParams dynamicQParams) {
+        return getLinkage().Radio_GetSingulationAlgorithmDyParameters(dynamicQParams);
+    }
+
+    @Override
+    public int getFixedAlgorithm(FixedQParams fixedQParams) {
+        return getLinkage().Radio_GetSingulationAlgorithmFixedParameters(fixedQParams);
+    }
+
 
     //********************************************老版接口（不再维护）******************************************
 

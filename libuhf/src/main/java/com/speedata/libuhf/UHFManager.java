@@ -75,7 +75,8 @@ public class UHFManager {
     private static int i;
 
     /**
-     * 立即检测一次电压，电压小于3.75V
+     * 立即检测一次电压，电压小于3.75V(已删除)
+     * （为什么还留着这个方法？经测试，停止调用该方法会出现开始盘点但不执行回调监听方法，未查明原因，所以暂时保留此方法）
      */
     public static void startCheckV() {
         if (FACTORY_XINLIAN.equals(factory)) {
@@ -88,14 +89,7 @@ public class UHFManager {
             double v = Integer.parseInt(battVoltFileStr) / 1000000.0;
             int antennaPower = SharedXmlUtil.getInstance(mContext).read("AntennaPower", 30);
             Log.d("zzc:", "battVolt: " + v + "antennaPower：" + antennaPower + " 第一次：");
-            if (v < 3.75) {
-                stopUseUHF();
-                if (timer != null) {
-                    stopTimer();
-                }
-            } else {
-                createTimer();
-            }
+//            createTimer();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -133,19 +127,6 @@ public class UHFManager {
                         String battVoltFileStr = convertStreamToString(battVoltFile);
                         double v = Integer.parseInt(battVoltFileStr) / 1000000.0;
                         int antennaPower = SharedXmlUtil.getInstance(mContext).read("AntennaPower", 30);
-                        if (i < 10) {
-                            VOL += v;
-                            i++;
-                        } else {
-                            VOL /= 10;
-                            Log.d("zzc:", "battVolt: " + VOL + " antennaPower：" + antennaPower + " 第10次算平均值");
-                            if (VOL < 3.4) {
-                                stopUseUHF();
-                                stopTimer();
-                            }
-                            i = 0;
-                            VOL = 0;
-                        }
                         Log.d("zzc:", "battVolt: " + v + " antennaPower：" + antennaPower + " 一直检测：");
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();

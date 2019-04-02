@@ -6,11 +6,12 @@ import android.os.Handler;
 import com.speedata.libuhf.interfaces.OnSpdInventoryListener;
 import com.speedata.libuhf.interfaces.OnSpdReadListener;
 import com.speedata.libuhf.interfaces.OnSpdWriteListener;
+import com.uhf.structures.DynamicQParams;
+import com.uhf.structures.FixedQParams;
 import com.uhf.structures.RW_Params;
 import com.uhf.structures.SelectCriteria;
 
 /**
- *
  * @author brxu
  * @date 2016/12/13
  */
@@ -41,6 +42,7 @@ public interface IUHFService {
 
     /**
      * 默认参数初始化模块上电
+     *
      * @return
      */
     public int openDev();
@@ -222,6 +224,42 @@ public interface IUHFService {
      * @return 0--成功 非0失败
      */
     public int writeMonzaQtTagSync(int memMap, byte[] pwd, int bank, int address, int length, byte[] writeData, int timeOutMs, RW_Params rw_params);
+
+    /**
+     * @param startQ    起始Q值
+     * @param minQ      最小Q值 0～15
+     * @param maxQ      最大Q值 0～15
+     * @param tryCount  尝试次数
+     * @param target    是否翻转 0启用 1禁止
+     * @param threshold 阀值 0~255
+     * @return 0设置成功
+     * -1 startQ  minQ  maxQ threshold取值范围不对
+     * -2 Q值范围设置错误 最小不能大于最大
+     * -3 不在阀值0～255的取值范围内，无效阀值
+     * -4 不在重试次数0～10的取值范围内，无效重试次数
+     * 其他值 查询厂商错误码
+     */
+    public int setDynamicAlgorithm(int startQ, int minQ, int maxQ, int tryCount
+            , int target, int threshold);
+
+    /**
+     * @param qValue   起始Q值  0～15
+     * @param tryCount 尝试次数
+     * @param target   是否翻转 0启用 1禁止
+     * @param repeat   是否重复 0启用 1禁止
+     * @return 0设置成功
+     * -1 startQ  minQ  maxQ threshold取值范围不对
+     * -4 不在重试次数0～10的取值范围内，无效重试次数
+     * 其他值 查询厂商错误码
+     */
+    public int setFixedAlgorithm(int qValue, int tryCount, int target, int repeat);
+
+
+    public int getDynamicAlgorithm(DynamicQParams dynamicQParams);
+
+    public int getFixedAlgorithm(FixedQParams fixedQParams);
+
+
     //********************************************老版接口（不再维护）***************************************************
 
 

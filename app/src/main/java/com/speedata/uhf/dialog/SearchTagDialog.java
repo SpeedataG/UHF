@@ -110,6 +110,7 @@ public class SearchTagDialog extends Dialog implements
         iuhfService.setOnInventoryListener(new OnSpdInventoryListener() {
             @Override
             public void getInventoryData(SpdInventoryData var1) {
+                Log.d("zzc:","OnSpdInventoryListener 盘点回调");
                 handler.sendMessage(handler.obtainMessage(1, var1));
             }
         });
@@ -202,16 +203,19 @@ public class SearchTagDialog extends Dialog implements
             } else {
                 inSearch = true;
                 this.setCancelable(false);
+                cancel.setEnabled(false);
+                export.setEnabled(false);
                 scant = 0;
                 firm.clear();
                 //取消掩码
                 iuhfService.selectCard(1, "", false);
                 EventBus.getDefault().post(new MsgEvent("CancelSelectCard", ""));
+                UHFManager.startCheckV();
                 iuhfService.inventoryStart();
+                Log.d("zzc:","inventoryStart 开始盘点");
                 startCheckingTime = System.currentTimeMillis();
                 action.setText(R.string.Stop_Search_Btn);
-                cancel.setEnabled(false);
-                export.setEnabled(false);
+
             }
         } else if (v == export) {
             kProgressHUD = KProgressHUD.create(cont)
