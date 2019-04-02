@@ -870,6 +870,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
     }
 
     //设置定频频点
+    @Override
     public int setFrequency(double frequency) {
         int singleFrequency = (int) (frequency * 1000);
         if (singleFrequency < 840000 || singleFrequency > 960000 || (singleFrequency % 125 != 0)) {

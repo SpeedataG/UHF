@@ -68,7 +68,7 @@ public class UHFManager {
     private static BatteryReceiver batteryReceiver;
     private static ReadBean mRead;
     private static String factory;
-    private static volatile int stipulationLevel = 20;
+    private static volatile int stipulationLevel = 15;
     private static Timer timer;
     private static TimerTask myTimerTask;
     private static double VOL;
@@ -201,10 +201,10 @@ public class UHFManager {
                 try {
                     //获取当前电量
                     int level = intent.getIntExtra("level", 0);
-                    Log.d("zzc:", "level: " + level + " stipulationLevel:" + stipulationLevel);
                     if (level < stipulationLevel) {
                         stopUseUHF();
                     }
+                    Log.d("zzc:", "level: " + level);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
