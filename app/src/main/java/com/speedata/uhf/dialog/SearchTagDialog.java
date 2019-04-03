@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
@@ -210,7 +211,7 @@ public class SearchTagDialog extends Dialog implements
                 //取消掩码
                 iuhfService.selectCard(1, "", false);
                 EventBus.getDefault().post(new MsgEvent("CancelSelectCard", ""));
-                UHFManager.startCheckV();
+                SystemClock.sleep(1);
                 iuhfService.inventoryStart();
                 Log.d("zzc:","inventoryStart 开始盘点");
                 startCheckingTime = System.currentTimeMillis();

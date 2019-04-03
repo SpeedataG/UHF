@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.serialport.DeviceControlSpd;
 import android.serialport.SerialPortSpd;
 import android.text.TextUtils;
@@ -71,29 +72,7 @@ public class UHFManager {
     private static volatile int stipulationLevel = 15;
     private static Timer timer;
     private static TimerTask myTimerTask;
-    private static double VOL;
-    private static int i;
 
-    /**
-     * 立即检测一次电压，电压小于3.75V(已删除)
-     * （为什么还留着这个方法？经测试，停止调用该方法会出现开始盘点但不执行回调监听方法，未查明原因，所以暂时保留此方法）
-     */
-    public static void startCheckV() {
-        if (FACTORY_XINLIAN.equals(factory)) {
-            return;
-        }
-        InputStream battVoltFile;
-        try {
-            battVoltFile = new FileInputStream("sys/class/power_supply/battery/batt_vol");
-            String battVoltFileStr = convertStreamToString(battVoltFile);
-            double v = Integer.parseInt(battVoltFileStr) / 1000000.0;
-            int antennaPower = SharedXmlUtil.getInstance(mContext).read("AntennaPower", 30);
-            Log.d("zzc:", "battVolt: " + v + "antennaPower：" + antennaPower + " 第一次：");
-//            createTimer();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
 
     public static IUHFService getUHFService(Context context) {
         //  判断模块   返回不同的模块接口对象
