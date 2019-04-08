@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import android.serialport.DeviceControlSpd;
+import android.widget.Toast;
 
 import com.speedata.libuhf.bean.SpdInventoryData;
 import com.speedata.libuhf.bean.SpdReadData;
@@ -728,12 +729,39 @@ public class XinLianQilian implements IUHFService {
 
     @Override
     public int setQueryTagGroup(int selected, int session, int target) {
-        return 0;
+        try {
+            int[] val = new int[]{-1};
+            val[0] = session;
+            Reader.READER_ERR er = Mreader.ParamSet(
+                    Reader.Mtr_Param.MTR_PARAM_POTL_GEN2_SESSION, val);
+            if (er == Reader.READER_ERR.MT_OK_ERR) {
+                Rparams.session = val[0];
+                return 0;
+            } else {
+                return -1;
+            }
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            return -1;
+        }
     }
 
     @Override
     public int getQueryTagGroup() {
-        return 0;
+        try {
+            int[] val = new int[]{-1};
+            Reader.READER_ERR er = Mreader.ParamGet(
+                    Reader.Mtr_Param.MTR_PARAM_POTL_GEN2_SESSION, val);
+
+            if (er == Reader.READER_ERR.MT_OK_ERR) {
+                return val[0];
+            } else {
+                return -1;
+            }
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            return -1;
+        }
     }
 
     @Override
@@ -818,6 +846,153 @@ public class XinLianQilian implements IUHFService {
     @Override
     public int getFixedAlgorithm(FixedQParams fixedQParams) {
         return 0;
+    }
+
+    @Override
+    public int setGen2QValue(int qValue) {
+        try {
+            int[] val = new int[]{-1};
+            val[0] = qValue - 1;
+            Reader.READER_ERR er0 = Mreader.ParamSet(Reader.Mtr_Param.MTR_PARAM_POTL_GEN2_Q, val);
+            if (er0 == Reader.READER_ERR.MT_OK_ERR) {
+                Rparams.qv = val[0];
+                return 0;
+            } else {
+                return -1;
+            }
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    @Override
+    public int setGen2WriteMode(int wMode) {
+        try {
+            int[] val = new int[]{-1};
+            val[0] = wMode;
+            Reader.READER_ERR er0 = Mreader.ParamSet(Reader.Mtr_Param.MTR_PARAM_POTL_GEN2_WRITEMODE, val);
+            if (er0 == Reader.READER_ERR.MT_OK_ERR) {
+                Rparams.wmode = val[0];
+                return 0;
+            } else {
+                return -1;
+            }
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    @Override
+    public int setGen2Blf(int blf) {
+        try {
+            int[] val = new int[]{-1};
+            val[0] = blf;
+            Reader.READER_ERR er0 = Mreader.ParamSet(Reader.Mtr_Param.MTR_PARAM_POTL_GEN2_BLF, val);
+            if (er0 == Reader.READER_ERR.MT_OK_ERR) {
+                Rparams.blf = val[0];
+                return 0;
+            } else {
+                return -1;
+            }
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    @Override
+    public int setGen2MaxLen(int maxLen) {
+        try {
+            int[] val = new int[]{-1};
+            val[0] = maxLen;
+            Reader.READER_ERR er0 = Mreader.ParamSet(Reader.Mtr_Param.MTR_PARAM_POTL_GEN2_MAXEPCLEN, val);
+            if (er0 == Reader.READER_ERR.MT_OK_ERR) {
+                Rparams.maxlen = val[0];
+                return 0;
+            } else {
+                return -1;
+            }
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    @Override
+    public int setGen2Target(int target) {
+        try {
+            int[] val = new int[]{-1};
+            val[0] = target;
+            Reader.READER_ERR er0 = Mreader.ParamSet(Reader.Mtr_Param.MTR_PARAM_POTL_GEN2_TARGET, val);
+            if (er0 == Reader.READER_ERR.MT_OK_ERR) {
+                Rparams.target = val[0];
+                return 0;
+            } else {
+                return -1;
+            }
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    @Override
+    public int setGen2Code(int code) {
+        try {
+            int[] val = new int[]{-1};
+            val[0] = code;
+            Reader.READER_ERR er0 = Mreader.ParamSet(Reader.Mtr_Param.MTR_PARAM_POTL_GEN2_TAGENCODING, val);
+            if (er0 == Reader.READER_ERR.MT_OK_ERR) {
+                Rparams.gen2code = val[0];
+                return 0;
+            } else {
+                return -1;
+            }
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    @Override
+    public int setGen2Tari(int tari) {
+        try {
+            int[] val = new int[]{-1};
+            val[0] = tari;
+            Reader.READER_ERR er0 = Mreader.ParamSet(Reader.Mtr_Param.MTR_PARAM_POTL_GEN2_TARI, val);
+            if (er0 == Reader.READER_ERR.MT_OK_ERR) {
+                Rparams.gen2tari = val[0];
+                return 0;
+            } else {
+                return -1;
+            }
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    @Override
+    public int[] getGen2AllValue() {
+        int[] res = new int[2];
+        try {
+            int[] val1 = new int[]{-1};
+            int[] val2 = new int[]{-1};
+            Reader.READER_ERR er;
+            er = Mreader.ParamGet(Reader.Mtr_Param.MTR_PARAM_POTL_GEN2_Q, val1);
+            if (er == Reader.READER_ERR.MT_OK_ERR) {
+                res[0] = val1[0] + 1;
+            } else {
+                res[0] = -1;
+            }
+
+            er = Mreader.ParamGet(Reader.Mtr_Param.MTR_PARAM_POTL_GEN2_TARGET, val2);
+            if (er == Reader.READER_ERR.MT_OK_ERR) {
+                res[1] = val2[0];
+            } else {
+                res[1] = -1;
+            }
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            res = null;
+        }
+        return res;
     }
 
 

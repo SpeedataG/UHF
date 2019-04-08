@@ -734,6 +734,45 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         return getLinkage().Radio_GetSingulationAlgorithmFixedParameters(fixedQParams);
     }
 
+    @Override
+    public int setGen2QValue(int qValue) {
+        return 0;
+    }
+
+    @Override
+    public int setGen2WriteMode(int wMode) {
+        return 0;
+    }
+
+    @Override
+    public int setGen2Blf(int blf) {
+        return 0;
+    }
+
+    @Override
+    public int setGen2MaxLen(int maxLen) {
+        return 0;
+    }
+
+    @Override
+    public int setGen2Target(int target) {
+        return 0;
+    }
+
+    @Override
+    public int setGen2Code(int code) {
+        return 0;
+    }
+
+    @Override
+    public int setGen2Tari(int tari) {
+        return 0;
+    }
+
+    @Override
+    public int[] getGen2AllValue() {
+        return null;
+    }
 
     //********************************************老版接口（不再维护）******************************************
 

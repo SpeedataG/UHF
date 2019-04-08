@@ -259,6 +259,22 @@ public interface IUHFService {
 
     public int getFixedAlgorithm(FixedQParams fixedQParams);
 
+    public int setGen2QValue(int qValue);
+
+    public int setGen2WriteMode(int wMode);
+
+    public int setGen2Blf(int blf);
+
+    public int setGen2MaxLen(int maxLen);
+
+    public int setGen2Target(int target);
+
+    public int setGen2Code(int code);
+
+    public int setGen2Tari(int tari);
+
+    public int[] getGen2AllValue();
+
 
     //********************************************老版接口（不再维护）***************************************************
 
