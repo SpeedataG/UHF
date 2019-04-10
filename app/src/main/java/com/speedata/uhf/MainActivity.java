@@ -63,12 +63,15 @@ public class MainActivity extends Activity implements OnClickListener {
     private WakeLock wK = null;
     private int initProgress = 0;
     private String model;
+    private String TAG = "TIME";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        long currenTime = System.currentTimeMillis();
         try {
             iuhfService = UHFManager.getUHFService(MainActivity.this);
+            Log.d(TAG, "currenTime 1:" + (System.currentTimeMillis() - currenTime));
         } catch (Exception e) {
             e.printStackTrace();
             boolean cn = "CN".equals(getApplicationContext().getResources().getConfiguration().locale.getCountry());
@@ -80,7 +83,9 @@ public class MainActivity extends Activity implements OnClickListener {
             return;
         }
         model = SharedXmlUtil.getInstance(MainActivity.this).read("model", "");
+        Log.d(TAG, "currenTime 2:" + (System.currentTimeMillis() - currenTime));
         initUI();
+        Log.d(TAG, "currenTime 3:" + (System.currentTimeMillis() - currenTime));
         version.append("-" + model);
         newWakeLock();
         EventBus.getDefault().register(this);
@@ -96,6 +101,7 @@ public class MainActivity extends Activity implements OnClickListener {
             btnInvSet.setVisibility(View.VISIBLE);
             btnInvSet.setEnabled(true);
         }
+        Log.d(TAG, "currenTime 4:" + (System.currentTimeMillis() - currenTime));
 
     }
 
