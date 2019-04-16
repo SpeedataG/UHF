@@ -3,12 +3,12 @@ package com.speedata.libuhf;
 
 import android.os.Handler;
 
-import com.speedata.libuhf.bean.DynamicQParams;
-import com.speedata.libuhf.bean.FixedQParams;
 import com.speedata.libuhf.interfaces.OnSpdInventoryListener;
 import com.speedata.libuhf.interfaces.OnSpdReadListener;
 import com.speedata.libuhf.interfaces.OnSpdWriteListener;
 
+import com.uhf.structures.DynamicQParams;
+import com.uhf.structures.FixedQParams;
 import com.uhf.structures.RW_Params;
 import com.uhf.structures.SelectCriteria;
 
