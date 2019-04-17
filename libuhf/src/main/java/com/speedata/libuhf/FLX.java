@@ -336,12 +336,19 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
                     }
                 }
 
-            } else if (xinghao.contains("SD100")) {
+            } else if (xinghao.equals("SD100")) {
                 // TODO: 2018/10/10   上电处理
                 try {
                     pw = new DeviceControlSpd(DeviceControlSpd.POWER_GAOTONG);
                     pw.gtPower("uhf_open");
                     pw.gtPower("open");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            } else if (xinghao.equals("SD100T")) {
+                try {
+                    pw = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN,52,89,71);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -373,7 +380,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
                 result = getLinkage().open_serial(SERIALPORT);
             }
         } else if ("SD60RT".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
-                || xinghao.contains("DXD60RT") || xinghao.contains("C6000")) {
+                || xinghao.contains("DXD60RT") || xinghao.contains("C6000")|| "SD100T".equals(xinghao)) {
             result = getLinkage().open_serial(SERIALPORT_SD60);
         } else if (xinghao.contains("SD100")) {
             SystemClock.sleep(240);

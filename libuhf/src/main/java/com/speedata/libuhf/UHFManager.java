@@ -69,7 +69,7 @@ public class UHFManager {
     private static BatteryReceiver batteryReceiver;
     private static ReadBean mRead;
     private static String factory;
-    private static volatile int stipulationLevel = 15;
+    private static volatile int stipulationLevel = 0;
     private static Timer timer;
     private static TimerTask myTimerTask;
 
@@ -300,7 +300,7 @@ public class UHFManager {
                         powerOn(DeviceControlSpd.PowerType.MAIN, 88);
                     }
 
-                } else if (xinghao.contains("SD100")) {
+                } else if (xinghao.equals("SD100")) {
                     try {
                         pw = new DeviceControlSpd(DeviceControlSpd.POWER_GAOTONG);
                         pw.gtPower("uhf_open");
@@ -309,7 +309,10 @@ public class UHFManager {
                         e.printStackTrace();
                         Log.d("ZM", "SD100 powerOn-Exception: " + e.toString());
                     }
-                } else {
+                } else if (xinghao.equals("SD100T")){
+                    powerOn(DeviceControlSpd.PowerType.NEW_MAIN, 52,89,71);
+
+                }else {
                     powerOn(DeviceControlSpd.PowerType.MAIN, 94);
                 }
             }
@@ -371,7 +374,14 @@ public class UHFManager {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else {
+        }
+        else if (xinghao.equalsIgnoreCase("SD100T")) {
+            try {
+                serialPort.OpenSerial("/dev/ttyMT0", 115200);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else {
             try {
                 serialPort.OpenSerial("/dev/ttyMT2", 115200);
             } catch (IOException e) {

@@ -230,7 +230,7 @@ public class XinLianQilian implements IUHFService {
                     return -1;
                 }
 
-            } else if (xinghao.contains("SD100")) {
+            } else if (xinghao.equals("SD100")) {
                 try {
                     deviceControl = new DeviceControlSpd(DeviceControlSpd.POWER_GAOTONG);
                     deviceControl.gtPower("uhf_open");
@@ -246,7 +246,22 @@ public class XinLianQilian implements IUHFService {
                     return -1;
                 }
 
-            } else {
+            }else if (xinghao.equals("SD100T")) {
+                try {
+                    deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 52,89,71);
+                    deviceControl.PowerOnDevice();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Reader.READER_ERR er = Mreader.InitReader_Notype(SERIALPORT0, 1);
+                if (er == Reader.READER_ERR.MT_OK_ERR) {
+                    antportc = 1;
+                    return 0;
+                } else {
+                    return -1;
+                }
+
+            }  else {
                 try {
                     deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.MAIN, 94);
                     deviceControl.PowerOnDevice();
