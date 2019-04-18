@@ -69,7 +69,7 @@ public class UHFManager {
     private static BatteryReceiver batteryReceiver;
     private static ReadBean mRead;
     private static String factory;
-    private static volatile int stipulationLevel = 0;
+    private static volatile int stipulationLevel = 15;
     private static Timer timer;
     private static TimerTask myTimerTask;
 
