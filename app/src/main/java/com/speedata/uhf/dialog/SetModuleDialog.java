@@ -44,6 +44,7 @@ public class SetModuleDialog extends Dialog implements View.OnClickListener {
     private EditText et_zaibo;
     private Button button_zaibo;
     private LinearLayout ll_zaibo;
+    private boolean isSet = false;
 
 
 
@@ -85,7 +86,7 @@ public class SetModuleDialog extends Dialog implements View.OnClickListener {
                 lf.setSelection(3, true);
             } else if (re == -1) {
                 lf.setSelection(5, true);
-                status.setText("read region setting read failed");
+                status.setText(R.string.set_read_fail);
                 Log.e("r2000_kt45", "read region setting read failed");
             } else {
                 lf.setSelection(4, true);
@@ -103,7 +104,7 @@ public class SetModuleDialog extends Dialog implements View.OnClickListener {
                 lf.setSelection(3, true);
             } else {
                 lf.setSelection(4, true);
-                status.setText("read region setting read failed");
+                status.setText(R.string.set_read_fail);
                 Log.e("r2000_kt45", "read region setting read failed");
             }
         }
@@ -148,51 +149,70 @@ public class SetModuleDialog extends Dialog implements View.OnClickListener {
         if (v == setf) {
             int freq_region = lf.getSelectedItemPosition();
             if (freq_region >= 4) {
-                status.setText("Invalid select");
+                status.setText(R.string.invalid_select);
             } else {
                 if (iuhfService.setFreqRegion(freq_region) < 0) {
-                    status.setText("set freq region failed");
+                    status.setText(R.string.set_freq_fail);
                 } else {
-                    status.setText("set freq region ok");
-                    back.setText("update settings");
+                    status.setText(R.string.set_freq_ok);
+                    back.setText(R.string.update_set);
+                    isSet = true;
                     this.setCancelable(false);
                 }
             }
 
         } else if (v == back) {
-            new toast_thread().setr("update settings now").start();
+            if (isSet){
+                new toast_thread().setr(mContext.getResources().getString(R.string.toast_update_now)).start();
+            }
             dismiss();
         } else if (v == setp) {
-            int ivp = Integer.parseInt(pv.getText().toString());
+            String power = pv.getText().toString();
+            if (power.isEmpty()){
+                status.setText(R.string.param_not_null);
+                return;
+            }
+            int ivp = Integer.parseInt(power);
             if ((ivp < 0) || (ivp > 33)) {
-                status.setText("value range is 0 ~ 33");
+                status.setText(R.string.power_range);
             } else {
                 int rv = iuhfService.setAntennaPower(ivp);
                 if (rv < 0) {
-                    status.setText("set antenna power failed");
+                    status.setText(R.string.set_power_fail );
                 } else {
-                    status.setText("set antenna power ok");
-                    back.setText("update settings");
+                    status.setText(R.string.set_power_ok);
+                    back.setText(R.string.update_set);
+                    isSet = true;
                     this.setCancelable(false);
                 }
             }
         } else if (v == button_set_pindian) {
-            double parseDouble = Double.parseDouble(et_pin_dian.getText().toString());
+            String parse = et_pin_dian.getText().toString();
+            if (parse.isEmpty()){
+                status.setText(R.string.param_not_null);
+                return;
+            }
+            double parseDouble = Double.parseDouble(parse);
             int frequency = iuhfService.setFrequency(parseDouble);
             if (frequency == 0) {
-                status.setText("set fixed frequency ok");
+                status.setText(R.string.set_fix_ok);
                 ll_zaibo.setVisibility(View.VISIBLE);
             } else {
-                status.setText("set fixed frequency failed");
+                status.setText(R.string.set_fix_fail);
                 ll_zaibo.setVisibility(View.GONE);
             }
         } else if (v == button_zaibo) {
-            int zaibo = Integer.parseInt(et_zaibo.getText().toString());
+            String parse = et_zaibo.getText().toString();
+            if (parse.isEmpty()){
+                status.setText(R.string.param_not_null);
+                return;
+            }
+            int zaibo = Integer.parseInt(parse);
             int engTest = iuhfService.enableEngTest(zaibo);
             if (engTest == 0) {
-                status.setText("Set carrier success");
+                status.setText(R.string.set_carrier_ok);
             } else {
-                status.setText("Set carrier failed");
+                status.setText(R.string.set_carrier_fail);
             }
         }
     }

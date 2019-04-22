@@ -79,7 +79,7 @@ public class ReadTagDialog extends Dialog implements
                     String readHexString = StringUtils.byteToHexString(readData, var1.getDataLen());
                     stringBuilder.append("ReadData：").append(readHexString).append("\n");
                 } else {
-                    stringBuilder.append("ReadError：").append(var1.getStatus()).append("\n");
+                    stringBuilder.append(mContext.getResources().getString(R.string.Status_Read_Card_Faild)).append(var1.getStatus()).append("\n");
                 }
                 handler.sendMessage(handler.obtainMessage(1, stringBuilder));
             }
@@ -94,18 +94,18 @@ public class ReadTagDialog extends Dialog implements
             final String strCount = readCount.getText().toString();
             final String strPasswd = password.getText().toString();
             if (TextUtils.isEmpty(strAddr) || TextUtils.isEmpty(strCount) || TextUtils.isEmpty(strPasswd)) {
-                Toast.makeText(mContext, "参数不能为空", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, R.string.param_not_null, Toast.LENGTH_SHORT).show();
                 return;
             }
             final int addr = Integer.parseInt(strAddr);
             final int count = Integer.parseInt(strCount);
-            status.setText("正在读卡中....");
+            status.setText(R.string.reading_card);
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     int readArea = iuhfService.readArea(whichChoose, addr, count, strPasswd);
                     if (readArea != 0) {
-                        handler.sendMessage(handler.obtainMessage(1, "参数不正确"));
+                        handler.sendMessage(handler.obtainMessage(1, mContext.getResources().getString(R.string.param_error)));
                     }
                 }
             }).start();

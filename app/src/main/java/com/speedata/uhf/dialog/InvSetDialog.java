@@ -40,6 +40,7 @@ public class InvSetDialog extends Dialog implements android.view.View.OnClickLis
         // TODO Auto-generated constructor stub
     }
 
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.invset);
@@ -120,8 +121,9 @@ public class InvSetDialog extends Dialog implements android.view.View.OnClickLis
                     try {
                         caddr = Integer.parseInt(saddr);
                         csize = Integer.parseInt(ssize);
-                        if (csize == 0)
+                        if (csize == 0) {
                             throw new NumberFormatException("size cannot be 0");
+                        }
 
                     } catch (NumberFormatException p) {
                         status.setText(R.string.Status_InvalidNumber);

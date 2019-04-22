@@ -76,10 +76,10 @@ public class SetEPCDialog extends Dialog implements
                 if (var1.getStatus() == 0) {
                     //状态判断，已经写卡成功了就不返回错误码了
                     isSuccess = true;
-                    stringBuilder.append("WriteSuccess" + "\n");
+                    stringBuilder.append(mContext.getResources().getString(R.string.Status_Write_Card_Ok) + "\n");
                     handler.sendMessage(handler.obtainMessage(1, stringBuilder));
                 } else {
-                    stringBuilder.append("WriteError：" + var1.getStatus() + "\n");
+                    stringBuilder.append(mContext.getResources().getString(R.string.Status_Write_Card_Faild) + var1.getStatus() + "\n");
                 }
                 if (!isSuccess) {
                     handler.sendMessage(handler.obtainMessage(1, stringBuilder));
@@ -97,7 +97,7 @@ public class SetEPCDialog extends Dialog implements
             final String epc_str = newepc.getText().toString().replace(" ", "");
             String count_str = newepclength.getText().toString();
             if (TextUtils.isEmpty(password) || TextUtils.isEmpty(epc_str) || TextUtils.isEmpty(count_str)) {
-                Toast.makeText(mContext, "参数不能为空", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.param_not_null), Toast.LENGTH_SHORT).show();
                 return;
             }
             final byte[] write = StringUtils.stringToByte(epc_str);
@@ -108,14 +108,14 @@ public class SetEPCDialog extends Dialog implements
                 return;
             }
 
-            Status.setText("正在写卡中....");
+            Status.setText(mContext.getResources().getString(R.string.writing_card));
             isSuccess = false;
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     int writeArea = set_EPC(epcl, password, write);
                     if (writeArea != 0) {
-                        handler.sendMessage(handler.obtainMessage(1, "参数不正确"));
+                        handler.sendMessage(handler.obtainMessage(1, mContext.getResources().getString(R.string.param_error)));
                     }
                 }
             }).start();
