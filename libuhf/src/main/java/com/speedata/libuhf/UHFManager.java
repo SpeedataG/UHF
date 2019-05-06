@@ -277,7 +277,7 @@ public class UHFManager {
 //                    powerOn(UHFDeviceControl.PowerType.NEW_MAIN, 86);
                     powerOn(DeviceControlSpd.PowerType.EXPAND, 9, 14);
 
-                } else if (xinghao.contains("SD55")) {
+                } else if (xinghao.contains("SD55")|| xinghao.contains("R66")) {
                     if (ConfigUtils.getApiVersion() > 23) {
                         powerOn(DeviceControlSpd.PowerType.NEW_MAIN, 12);
                     } else {
@@ -345,7 +345,7 @@ public class UHFManager {
         SerialPortSpd serialPort = new SerialPortSpd();
 //        String xinghao = Build.MODEL;
         String xinghao = SystemProperties.get("ro.product.model");
-        if (xinghao.contains("SD55")) {
+        if (xinghao.contains("SD55")|| xinghao.contains("R66")) {
             if (ConfigUtils.getApiVersion() > 23) {
                 try {
                     serialPort.OpenSerial("/dev/ttyMT0", 115200);
