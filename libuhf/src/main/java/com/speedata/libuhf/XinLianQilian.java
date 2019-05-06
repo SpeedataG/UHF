@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.os.SystemProperties;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -131,7 +132,7 @@ public class XinLianQilian implements IUHFService {
                 return -1;
             }
         } else {
-            String xinghao = Build.MODEL;
+            String xinghao = SystemProperties.get("ro.product.model");
             if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60") || xinghao.contains("SC60")
                     || xinghao.contains("DXD60RT") || xinghao.contains("C6000")) {
                 try {
@@ -296,7 +297,7 @@ public class XinLianQilian implements IUHFService {
             }
         } else {
             try {
-                if (Build.MODEL.contains("SD100")) {
+                if (SystemProperties.get("ro.product.model").contains("SD100")) {
                     deviceControl.gtPower("uhf_close");
                     deviceControl.gtPower("close");
                 } else {

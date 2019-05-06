@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.os.SystemProperties;
 import android.serialport.DeviceControlSpd;
 import android.serialport.SerialPortSpd;
 import android.text.TextUtils;
@@ -223,11 +224,6 @@ public class UHFManager {
             noXmlJudgeModule();
         }
 
-//        if (!FACTORY_XINLIAN.equals(factory)) {
-//            if (Build.MODEL.contains("SD60") || Build.MODEL.contains("SC60")) {
-//                createTimer();
-//            }
-//        }
         boolean initResult = true;
         switch (factory) {
             case FACTORY_FEILIXIN:
@@ -273,7 +269,8 @@ public class UHFManager {
             if (Build.VERSION.RELEASE.equals("4.4.2")) {
                 powerOn(DeviceControlSpd.PowerType.MAIN, 64);
             } else {
-                String xinghao = Build.MODEL;
+//                String xinghao = Build.MODEL;
+                String xinghao = SystemProperties.get("ro.product.model");
                 Log.d("ZM", "Build.MODEL: " + xinghao);
                 if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60") || xinghao.contains("SC60")
                         || xinghao.contains("DXD60RT") || xinghao.contains("C6000")) {
@@ -346,7 +343,8 @@ public class UHFManager {
     private static String getModel() {
         String factory = "";
         SerialPortSpd serialPort = new SerialPortSpd();
-        String xinghao = Build.MODEL;
+//        String xinghao = Build.MODEL;
+        String xinghao = SystemProperties.get("ro.product.model");
         if (xinghao.contains("SD55")) {
             if (ConfigUtils.getApiVersion() > 23) {
                 try {
@@ -474,7 +472,7 @@ public class UHFManager {
 
     private static void powerOff() {
         try {
-            if (Build.MODEL.contains("SD100")) {
+            if (SystemProperties.get("ro.product.model").contains("SD100")) {
                 pw.gtPower("uhf_close");
                 pw.gtPower("close");
             } else {

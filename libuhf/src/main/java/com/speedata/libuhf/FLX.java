@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.os.SystemProperties;
 import android.serialport.DeviceControlSpd;
 import android.text.TextUtils;
 import android.util.Log;
@@ -280,7 +281,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
                 e.printStackTrace();
             }
         } else {
-            String xinghao = Build.MODEL;
+            String xinghao = SystemProperties.get("ro.product.model");
             if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60") || xinghao.contains("SC60")
                     || xinghao.contains("DXD60RT") || xinghao.contains("C6000")) {
                 try {
@@ -362,7 +363,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             }
         }
         try {
-            if (!Build.MODEL.contains("SD100")) {
+            if (!SystemProperties.get("ro.product.model").contains("SD100")) {
                 pw.PowerOffDevice();
                 pw.PowerOnDevice();
             }
@@ -372,7 +373,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         }
         SystemClock.sleep(20);
         int result;
-        String xinghao = Build.MODEL;
+        String xinghao = SystemProperties.get("ro.product.model");
         if (xinghao.contains("SD55")) {
             if (ConfigUtils.getApiVersion() > 23) {
                 result = getLinkage().open_serial(SERIALPORT0);
@@ -409,7 +410,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             }
         } else {
             try {
-                if (Build.MODEL.contains("SD100")) {
+                if (SystemProperties.get("ro.product.model").contains("SD100")) {
                     pw.gtPower("uhf_close");
                     pw.gtPower("close");
                 } else {

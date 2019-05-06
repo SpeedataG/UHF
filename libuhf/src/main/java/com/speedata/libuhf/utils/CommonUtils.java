@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.SystemProperties;
 import android.text.TextUtils;
 
 import java.io.BufferedReader;
@@ -155,7 +156,7 @@ public class CommonUtils {
 //            return model.toLowerCase().subSequence(0, 4).toString();
 //        }
 
-        return Build.MODEL.toLowerCase();
+        return SystemProperties.get("ro.product.model").toLowerCase();
     }
 
     /**
