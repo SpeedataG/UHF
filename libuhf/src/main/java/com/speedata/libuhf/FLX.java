@@ -282,7 +282,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             }
         } else {
             String xinghao = SystemProperties.get("ro.product.model");
-            if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60") || xinghao.contains("SC60")
+            if ("SD60RT".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
                     || xinghao.contains("DXD60RT") || xinghao.contains("C6000")) {
                 try {
 //                    pw = new UHFDeviceControl(UHFDeviceControl.PowerType.NEW_MAIN, 86);
@@ -290,7 +290,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            } else if (xinghao.contains("SD55")|| xinghao.contains("R66")) {
+            } else if (xinghao.contains("SD55") || xinghao.contains("R66")) {
                 if (ConfigUtils.getApiVersion() > 23) {
                     try {
                         pw = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 12);
@@ -349,7 +349,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
 
             } else if (xinghao.equals("SD100T")) {
                 try {
-                    pw = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN,52,89,71);
+                    pw = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 52, 89, 71);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -374,15 +374,15 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         SystemClock.sleep(20);
         int result;
         String xinghao = SystemProperties.get("ro.product.model");
-        if (xinghao.contains("SD55")|| xinghao.contains("R66")) {
+        if ("SD60RT".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
+                || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "SD100T".equals(xinghao)) {
+            result = getLinkage().open_serial(SERIALPORT_SD60);
+        } else if (xinghao.contains("SD55") || xinghao.contains("R66")) {
             if (ConfigUtils.getApiVersion() > 23) {
                 result = getLinkage().open_serial(SERIALPORT0);
             } else {
                 result = getLinkage().open_serial(SERIALPORT);
             }
-        } else if ("SD60RT".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
-                || xinghao.contains("DXD60RT") || xinghao.contains("C6000")|| "SD100T".equals(xinghao)) {
-            result = getLinkage().open_serial(SERIALPORT_SD60);
         } else if (xinghao.contains("SD100")) {
             SystemClock.sleep(240);
             result = getLinkage().open_serial(SERIALPORT_SD100);

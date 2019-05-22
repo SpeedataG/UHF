@@ -10,6 +10,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.os.SystemProperties;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
@@ -35,14 +36,16 @@ import com.speedata.uhf.libutils.excel.ExcelUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import jxl.write.Colour;
 
 /**
- *
  * @author 张明_
  * @date 2016/12/28
  */
@@ -68,8 +71,14 @@ public class SearchTagDialog extends Dialog implements
     private TextView speedTv;
     private TextView totalTv;
     private TextView totalTime;
+    /**
+     * 盘点命令下发后截取的系统时间
+     */
     private long startCheckingTime;
-    //盘点命令下发后截取的系统时间
+
+    private static final String CHARGING_PATH = "/sys/class/misc/bq25601/regdump/";
+    private File file;
+    private BufferedWriter writer;
 
     public SearchTagDialog(Context context, IUHFService iuhfService, String model) {
         super(context);
@@ -84,17 +93,17 @@ public class SearchTagDialog extends Dialog implements
         setContentView(R.layout.setreader);
 
         initView();
-        cancel =  findViewById(R.id.btn_search_cancle);
+        cancel = findViewById(R.id.btn_search_cancle);
         cancel.setOnClickListener(this);
         action = findViewById(R.id.btn_search_action);
         action.setOnClickListener(this);
 
         export = findViewById(R.id.btn_export);
         export.setOnClickListener(this);
-        cbb =  findViewById(R.id.checkBox_beep);
+        cbb = findViewById(R.id.checkBox_beep);
 
-        status =  findViewById(R.id.textView_search_status);
-        ListView epcList =  findViewById(R.id.listView_search_epclist);
+        status = findViewById(R.id.textView_search_status);
+        ListView epcList = findViewById(R.id.listView_search_epclist);
         epcList.setOnItemClickListener(this);
 
         soundPool = new SoundPool(2, AudioManager.STREAM_MUSIC, 0);
@@ -111,10 +120,11 @@ public class SearchTagDialog extends Dialog implements
         iuhfService.setOnInventoryListener(new OnSpdInventoryListener() {
             @Override
             public void getInventoryData(SpdInventoryData var1) {
-                Log.d("zzc:","OnSpdInventoryListener 盘点回调");
+                Log.d("zzc:", "OnSpdInventoryListener 盘点回调");
                 handler.sendMessage(handler.obtainMessage(1, var1));
             }
         });
+        file = new File(CHARGING_PATH);
     }
 
     //新的Listener回调参考代码
@@ -198,6 +208,14 @@ public class SearchTagDialog extends Dialog implements
                 inSearch = false;
                 this.setCancelable(true);
                 iuhfService.inventoryStop();
+                try {
+                    writer = new BufferedWriter(new FileWriter(file, false));
+                    writer.write("otgoff");
+                    writer.flush();
+                    writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 action.setText(R.string.Start_Search_Btn);
                 cancel.setEnabled(true);
                 export.setEnabled(true);
@@ -211,9 +229,17 @@ public class SearchTagDialog extends Dialog implements
                 //取消掩码
                 iuhfService.selectCard(1, "", false);
                 EventBus.getDefault().post(new MsgEvent("CancelSelectCard", ""));
-                SystemClock.sleep(1);
+                try {
+                    writer = new BufferedWriter(new FileWriter(file, false));
+                    writer.write("otgon");
+                    writer.flush();
+                    writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                SystemClock.sleep(10);
                 iuhfService.inventoryStart();
-                Log.d("zzc:","inventoryStart 开始盘点");
+                Log.d("zzc:", "inventoryStart 开始盘点");
                 startCheckingTime = System.currentTimeMillis();
                 action.setText(R.string.Stop_Search_Btn);
 

@@ -272,12 +272,12 @@ public class UHFManager {
 //                String xinghao = Build.MODEL;
                 String xinghao = SystemProperties.get("ro.product.model");
                 Log.d("ZM", "Build.MODEL: " + xinghao);
-                if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60") || xinghao.contains("SC60")
+                if ("SD60RT".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
                         || xinghao.contains("DXD60RT") || xinghao.contains("C6000")) {
 //                    powerOn(UHFDeviceControl.PowerType.NEW_MAIN, 86);
                     powerOn(DeviceControlSpd.PowerType.EXPAND, 9, 14);
 
-                } else if (xinghao.contains("SD55")|| xinghao.contains("R66")) {
+                } else if (xinghao.contains("SD55") || xinghao.contains("R66")) {
                     if (ConfigUtils.getApiVersion() > 23) {
                         powerOn(DeviceControlSpd.PowerType.NEW_MAIN, 12);
                     } else {
@@ -306,10 +306,10 @@ public class UHFManager {
                         e.printStackTrace();
                         Log.d("ZM", "SD100 powerOn-Exception: " + e.toString());
                     }
-                } else if (xinghao.equals("SD100T")){
-                    powerOn(DeviceControlSpd.PowerType.NEW_MAIN, 52,89,71);
+                } else if (xinghao.equals("SD100T")) {
+                    powerOn(DeviceControlSpd.PowerType.NEW_MAIN, 52, 89, 71);
 
-                }else {
+                } else {
                     powerOn(DeviceControlSpd.PowerType.MAIN, 94);
                 }
             }
@@ -345,7 +345,14 @@ public class UHFManager {
         SerialPortSpd serialPort = new SerialPortSpd();
 //        String xinghao = Build.MODEL;
         String xinghao = SystemProperties.get("ro.product.model");
-        if (xinghao.contains("SD55")|| xinghao.contains("R66")) {
+        if ("SD60RT".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
+                || xinghao.contains("DXD60RT") || xinghao.contains("C6000")) {
+            try {
+                serialPort.OpenSerial("/dev/ttyMT0", 115200);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (xinghao.contains("SD55") || xinghao.contains("R66")) {
             if (ConfigUtils.getApiVersion() > 23) {
                 try {
                     serialPort.OpenSerial("/dev/ttyMT0", 115200);
@@ -359,27 +366,19 @@ public class UHFManager {
                     e.printStackTrace();
                 }
             }
-        } else if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60") || xinghao.contains("SC60")
-                || xinghao.contains("DXD60RT") || xinghao.contains("C6000")) {
-            try {
-                serialPort.OpenSerial("/dev/ttyMT0", 115200);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         } else if (xinghao.equalsIgnoreCase("SD100")) {
             try {
                 serialPort.OpenSerial("/dev/ttyHSL2", 115200);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-        else if (xinghao.equalsIgnoreCase("SD100T")) {
+        } else if (xinghao.equalsIgnoreCase("SD100T")) {
             try {
                 serialPort.OpenSerial("/dev/ttyMT0", 115200);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }else {
+        } else {
             try {
                 serialPort.OpenSerial("/dev/ttyMT2", 115200);
             } catch (IOException e) {

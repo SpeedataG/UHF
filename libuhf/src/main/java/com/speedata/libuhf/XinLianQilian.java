@@ -133,7 +133,7 @@ public class XinLianQilian implements IUHFService {
             }
         } else {
             String xinghao = SystemProperties.get("ro.product.model");
-            if (xinghao.equalsIgnoreCase("SD60RT") || xinghao.equalsIgnoreCase("SD60") || xinghao.contains("SC60")
+            if ("SD60RT".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
                     || xinghao.contains("DXD60RT") || xinghao.contains("C6000")) {
                 try {
 //                    deviceControl = new UHFDeviceControl(UHFDeviceControl.PowerType.NEW_MAIN, 86);
@@ -149,7 +149,7 @@ public class XinLianQilian implements IUHFService {
                 } else {
                     return -1;
                 }
-            } else if (xinghao.contains("SD55")|| xinghao.contains("R66")) {
+            } else if (xinghao.contains("SD55") || xinghao.contains("R66")) {
                 if (ConfigUtils.getApiVersion() > 23) {
                     try {
                         deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 12);
@@ -247,9 +247,9 @@ public class XinLianQilian implements IUHFService {
                     return -1;
                 }
 
-            }else if (xinghao.equals("SD100T")) {
+            } else if (xinghao.equals("SD100T")) {
                 try {
-                    deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 52,89,71);
+                    deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 52, 89, 71);
                     deviceControl.PowerOnDevice();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -262,7 +262,7 @@ public class XinLianQilian implements IUHFService {
                     return -1;
                 }
 
-            }  else {
+            } else {
                 try {
                     deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.MAIN, 94);
                     deviceControl.PowerOnDevice();
