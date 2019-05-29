@@ -119,6 +119,12 @@
     <string name="btn_get_algorithm">获取算法</string>
     <string name="gen2_target">目标：</string>
     <string name="btn_get_value">获取数值</string>
+    <string name="btn_start_fast">启用快速模式</string>
+    <string name="btn_stop_fast">停用快速模式</string>
+    <string name="toast_start_fast_success">快速模式已开启</string>
+    <string name="toast_start_fast_failed">启用快速模式失败</string>
+    <string name="toast_stop_fast_success">快速模式已关闭</string>
+    <string name="toast_stop_fast_failed">关闭快速模式失败</string>
 
     <!--InventorySettingDialog-->
     <string name="toast_try">请输入重试次数</string>

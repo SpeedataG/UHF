@@ -133,7 +133,7 @@ public class XinLianQilian implements IUHFService {
             }
         } else {
             String xinghao = SystemProperties.get("ro.product.model");
-            if ("SD60RT".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
+            if ("SD60RT".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || "SD55L".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
                     || xinghao.contains("DXD60RT") || xinghao.contains("C6000")) {
                 try {
 //                    deviceControl = new UHFDeviceControl(UHFDeviceControl.PowerType.NEW_MAIN, 86);
@@ -141,6 +141,15 @@ public class XinLianQilian implements IUHFService {
                     deviceControl.PowerOnDevice();
                 } catch (IOException e) {
                     e.printStackTrace();
+                }
+                if ("SD55L".equalsIgnoreCase(xinghao)) {
+                    Reader.READER_ERR er = Mreader.InitReader_Notype(SERIALPORT, 1);
+                    if (er == Reader.READER_ERR.MT_OK_ERR) {
+                        antportc = 1;
+                        return 0;
+                    } else {
+                        return -1;
+                    }
                 }
                 Reader.READER_ERR er = Mreader.InitReader_Notype(SERIALPORT_SD60, 1);
                 if (er == Reader.READER_ERR.MT_OK_ERR) {
@@ -1011,6 +1020,37 @@ public class XinLianQilian implements IUHFService {
         return res;
     }
 
+    @Override
+    public int startFastMode() {
+        try {
+            int[] uants = Rparams.uants;
+            Reader.READER_ERR er = Mreader.AsyncStartReading(uants, Rparams.uants.length, 0);
+            if (er == Reader.READER_ERR.MT_OK_ERR) {
+                nostop = true;
+                return 0;
+            } else {
+                return -1;
+            }
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    @Override
+    public int stopFastMode() {
+        try {
+            Reader.READER_ERR er = Mreader.AsyncStopReading();
+            if (er == Reader.READER_ERR.MT_OK_ERR) {
+                nostop = false;
+                return 0;
+            } else {
+                return -1;
+            }
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
 
     //********************************************老版接口（不再维护）******************************************
 
@@ -1662,9 +1702,13 @@ public class XinLianQilian implements IUHFService {
                         continue;
                     }
                     Log.d(TAG, "run: 2222222222222222222222222222");
-                    er = Mreader.TagInventory_Raw(uants,
-                            Rparams.uants.length,
-                            (short) Rparams.readtime, tagcnt);
+                    if (nostop) {
+                        er = Mreader.AsyncGetTagCount(tagcnt);
+                    } else {
+                        er = Mreader.TagInventory_Raw(uants,
+                                Rparams.uants.length,
+                                (short) Rparams.readtime, tagcnt);
+                    }
                     if (er == Reader.READER_ERR.MT_OK_ERR) {
                         if (tagcnt[0] > 0) {
                             for (int i = 0; i < tagcnt[0]; i++) {

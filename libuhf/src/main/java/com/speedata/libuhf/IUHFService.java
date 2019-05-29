@@ -276,6 +276,18 @@ public interface IUHFService {
 
     public int[] getGen2AllValue();
 
+    /**
+     * 开启快速模式
+     * @return 0成功 -1失败
+     */
+    public int startFastMode();
+
+    /**
+     * 关闭快速模式
+     * @return 0成功 -1失败
+     */
+    public int stopFastMode();
+
 
     //********************************************老版接口（不再维护）***************************************************
 

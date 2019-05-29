@@ -318,9 +318,14 @@
             android:gravity="center">
 
             <Button
+                android:id="@+id/btn_fast_mode"
+                style="@style/ButtonStyle"
+                android:text="@string/btn_start_fast" />
+
+            <Button
                 android:id="@+id/btn_get_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/ButtonStyle"
+                android:layout_marginLeft="10dp"
                 android:text="@string/btn_get_value" />
         </LinearLayout>
 

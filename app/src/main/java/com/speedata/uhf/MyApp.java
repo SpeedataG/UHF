@@ -30,6 +30,11 @@ public class MyApp extends Application {
         return m_application;
     }
 
+    /**
+     * 是否启动快速模式
+     */
+    public static boolean isFastMode = false;
+
     @Override
     public void onCreate() {
         super.onCreate();

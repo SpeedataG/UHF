@@ -282,7 +282,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             }
         } else {
             String xinghao = SystemProperties.get("ro.product.model");
-            if ("SD60RT".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
+            if ("SD60RT".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || "SD55L".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
                     || xinghao.contains("DXD60RT") || xinghao.contains("C6000")) {
                 try {
 //                    pw = new UHFDeviceControl(UHFDeviceControl.PowerType.NEW_MAIN, 86);
@@ -780,6 +780,16 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
     @Override
     public int[] getGen2AllValue() {
         return null;
+    }
+
+    @Override
+    public int startFastMode() {
+        return 0;
+    }
+
+    @Override
+    public int stopFastMode() {
+        return 0;
     }
 
     //********************************************老版接口（不再维护）******************************************
