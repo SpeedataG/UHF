@@ -753,6 +753,11 @@ public class XinLianQilian implements IUHFService {
     }
 
     @Override
+    public int setKill(String accessPassword, String killPassword) {
+        return 0;
+    }
+
+    @Override
     public int setQueryTagGroup(int selected, int session, int target) {
         try {
             int[] val = new int[]{-1};

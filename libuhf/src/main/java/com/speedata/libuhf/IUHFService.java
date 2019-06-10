@@ -129,7 +129,21 @@ public interface IUHFService {
      */
     public int setLock(int type, int area, String passwd);
 
+    /**
+     * 销毁标签
+     * @param accessPassword 访问密码
+     * @param killPassword 销毁密码
+     * @return 0成功
+     */
+    public int setKill(String accessPassword, String killPassword);
 
+    /**
+     * 设置通话项
+     * @param selected 默认0
+     * @param session 0-s0 1-s1 2-s2 3-s3
+     * @param target 默认0
+     * @return  返回0成功 -1失败
+     */
     public int setQueryTagGroup(int selected, int session, int target);
 
     public int getQueryTagGroup();
@@ -278,12 +292,14 @@ public interface IUHFService {
 
     /**
      * 开启快速模式
+     *
      * @return 0成功 -1失败
      */
     public int startFastMode();
 
     /**
      * 关闭快速模式
+     *
      * @return 0成功 -1失败
      */
     public int stopFastMode();

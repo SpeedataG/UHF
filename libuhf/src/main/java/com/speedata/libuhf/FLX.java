@@ -459,7 +459,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
      */
     @Override
     public void inventoryStart() {
-        getLinkage().startInventory(0);
+        getLinkage().startInventory(1);
     }
 
     /**
@@ -598,6 +598,13 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             return getLinkage().Radio_LockTag(rpaswd, ap, kp, ea, ta, ua);
         }
         return -1;
+    }
+
+    @Override
+    public int setKill(String accessPassword, String killPassword) {
+        byte[] accessPwd = StringUtils.stringToByte(accessPassword);
+        byte[] killPwd = StringUtils.stringToByte(killPassword);
+        return getLinkage().Radio_KillTag(accessPwd, killPwd);
     }
 
     @Override

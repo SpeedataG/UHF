@@ -45,7 +45,8 @@
     <string name="Lock_Btn">锁/解锁</string>
     <string name="Kill_Btn">Kill Tag</string>
     <string name="Item_Tag_EPC">EPC标签</string>
-    <string name="Item_Access_Pswd">Access Password</string>
+    <string name="Item_Access_Pswd">访问密码</string>
+    <string name="Item_Kill_Pswd">销毁密码</string>
     <string name="Item_Pswd_Type">密码类型</string>
     <string name="Item_New_Password">新的密码</string>
     <string name="Item_EPC_Length">EPC长度(words)</string>
@@ -101,6 +102,7 @@
     <string name="dialog_dir_seek">开始寻找</string>
 
     <string name="setInv">盘点设置</string>
+    <string name="setKill">销毁标签</string>
 
     <!--inventory_setting layout-->
     <string name="session">通话项：</string>

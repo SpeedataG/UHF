@@ -24,6 +24,7 @@ import com.speedata.libuhf.utils.SharedXmlUtil;
 import com.speedata.uhf.dialog.DirectionalTagDialog;
 import com.speedata.uhf.dialog.InvSetDialog;
 import com.speedata.uhf.dialog.InventorySettingDialog;
+import com.speedata.uhf.dialog.KillTagDialog;
 import com.speedata.uhf.dialog.LockTagDialog;
 import com.speedata.uhf.dialog.ReadTagDialog;
 import com.speedata.uhf.dialog.SearchTagDialog;
@@ -58,6 +59,7 @@ public class MainActivity extends Activity implements OnClickListener {
     private Button lockTag;
     private Button btnInvSet;
     private Button mButtonSetInv;
+    private Button mButtonSetKill;
     private IUHFService iuhfService;
     private String currentTagEpc = null;
     private WakeLock wK = null;
@@ -248,6 +250,8 @@ public class MainActivity extends Activity implements OnClickListener {
 
         mButtonSetInv = findViewById(R.id.button_setInv);
         mButtonSetInv.setOnClickListener(this);
+        mButtonSetKill = findViewById(R.id.button_setKill);
+        mButtonSetKill.setOnClickListener(this);
 
     }
 
@@ -358,6 +362,15 @@ public class MainActivity extends Activity implements OnClickListener {
         } else if (arg0 == mButtonSetInv) {
             InventorySettingDialog inventorySettingDialog = new InventorySettingDialog(this);
             inventorySettingDialog.show();
+        }else if(arg0==mButtonSetKill){
+            if (currentTagEpc == null) {
+                status.setText(R.string.Status_No_Card_Select);
+                Toast.makeText(this, R.string.Status_No_Card_Select, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            KillTagDialog killTagDialog = new KillTagDialog(this,iuhfService,currentTagEpc, model);
+            killTagDialog.setTitle(getResources().getString(R.string.setKill));
+            killTagDialog.show();
         }
 
 
