@@ -282,7 +282,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             }
         } else {
             String xinghao = SystemProperties.get("ro.product.model");
-            if ("SD60RT".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || "SD55L".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
+            if ("SD60RT".equalsIgnoreCase(xinghao) || "MST-II-YN".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || "SD55L".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
                     || xinghao.contains("DXD60RT") || xinghao.contains("C6000")) {
                 try {
 //                    pw = new UHFDeviceControl(UHFDeviceControl.PowerType.NEW_MAIN, 86);
@@ -374,7 +374,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         SystemClock.sleep(20);
         int result;
         String xinghao = SystemProperties.get("ro.product.model");
-        if ("SD60RT".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
+        if ("SD60RT".equalsIgnoreCase(xinghao) || "MST-II-YN".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
                 || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "SD100T".equals(xinghao)) {
             result = getLinkage().open_serial(SERIALPORT_SD60);
         } else if (xinghao.contains("SD55") || xinghao.contains("R66")) {
