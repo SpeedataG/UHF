@@ -71,6 +71,7 @@ public class UHFManager {
     private static ReadBean mRead;
     private static String factory;
     private static volatile int stipulationLevel = 15;
+    private static volatile int TemperatureLevel = 55;
     private static Timer timer;
     private static TimerTask myTimerTask;
 
@@ -78,6 +79,7 @@ public class UHFManager {
     public static IUHFService getUHFService(Context context) {
         //  判断模块   返回不同的模块接口对象
         mContext = context.getApplicationContext();
+        createTempTimer();
         //注册广播接受者java代码
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         //创建广播接受者对象
@@ -108,6 +110,35 @@ public class UHFManager {
                         double v = Integer.parseInt(battVoltFileStr) / 1000000.0;
                         int antennaPower = SharedXmlUtil.getInstance(mContext).read("AntennaPower", 30);
                         Log.d("zzc:", "battVolt: " + v + " antennaPower：" + antennaPower + " 一直检测：");
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            };
+            timer.schedule(myTimerTask, 0, 1000);
+        }
+    }
+
+    private static void createTempTimer() {
+        if (timer == null) {
+            timer = new Timer();
+            if (myTimerTask != null) {
+                myTimerTask.cancel();
+            }
+            myTimerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    InputStream battTempFile;
+                    try {
+                        battTempFile = new FileInputStream("sys/class/power_supply/battery/batt_temp");
+                        String battTempFileStr = convertStreamToString(battTempFile);
+                        Log.d("zzc:", "battTemp: " + battTempFileStr);
+                        double t = Integer.parseInt(battTempFileStr) / 10.0;
+                        Log.d("zzc:", "battTemp 温度: " + t + " 一直检测：");
+                        if (t >= TemperatureLevel) {
+                            stopUseUHF();
+                        }
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
@@ -179,7 +210,7 @@ public class UHFManager {
             iuhfService.closeDev();
         }
         if (onSpdBanMsgListener != null) {
-            callBack("Low power UHF is forbidden");
+            callBack("Low power or high temperature UHF is forbidden");
         }
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(new Runnable() {
@@ -187,9 +218,9 @@ public class UHFManager {
             public void run() {
                 boolean cn = "CN".equals(mContext.getResources().getConfiguration().locale.getCountry());
                 if (cn) {
-                    Toast.makeText(mContext, "电量低禁用超高频", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, "电量低或温度过高禁用超高频", Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(mContext, "Low power UHF is forbidden", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, "Low power or high temperature UHF is forbidden", Toast.LENGTH_LONG).show();
                 }
 
             }
@@ -345,7 +376,7 @@ public class UHFManager {
         SerialPortSpd serialPort = new SerialPortSpd();
 //        String xinghao = Build.MODEL;
         String xinghao = SystemProperties.get("ro.product.model");
-        if ("SD60RT".equalsIgnoreCase(xinghao)|| "MST-II-YN".equalsIgnoreCase(xinghao)  || "SD60".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
+        if ("SD60RT".equalsIgnoreCase(xinghao) || "MST-II-YN".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
                 || xinghao.contains("DXD60RT") || xinghao.contains("C6000")) {
             try {
                 serialPort.OpenSerial("/dev/ttyMT0", 115200);
