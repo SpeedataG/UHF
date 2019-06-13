@@ -6,6 +6,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -25,6 +29,7 @@ import com.speedata.libuhf.utils.SharedXmlUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -32,9 +37,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.regex.Pattern;
 
 import static android.content.ContentValues.TAG;
 
@@ -71,7 +78,8 @@ public class UHFManager {
     private static ReadBean mRead;
     private static String factory;
     private static volatile int stipulationLevel = 15;
-    private static volatile int TemperatureLevel = 55;
+    private static volatile int TemperatureLevel = 75;
+    private static volatile int battTemperatureLevel = 55;
     private static Timer timer;
     private static TimerTask myTimerTask;
 
@@ -120,6 +128,98 @@ public class UHFManager {
         }
     }
 
+    /**
+     * 读内核信息获取CPU温度
+     *
+     * @return
+     */
+    private static String getCpuTemp() {
+        String temp = "Unknow";
+        float tempFloat = 0;
+        BufferedReader br = null;
+        FileReader fr = null;
+        try {
+            File dir = new File("/sys/class/thermal/");
+            File[] files = dir.listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File file) {
+                    if (Pattern.matches("thermal_zone[0-9]+", file.getName())) {
+                        return true;
+                    }
+                    return false;
+                }
+            });
+
+            final int SIZE = files.length;
+            String line = "";
+            String type = "";
+            for (int i = 0; i < SIZE; i++) {
+                fr = new FileReader("/sys/class/thermal/thermal_zone" + i + "/type");
+                br = new BufferedReader(fr);
+                line = br.readLine();
+                if (line != null) {
+                    type = line;
+                }
+
+                fr = new FileReader("/sys/class/thermal/thermal_zone" + i + "/temp");
+                br = new BufferedReader(fr);
+                line = br.readLine();
+                if (line != null) {
+                    // MTK CPU mt6356tsbuck1 mt6356tsbuck2
+                    if (type.contains("mt6356tsbuck")) {
+                        long temperature = Long.parseLong(line);
+                        if (temperature < 0) {
+                            temp = "Unknow";
+                            tempFloat = 0;
+                        } else {
+                            if ((float) (temperature / 1000.0) > tempFloat) {
+                                temp = (float) (temperature / 1000.0) + "";
+                                tempFloat = (float) (temperature / 1000.0);
+                            }
+                        }
+                    } else if (type.contains("tsens_tz_sensor")) {
+                        // Qualcomm CPU
+                        long temperature = Long.parseLong(line);
+                        if (temperature < 0) {
+                            temp = "Unknow";
+                        } else if (temperature > 100) {
+                            temp = (float) (temperature / 10.0) + "";
+                        } else {
+                            temp = temperature + "";
+                        }
+                    }
+
+                }
+            }
+
+            if (fr != null) {
+                fr.close();
+            }
+            if (br != null) {
+                br.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (fr != null) {
+                try {
+                    fr.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return temp;
+    }
+
     private static void createTempTimer() {
         if (timer == null) {
             timer = new Timer();
@@ -130,15 +230,28 @@ public class UHFManager {
                 @Override
                 public void run() {
                     InputStream battTempFile;
+                    String mtTemp = "Unknow";
+                    double mtTemperature = 0.0;
                     try {
-                        battTempFile = new FileInputStream("sys/class/power_supply/battery/batt_temp");
-                        String battTempFileStr = convertStreamToString(battTempFile);
-                        Log.d("zzc:", "battTemp: " + battTempFileStr);
-                        double t = Integer.parseInt(battTempFileStr) / 10.0;
-                        Log.d("zzc:", "battTemp 温度: " + t + " 一直检测：");
-                        if (t >= TemperatureLevel) {
-                            stopUseUHF();
+                        if (ConfigUtils.getApiVersion() > 23) {
+                            mtTemp = getCpuTemp();
+                            if (!"Unknow".equals(mtTemp)) {
+                                mtTemperature = Double.parseDouble(mtTemp);
+                            }
+                            Log.d("zzc:", "cpuTemp: mt6356tsbuck温度:" + mtTemperature);
+                            if (mtTemperature >= TemperatureLevel) {
+                                stopUseUHF();
+                            }
+                        } else {
+                            battTempFile = new FileInputStream("sys/class/power_supply/battery/batt_temp");
+                            String battTempFileStr = convertStreamToString(battTempFile);
+                            double t = Integer.parseInt(battTempFileStr) / 10.0;
+                            Log.d("zzc:", "battTemp 温度: " + t + " 一直检测：");
+                            if (t >= battTemperatureLevel) {
+                                stopUseUHF();
+                            }
                         }
+
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
@@ -337,7 +450,7 @@ public class UHFManager {
                         e.printStackTrace();
                         Log.d("ZM", "SD100 powerOn-Exception: " + e.toString());
                     }
-                } else if (xinghao.equals("SD100T")) {
+                } else if (xinghao.equals("SD100T") || xinghao.equals("X47")) {
                     powerOn(DeviceControlSpd.PowerType.NEW_MAIN, 52, 89, 71);
 
                 } else {
@@ -403,7 +516,7 @@ public class UHFManager {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else if (xinghao.equalsIgnoreCase("SD100T")) {
+        } else if (xinghao.equalsIgnoreCase("SD100T")|| xinghao.equalsIgnoreCase("X47")) {
             try {
                 serialPort.OpenSerial("/dev/ttyMT0", 115200);
             } catch (IOException e) {

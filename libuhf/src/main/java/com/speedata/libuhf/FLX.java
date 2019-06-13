@@ -347,7 +347,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
                     e.printStackTrace();
                 }
 
-            } else if (xinghao.equals("SD100T")) {
+            } else if ("SD100T".equals(xinghao) || "X47".equalsIgnoreCase(xinghao)) {
                 try {
                     pw = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 52, 89, 71);
                 } catch (IOException e) {
@@ -375,7 +375,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         int result;
         String xinghao = SystemProperties.get("ro.product.model");
         if ("SD60RT".equalsIgnoreCase(xinghao) || "MST-II-YN".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
-                || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "SD100T".equals(xinghao)) {
+                || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "SD100T".equals(xinghao) || "X47".equalsIgnoreCase(xinghao)) {
             result = getLinkage().open_serial(SERIALPORT_SD60);
         } else if (xinghao.contains("SD55") || xinghao.contains("R66")) {
             if (ConfigUtils.getApiVersion() > 23) {

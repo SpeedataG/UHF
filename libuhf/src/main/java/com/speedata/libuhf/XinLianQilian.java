@@ -256,7 +256,7 @@ public class XinLianQilian implements IUHFService {
                     return -1;
                 }
 
-            } else if (xinghao.equals("SD100T")) {
+            } else if ("SD100T".equals(xinghao) || "X47".equalsIgnoreCase(xinghao)) {
                 try {
                     deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 52, 89, 71);
                     deviceControl.PowerOnDevice();
@@ -306,11 +306,13 @@ public class XinLianQilian implements IUHFService {
             }
         } else {
             try {
-                if (SystemProperties.get("ro.product.model").contains("SD100")) {
-                    deviceControl.gtPower("uhf_close");
-                    deviceControl.gtPower("close");
-                } else {
-                    deviceControl.PowerOffDevice();
+                if (deviceControl != null) {
+                    if (SystemProperties.get("ro.product.model").contains("SD100")) {
+                        deviceControl.gtPower("uhf_close");
+                        deviceControl.gtPower("close");
+                    } else {
+                        deviceControl.PowerOffDevice();
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
