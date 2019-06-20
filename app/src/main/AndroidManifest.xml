@@ -34,7 +34,15 @@
             android:name="com.tencent.bugly.beta.ui.BetaActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|locale"
             android:theme="@android:style/Theme.Translucent" />
-
+        <service
+            android:name=".MyService"
+            android:enabled="true"
+            android:exported="true"></service>
+        <receiver android:name=".StartService">
+            <intent-filter>
+                <action android:name="com.spd.action.start_server"/>
+            </intent-filter>
+        </receiver>
 
     </application>
 

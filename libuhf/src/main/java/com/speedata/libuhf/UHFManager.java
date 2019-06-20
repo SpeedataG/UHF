@@ -85,16 +85,17 @@ public class UHFManager {
 
 
     public static IUHFService getUHFService(Context context) {
-        //  判断模块   返回不同的模块接口对象
-        mContext = context.getApplicationContext();
-        createTempTimer();
-        //注册广播接受者java代码
-        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        //创建广播接受者对象
-        batteryReceiver = new BatteryReceiver();
-        //注册receiver
-        mContext.registerReceiver(batteryReceiver, intentFilter);
+
         if (iuhfService == null) {
+            //  判断模块   返回不同的模块接口对象
+            mContext = context.getApplicationContext();
+            createTempTimer();
+            //注册广播接受者java代码
+            IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+            //创建广播接受者对象
+            batteryReceiver = new BatteryReceiver();
+            //注册receiver
+            mContext.registerReceiver(batteryReceiver, intentFilter);
             if (!judgeModel()) {
                 return null;
             }
@@ -240,7 +241,8 @@ public class UHFManager {
                             }
                             Log.d("zzc:", "cpuTemp: mt6356tsbuck温度:" + mtTemperature);
                             if (mtTemperature >= TemperatureLevel) {
-                                stopUseUHF();
+                                stopUseUHFByTemp();
+                                stopTimer();
                             }
                         } else {
                             battTempFile = new FileInputStream("sys/class/power_supply/battery/batt_temp");
@@ -248,7 +250,8 @@ public class UHFManager {
                             double t = Integer.parseInt(battTempFileStr) / 10.0;
                             Log.d("zzc:", "battTemp 温度: " + t + " 一直检测：");
                             if (t >= battTemperatureLevel) {
-                                stopUseUHF();
+                                stopUseUHFByTemp();
+                                stopTimer();
                             }
                         }
 
@@ -307,7 +310,8 @@ public class UHFManager {
                     //获取当前电量
                     int level = intent.getIntExtra("level", 0);
                     if (level < stipulationLevel) {
-                        stopUseUHF();
+                        stopUseUHFByBattery();
+                        stopTimer();
                     }
                     Log.d("zzc:", "level: " + level);
                 } catch (Exception e) {
@@ -317,13 +321,12 @@ public class UHFManager {
         }
 
     }
-
-    private static void stopUseUHF() {
+    private static void stopUseUHFByTemp() {
         if (iuhfService != null) {
             iuhfService.closeDev();
         }
         if (onSpdBanMsgListener != null) {
-            callBack("Low power or high temperature UHF is forbidden");
+            callBack("High temperature UHF is forbidden");
         }
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(new Runnable() {
@@ -331,9 +334,31 @@ public class UHFManager {
             public void run() {
                 boolean cn = "CN".equals(mContext.getResources().getConfiguration().locale.getCountry());
                 if (cn) {
-                    Toast.makeText(mContext, "电量低或温度过高禁用超高频", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, "温度过高禁用超高频", Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(mContext, "Low power or high temperature UHF is forbidden", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, "High temperature UHF is forbidden", Toast.LENGTH_LONG).show();
+                }
+
+            }
+        });
+    }
+
+    private static void stopUseUHFByBattery() {
+        if (iuhfService != null) {
+            iuhfService.closeDev();
+        }
+        if (onSpdBanMsgListener != null) {
+            callBack("Low power UHF is forbidden");
+        }
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                boolean cn = "CN".equals(mContext.getResources().getConfiguration().locale.getCountry());
+                if (cn) {
+                    Toast.makeText(mContext, "电量低禁用超高频", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(mContext, "Low power UHF is forbidden", Toast.LENGTH_LONG).show();
                 }
 
             }

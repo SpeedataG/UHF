@@ -260,7 +260,9 @@ public class XinLianQilian implements IUHFService {
                 try {
                     deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 52, 89, 71);
                     deviceControl.PowerOnDevice();
+                    Log.e("UHFService","==PowerOnDevice()==成功==52, 89, 71");
                 } catch (IOException e) {
+                    Log.e("UHFService","==PowerOnDevice()==失败==");
                     e.printStackTrace();
                 }
                 Reader.READER_ERR er = Mreader.InitReader_Notype(SERIALPORT0, 1);

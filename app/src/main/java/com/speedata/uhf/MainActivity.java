@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -122,6 +123,11 @@ public class MainActivity extends Activity implements OnClickListener {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
     protected void onStop() {
         try {
             if (iuhfService != null) {
@@ -193,12 +199,11 @@ public class MainActivity extends Activity implements OnClickListener {
     @SuppressLint("SetTextI18n")
     private boolean openDev() {
         if (iuhfService.openDev() != 0) {
-            curTagInfo.setText("Open serialport failed");
+            Toast.makeText(this, "Open serialport failed", Toast.LENGTH_SHORT).show();
             new AlertDialog.Builder(this).setTitle(R.string.DIA_ALERT).setMessage(R.string.DEV_OPEN_ERR).setPositiveButton(R.string.DIA_CHECK, new DialogInterface.OnClickListener() {
 
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    // TODO Auto-generated method stub
                     finish();
                 }
             }).show();
@@ -255,6 +260,11 @@ public class MainActivity extends Activity implements OnClickListener {
 
     }
 
+    private void sendUpddateService() {
+        Intent intent = new Intent();
+        intent.setAction("uhf.update");
+        sendBroadcast(intent);
+    }
 
     @Override
     public void onDestroy() {
@@ -262,7 +272,6 @@ public class MainActivity extends Activity implements OnClickListener {
         if (wK != null) {
             wK.release();
         }
-
         //注销广播、对象制空
         UHFManager.closeUHFService();
         EventBus.getDefault().unregister(this);
@@ -362,13 +371,13 @@ public class MainActivity extends Activity implements OnClickListener {
         } else if (arg0 == mButtonSetInv) {
             InventorySettingDialog inventorySettingDialog = new InventorySettingDialog(this);
             inventorySettingDialog.show();
-        }else if(arg0==mButtonSetKill){
+        } else if (arg0 == mButtonSetKill) {
             if (currentTagEpc == null) {
                 status.setText(R.string.Status_No_Card_Select);
                 Toast.makeText(this, R.string.Status_No_Card_Select, Toast.LENGTH_SHORT).show();
                 return;
             }
-            KillTagDialog killTagDialog = new KillTagDialog(this,iuhfService,currentTagEpc, model);
+            KillTagDialog killTagDialog = new KillTagDialog(this, iuhfService, currentTagEpc, model);
             killTagDialog.setTitle(getResources().getString(R.string.setKill));
             killTagDialog.show();
         }

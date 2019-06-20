@@ -350,7 +350,9 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             } else if ("SD100T".equals(xinghao) || "X47".equalsIgnoreCase(xinghao)) {
                 try {
                     pw = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 52, 89, 71);
+                    Log.e("UHFService", "==PowerOnDevice()==成功==52, 89, 71");
                 } catch (IOException e) {
+                    Log.e("UHFService", "==PowerOnDevice()==失败==");
                     e.printStackTrace();
                 }
 
@@ -363,7 +365,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             }
         }
         try {
-            if (!SystemProperties.get("ro.product.model").contains("SD100")) {
+            if (!SystemProperties.get("ro.product.model").contains("SD100") || "SD100T".equals(SystemProperties.get("ro.product.model"))) {
                 pw.PowerOffDevice();
                 pw.PowerOnDevice();
             }
@@ -410,7 +412,10 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             }
         } else {
             try {
-                if (SystemProperties.get("ro.product.model").contains("SD100")) {
+                if ("SD100T".equals(SystemProperties.get("ro.product.model"))) {
+                    pw.PowerOffDevice();
+                    Log.d("UHF", "closeDev");
+                } else if (SystemProperties.get("ro.product.model").contains("SD100")) {
                     pw.gtPower("uhf_close");
                     pw.gtPower("close");
                 } else {
