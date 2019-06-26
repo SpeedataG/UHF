@@ -52,8 +52,6 @@ public class XinLianQilian implements IUHFService {
     private static int antportc;
     private Handler handler_inventer = null;
     private ReaderParams Rparams = new ReaderParams();
-    private int ThreadMODE = 0;
-    private Handler handler = new Handler();
     public boolean nostop = false;
     Reader.TagFilter_ST g2tf = null;
     private DeviceControlSpd deviceControl;

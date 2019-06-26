@@ -6,14 +6,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.SystemClock;
 import android.os.SystemProperties;
 import android.serialport.DeviceControlSpd;
 import android.serialport.SerialPortSpd;
@@ -37,10 +32,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.regex.Pattern;
 
 import static android.content.ContentValues.TAG;
@@ -242,7 +235,7 @@ public class UHFManager {
                             Log.d("zzc:", "cpuTemp: mt6356tsbuck温度:" + mtTemperature);
                             if (mtTemperature >= TemperatureLevel) {
                                 stopUseUHFByTemp();
-                                stopTimer();
+                                closeUHFService();
                             }
                         } else {
                             battTempFile = new FileInputStream("sys/class/power_supply/battery/batt_temp");
@@ -251,7 +244,7 @@ public class UHFManager {
                             Log.d("zzc:", "battTemp 温度: " + t + " 一直检测：");
                             if (t >= battTemperatureLevel) {
                                 stopUseUHFByTemp();
-                                stopTimer();
+                                closeUHFService();
                             }
                         }
 
@@ -311,7 +304,7 @@ public class UHFManager {
                     int level = intent.getIntExtra("level", 0);
                     if (level < stipulationLevel) {
                         stopUseUHFByBattery();
-                        stopTimer();
+                        closeUHFService();
                     }
                     Log.d("zzc:", "level: " + level);
                 } catch (Exception e) {
@@ -321,6 +314,7 @@ public class UHFManager {
         }
 
     }
+
     private static void stopUseUHFByTemp() {
         if (iuhfService != null) {
             iuhfService.closeDev();
@@ -541,7 +535,7 @@ public class UHFManager {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else if (xinghao.equalsIgnoreCase("SD100T")|| xinghao.equalsIgnoreCase("X47")) {
+        } else if (xinghao.equalsIgnoreCase("SD100T") || xinghao.equalsIgnoreCase("X47")) {
             try {
                 serialPort.OpenSerial("/dev/ttyMT0", 115200);
             } catch (IOException e) {

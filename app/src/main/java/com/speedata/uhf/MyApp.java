@@ -13,6 +13,7 @@ import com.speedata.libuhf.IUHFService;
 import com.speedata.libuhf.UHFManager;
 import com.tencent.bugly.Bugly;
 import com.tencent.bugly.crashreport.CrashReport;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -55,6 +56,7 @@ public class MyApp extends Application {
         Bugly.init(getApplicationContext(), "75242a29e5", true, strategy);
 
         setIuhfService();
+//        startService(new Intent(this, MyService.class));
     }
 
     public void setIuhfService() {
@@ -78,6 +80,7 @@ public class MyApp extends Application {
             });
         }
     }
+
     public IUHFService getIuhfService() {
         return iuhfService;
     }

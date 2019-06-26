@@ -124,6 +124,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
     @Override
     protected void onPause() {
+        sendUpddateService();
         super.onPause();
     }
 
@@ -131,7 +132,7 @@ public class MainActivity extends Activity implements OnClickListener {
     protected void onStop() {
         try {
             if (iuhfService != null) {
-                iuhfService.closeDev();
+//                iuhfService.closeDev();
                 Log.e("zzc:", "下电");
                 //断点后选卡操作会失效，需要重新选卡（掩码）
                 currentTagEpc = null;
@@ -273,7 +274,7 @@ public class MainActivity extends Activity implements OnClickListener {
             wK.release();
         }
         //注销广播、对象制空
-        UHFManager.closeUHFService();
+//        UHFManager.closeUHFService();
         EventBus.getDefault().unregister(this);
     }
 
