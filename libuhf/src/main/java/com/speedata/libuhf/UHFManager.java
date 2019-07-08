@@ -278,7 +278,9 @@ public class UHFManager {
     }
 
     public static void unregisterReceiver() {
-        mContext.unregisterReceiver(batteryReceiver);
+        if (batteryReceiver != null) {
+            mContext.unregisterReceiver(batteryReceiver);
+        }
     }
 
     public static void setIuhfServiceNull() {
