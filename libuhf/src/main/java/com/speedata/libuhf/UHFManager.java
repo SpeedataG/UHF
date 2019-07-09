@@ -235,7 +235,6 @@ public class UHFManager {
                             Log.d("zzc:", "cpuTemp: mt6356tsbuck温度:" + mtTemperature);
                             if (mtTemperature >= TemperatureLevel) {
                                 stopUseUHFByTemp();
-                                closeUHFService();
                             }
                         } else {
                             battTempFile = new FileInputStream("sys/class/power_supply/battery/batt_temp");
@@ -244,7 +243,6 @@ public class UHFManager {
                             Log.d("zzc:", "battTemp 温度: " + t + " 一直检测：");
                             if (t >= battTemperatureLevel) {
                                 stopUseUHFByTemp();
-                                closeUHFService();
                             }
                         }
 
@@ -280,6 +278,7 @@ public class UHFManager {
     public static void unregisterReceiver() {
         if (batteryReceiver != null) {
             mContext.unregisterReceiver(batteryReceiver);
+            batteryReceiver = null;
         }
     }
 
@@ -306,7 +305,6 @@ public class UHFManager {
                     int level = intent.getIntExtra("level", 0);
                     if (level < stipulationLevel) {
                         stopUseUHFByBattery();
-                        closeUHFService();
                     }
                     Log.d("zzc:", "level: " + level);
                 } catch (Exception e) {
@@ -324,19 +322,19 @@ public class UHFManager {
         if (onSpdBanMsgListener != null) {
             callBack("High temperature UHF is forbidden");
         }
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                boolean cn = "CN".equals(mContext.getResources().getConfiguration().locale.getCountry());
-                if (cn) {
-                    Toast.makeText(mContext, "温度过高禁用超高频", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(mContext, "High temperature UHF is forbidden", Toast.LENGTH_LONG).show();
-                }
-
-            }
-        });
+//        Handler handler = new Handler(Looper.getMainLooper());
+//        handler.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                boolean cn = "CN".equals(mContext.getResources().getConfiguration().locale.getCountry());
+//                if (cn) {
+//                    Toast.makeText(mContext, "温度过高禁用超高频", Toast.LENGTH_LONG).show();
+//                } else {
+//                    Toast.makeText(mContext, "High temperature UHF is forbidden", Toast.LENGTH_LONG).show();
+//                }
+//
+//            }
+//        });
     }
 
     private static void stopUseUHFByBattery() {
@@ -346,19 +344,19 @@ public class UHFManager {
         if (onSpdBanMsgListener != null) {
             callBack("Low power UHF is forbidden");
         }
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                boolean cn = "CN".equals(mContext.getResources().getConfiguration().locale.getCountry());
-                if (cn) {
-                    Toast.makeText(mContext, "电量低禁用超高频", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(mContext, "Low power UHF is forbidden", Toast.LENGTH_LONG).show();
-                }
-
-            }
-        });
+//        Handler handler = new Handler(Looper.getMainLooper());
+//        handler.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                boolean cn = "CN".equals(mContext.getResources().getConfiguration().locale.getCountry());
+//                if (cn) {
+//                    Toast.makeText(mContext, "电量低禁用超高频", Toast.LENGTH_LONG).show();
+//                } else {
+//                    Toast.makeText(mContext, "Low power UHF is forbidden", Toast.LENGTH_LONG).show();
+//                }
+//
+//            }
+//        });
     }
 
     private static OnSpdBanMsgListener onSpdBanMsgListener = null;
