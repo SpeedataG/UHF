@@ -62,7 +62,7 @@ public class ErrorStatus {
                 break;
             case -19990:
             case -1:
-                STATUS = "写标签失败";
+                STATUS = "操作失败";
                 break;
             case -19989:
                 STATUS = "读密码错误";
@@ -159,6 +159,128 @@ public class ErrorStatus {
 
     private static void setENStatus(int errorCode) {
         switch (errorCode) {
+            case -20000:
+                STATUS = "Memory allocation failed";
+                break;
+            case -19999:
+                STATUS = "No device was found";
+                break;
+            case -19998:
+                STATUS = "Failed to retrieve device information";
+                break;
+            case -19997:
+                STATUS = "The device serial number is out of bounds";
+                break;
+            case -19996:
+                STATUS = "Turn off devices that have been turned off";
+                break;
+            case -19995:
+                STATUS = "The read tag flag is 2";
+                break;
+            case -19994:
+                STATUS = "MAC error reading tag";
+                break;
+            case -19993:
+            case 4:
+                STATUS = "No label found";
+                break;
+            case -19992:
+                STATUS = "Write data does not match";
+                break;
+            case -19991:
+                STATUS = "Tag read failed";
+                break;
+            case -19990:
+            case -1:
+                STATUS = "The operation failure";
+                break;
+            case -19989:
+                STATUS = "Password reading error";
+                break;
+            case -19988:
+                STATUS = "Password destruction error";
+                break;
+            case -19987:
+                STATUS = "Tag destruction error";
+                break;
+            case -19986:
+                STATUS = "Permission setting error";
+                break;
+            case -19972:
+                STATUS = "MAC firmware received error package";
+                break;
+            case -9999:
+                STATUS = "The rf reader has been turned on and is in operation";
+                break;
+            case -9998:
+                STATUS = "The memory space provided is too small";
+                break;
+            case -9997:
+                STATUS = "General error";
+                break;
+            case -9996:
+                STATUS = "Bus driver loading error";
+                break;
+            case -9995:
+                STATUS = "Bus driver version not supported";
+                break;
+            case -9994:
+                STATUS = "reserve";
+                break;
+            case -9993:
+                STATUS = "Antenna port error";
+                break;
+            case -9992:
+                STATUS = "Rf reader initialization failed";
+                break;
+            case -9991:
+                STATUS = "Parameter unavailable";
+                break;
+            case -9990:
+                STATUS = "No rf reader is available";
+                break;
+            case -9989:
+                STATUS = "uninitialized";
+                break;
+            case -9987:
+                STATUS = "Operation cancelled";
+                break;
+            case -9986:
+                STATUS = "Memory allocation failed";
+                break;
+            case -9985:
+                STATUS = "Device is busy";
+                break;
+            case -9984:
+                STATUS = "Rf reader error";
+                break;
+            case -9983:
+                STATUS = "Rf reader does not exist";
+                break;
+            case -9982:
+                STATUS = "Class library functions are not available";
+                break;
+            case -9981:
+                STATUS = "Rf reader MAC firmware not responding";
+                break;
+            case -9980:
+                STATUS = "Do not update non-volatile MAC registers";
+                break;
+            case -9979:
+                STATUS = "Do not update non-volatile MAC registers";
+                break;
+            case -9978:
+                STATUS = "MAC components block writing to non-volatile registers";
+                break;
+            case -9977:
+                STATUS = "Receive data overflow error";
+                break;
+            case -9976:
+                STATUS = "The MAC component returned the wrong value";
+                break;
+            case 3:
+                STATUS = "Instruction failure";
+                break;
             default:
                 STATUS = errorCode + "";
                 break;

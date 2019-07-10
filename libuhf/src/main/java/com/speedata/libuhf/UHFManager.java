@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemProperties;
@@ -318,6 +319,10 @@ public class UHFManager {
     private static void stopUseUHFByTemp() {
         if (iuhfService != null) {
             iuhfService.closeDev();
+            Intent intent = new Intent();
+            intent.setAction("com.uhf.high_temp");
+            mContext.sendBroadcast(intent);
+            Log.e("zzc:","UHFService===closeDev()===high_temp");
         }
         if (onSpdBanMsgListener != null) {
             callBack("High temperature UHF is forbidden");
@@ -340,10 +345,17 @@ public class UHFManager {
     private static void stopUseUHFByBattery() {
         if (iuhfService != null) {
             iuhfService.closeDev();
+            Intent intent = new Intent();
+            intent.setAction("com.uhf.low_power");
+            mContext.sendBroadcast(intent);
+            Log.e("zzc:","UHFService===closeDev()===low_power");
         }
         if (onSpdBanMsgListener != null) {
             callBack("Low power UHF is forbidden");
         }
+        Intent intent = new Intent();
+        intent.setAction("com.uhf.low_power");
+        mContext.sendBroadcast(intent);
 //        Handler handler = new Handler(Looper.getMainLooper());
 //        handler.post(new Runnable() {
 //            @Override
