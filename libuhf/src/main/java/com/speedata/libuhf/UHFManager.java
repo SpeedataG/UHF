@@ -329,15 +329,9 @@ public class UHFManager {
             iuhfService.closeDev();
             Log.e("zzc:", "UHFService===closeDev()===high_temp");
         }
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (onSpdBanMsgListener != null) {
-                    callBack("High temperature UHF is forbidden");
-                }
-            }
-        });
+        if (onSpdBanMsgListener != null) {
+            callBack("High temperature UHF is forbidden");
+        }
     }
 
     private static void stopUseUHFByBattery() {
