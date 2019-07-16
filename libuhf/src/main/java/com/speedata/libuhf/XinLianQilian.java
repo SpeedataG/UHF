@@ -156,7 +156,21 @@ public class XinLianQilian implements IUHFService {
                 } else {
                     return -1;
                 }
-            } else if (xinghao.contains("SD55") || xinghao.contains("R66")) {
+            } else if (xinghao.equals("SD55PTT")){
+                try {
+                    deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 8);
+                    deviceControl.PowerOnDevice();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Reader.READER_ERR er = Mreader.InitReader_Notype(SERIALPORT1, 1);
+                if (er == Reader.READER_ERR.MT_OK_ERR) {
+                    antportc = 1;
+                    return 0;
+                } else {
+                    return -1;
+                }
+            }else if (xinghao.contains("SD55") || xinghao.contains("R66")) {
                 if (ConfigUtils.getApiVersion() > 23) {
                     try {
                         deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 12);

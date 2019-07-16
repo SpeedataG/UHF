@@ -34,6 +34,7 @@ public interface IUHFService {
     public static final int LOW_POWER_MODE = 2;
     public static final int USER_MODE = 3;
     public static final String SERIALPORT0 = "/dev/ttyMT0";
+    public static final String SERIALPORT1 = "/dev/ttyMT1";
     public static final String SERIALPORT = "/dev/ttyMT2";
     public static final String SERIALPORT_SD100 = "/dev/ttyHSL2";
     public static final String SERIALPORT_SD60 = "/dev/ttyMT0";

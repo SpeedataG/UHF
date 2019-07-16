@@ -319,56 +319,27 @@ public class UHFManager {
     private static void stopUseUHFByTemp() {
         if (iuhfService != null) {
             iuhfService.closeDev();
-            Intent intent = new Intent();
-            intent.setAction("com.uhf.high_temp");
-            mContext.sendBroadcast(intent);
-            Log.e("zzc:","UHFService===closeDev()===high_temp");
+            Log.e("zzc:", "UHFService===closeDev()===high_temp");
         }
-        if (onSpdBanMsgListener != null) {
-            callBack("High temperature UHF is forbidden");
-        }
-//        Handler handler = new Handler(Looper.getMainLooper());
-//        handler.post(new Runnable() {
-//            @Override
-//            public void run() {
-//                boolean cn = "CN".equals(mContext.getResources().getConfiguration().locale.getCountry());
-//                if (cn) {
-//                    Toast.makeText(mContext, "温度过高禁用超高频", Toast.LENGTH_LONG).show();
-//                } else {
-//                    Toast.makeText(mContext, "High temperature UHF is forbidden", Toast.LENGTH_LONG).show();
-//                }
-//
-//            }
-//        });
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (onSpdBanMsgListener != null) {
+                    callBack("High temperature UHF is forbidden");
+                }
+            }
+        });
     }
 
     private static void stopUseUHFByBattery() {
         if (iuhfService != null) {
             iuhfService.closeDev();
-            Intent intent = new Intent();
-            intent.setAction("com.uhf.low_power");
-            mContext.sendBroadcast(intent);
-            Log.e("zzc:","UHFService===closeDev()===low_power");
+            Log.e("zzc:", "UHFService===closeDev()===low_power");
         }
         if (onSpdBanMsgListener != null) {
             callBack("Low power UHF is forbidden");
         }
-        Intent intent = new Intent();
-        intent.setAction("com.uhf.low_power");
-        mContext.sendBroadcast(intent);
-//        Handler handler = new Handler(Looper.getMainLooper());
-//        handler.post(new Runnable() {
-//            @Override
-//            public void run() {
-//                boolean cn = "CN".equals(mContext.getResources().getConfiguration().locale.getCountry());
-//                if (cn) {
-//                    Toast.makeText(mContext, "电量低禁用超高频", Toast.LENGTH_LONG).show();
-//                } else {
-//                    Toast.makeText(mContext, "Low power UHF is forbidden", Toast.LENGTH_LONG).show();
-//                }
-//
-//            }
-//        });
     }
 
     private static OnSpdBanMsgListener onSpdBanMsgListener = null;
@@ -452,6 +423,8 @@ public class UHFManager {
 //                    powerOn(UHFDeviceControl.PowerType.NEW_MAIN, 86);
                     powerOn(DeviceControlSpd.PowerType.EXPAND, 9, 14);
 
+                } else if (xinghao.equals("SD55PTT")) {
+                    powerOn(DeviceControlSpd.PowerType.NEW_MAIN, 8);
                 } else if (xinghao.contains("SD55") || xinghao.contains("R66")) {
                     if (ConfigUtils.getApiVersion() > 23) {
                         powerOn(DeviceControlSpd.PowerType.NEW_MAIN, 12);
@@ -524,6 +497,12 @@ public class UHFManager {
                 || xinghao.contains("DXD60RT") || xinghao.contains("C6000")) {
             try {
                 serialPort.OpenSerial("/dev/ttyMT0", 115200);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (xinghao.equals("SD55PTT")) {
+            try {
+                serialPort.OpenSerial("/dev/ttyMT1", 115200);
             } catch (IOException e) {
                 e.printStackTrace();
             }
