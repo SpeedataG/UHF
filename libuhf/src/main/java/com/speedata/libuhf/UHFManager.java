@@ -291,6 +291,14 @@ public class UHFManager {
         stipulationLevel = level;
     }
 
+    public static void setTemperatureLevel(int temp) {
+        TemperatureLevel = temp;
+    }
+
+    public static void setBattTemperatureLevel(int battTemperatureLevel) {
+        UHFManager.battTemperatureLevel = battTemperatureLevel;
+    }
+
     /**
      * 广播接受者
      */
