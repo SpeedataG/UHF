@@ -132,7 +132,7 @@ public class XinLianQilian implements IUHFService {
         } else {
             String xinghao = SystemProperties.get("ro.product.model");
             if ("SD60RT".equalsIgnoreCase(xinghao) || "MST-II-YN".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || "SD55L".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
-                    || xinghao.contains("DXD60RT") || xinghao.contains("C6000")) {
+                    || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "ESUR-H600".equals(xinghao)) {
                 try {
 //                    deviceControl = new UHFDeviceControl(UHFDeviceControl.PowerType.NEW_MAIN, 86);
                     deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.EXPAND, 9, 14);
@@ -156,7 +156,7 @@ public class XinLianQilian implements IUHFService {
                 } else {
                     return -1;
                 }
-            } else if (xinghao.equals("SD55PTT")){
+            } else if (xinghao.equals("SD55PTT")) {
                 try {
                     deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 8);
                     deviceControl.PowerOnDevice();
@@ -170,7 +170,7 @@ public class XinLianQilian implements IUHFService {
                 } else {
                     return -1;
                 }
-            }else if (xinghao.contains("SD55") || xinghao.contains("R66")) {
+            } else if (xinghao.contains("SD55") || xinghao.contains("R66")) {
                 if (ConfigUtils.getApiVersion() > 23) {
                     try {
                         deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 12);
@@ -272,9 +272,9 @@ public class XinLianQilian implements IUHFService {
                 try {
                     deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 52, 89, 71);
                     deviceControl.PowerOnDevice();
-                    Log.e("UHFService","==PowerOnDevice()==成功==52, 89, 71");
+                    Log.e("UHFService", "==PowerOnDevice()==成功==52, 89, 71");
                 } catch (IOException e) {
-                    Log.e("UHFService","==PowerOnDevice()==失败==");
+                    Log.e("UHFService", "==PowerOnDevice()==失败==");
                     e.printStackTrace();
                 }
                 Reader.READER_ERR er = Mreader.InitReader_Notype(SERIALPORT0, 1);
