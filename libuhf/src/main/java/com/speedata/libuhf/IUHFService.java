@@ -305,6 +305,19 @@ public interface IUHFService {
      */
     public int stopFastMode();
 
+    /**
+     * 设置盘点超时时间
+     * @param readTime 毫秒
+     * @return
+     */
+    public int setReadTime(int readTime);
+
+    /**
+     * 设置盘点时间间隔
+     * @param sleep 毫秒
+     * @return
+     */
+    public int setSleep(int sleep);
 
     //********************************************老版接口（不再维护）***************************************************
 

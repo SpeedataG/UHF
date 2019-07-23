@@ -776,13 +776,6 @@ public class XinLianQilian implements IUHFService {
     @Override
     public int setQueryTagGroup(int selected, int session, int target) {
         try {
-            if (session == 0) {
-                Rparams.readtime = 50;
-                Rparams.sleep = 200;
-            } else  {
-                Rparams.readtime = 50;
-                Rparams.sleep = 0;
-            }
             int[] val = new int[]{-1};
             val[0] = session;
             Reader.READER_ERR er = Mreader.ParamSet(
@@ -1079,6 +1072,18 @@ public class XinLianQilian implements IUHFService {
         } catch (Exception e) {
             return -1;
         }
+    }
+
+    @Override
+    public int setReadTime(int readTime) {
+        Rparams.readtime = readTime;
+        return 0;
+    }
+
+    @Override
+    public int setSleep(int sleep) {
+        Rparams.sleep = sleep;
+        return 0;
     }
 
 

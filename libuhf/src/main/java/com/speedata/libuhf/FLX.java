@@ -813,6 +813,16 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         return 0;
     }
 
+    @Override
+    public int setReadTime(int readTime) {
+        return 0;
+    }
+
+    @Override
+    public int setSleep(int sleep) {
+        return 0;
+    }
+
     //********************************************老版接口（不再维护）******************************************
 
 
