@@ -313,11 +313,23 @@ public interface IUHFService {
     public int setReadTime(int readTime);
 
     /**
+     * 获取盘点超时时间
+     * @return
+     */
+    public int getReadTime();
+
+    /**
      * 设置盘点时间间隔
      * @param sleep 毫秒
      * @return
      */
     public int setSleep(int sleep);
+
+    /**
+     * 获取盘点间隔时间
+     * @return
+     */
+    public int getSleep();
 
     //********************************************老版接口（不再维护）***************************************************
 

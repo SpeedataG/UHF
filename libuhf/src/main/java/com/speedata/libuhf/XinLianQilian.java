@@ -1081,9 +1081,19 @@ public class XinLianQilian implements IUHFService {
     }
 
     @Override
+    public int getReadTime() {
+        return Rparams.readtime;
+    }
+
+    @Override
     public int setSleep(int sleep) {
         Rparams.sleep = sleep;
         return 0;
+    }
+
+    @Override
+    public int getSleep() {
+        return Rparams.sleep;
     }
 
 
