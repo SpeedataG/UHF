@@ -1833,6 +1833,7 @@ public class XinLianQilian implements IUHFService {
                         inventory_stop();
                     }
                 }
+                SystemClock.sleep(Rparams.sleep);
             }
 
         }
