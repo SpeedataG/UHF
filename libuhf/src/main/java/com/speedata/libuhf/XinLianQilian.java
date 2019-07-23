@@ -776,6 +776,13 @@ public class XinLianQilian implements IUHFService {
     @Override
     public int setQueryTagGroup(int selected, int session, int target) {
         try {
+            if (session == 0) {
+                Rparams.readtime = 50;
+                Rparams.sleep = 200;
+            } else  {
+                Rparams.readtime = 50;
+                Rparams.sleep = 0;
+            }
             int[] val = new int[]{-1};
             val[0] = session;
             Reader.READER_ERR er = Mreader.ParamSet(
@@ -1044,6 +1051,8 @@ public class XinLianQilian implements IUHFService {
     @Override
     public int startFastMode() {
         try {
+            Rparams.option = 0;
+            Rparams.sleep = 0;
             int[] uants = Rparams.uants;
             Reader.READER_ERR er = Mreader.AsyncStartReading(uants, Rparams.uants.length, 0);
             if (er == Reader.READER_ERR.MT_OK_ERR) {
