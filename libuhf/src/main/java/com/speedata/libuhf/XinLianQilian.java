@@ -1,12 +1,14 @@
 package com.speedata.libuhf;
 
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.os.SystemProperties;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -51,6 +53,7 @@ public class XinLianQilian implements IUHFService {
     private static Reader Mreader = new Reader();
     private static int antportc;
     private Handler handler_inventer = null;
+    private Handler handler = new Handler();
     private ReaderParams Rparams = new ReaderParams();
     public boolean nostop = false;
     Reader.TagFilter_ST g2tf = null;
@@ -367,7 +370,12 @@ public class XinLianQilian implements IUHFService {
      */
     @Override
     public void inventoryStart() {
-        inventory_start();
+        if (inSearch) {
+            return;
+        }
+        inSearch = true;
+        cancelSelect();
+        handler.postDelayed(inv_thread, 0);
     }
 
     /**
@@ -381,10 +389,8 @@ public class XinLianQilian implements IUHFService {
         Log.d(TAG, "inventory_stop: start");
         inSearch = false;
         try {
-            if (myInvThread != null) {
-                myInvThread.interrupt();
-                myInvThread = null;
-
+            if (handler != null) {
+                handler.removeCallbacks(inv_thread);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1735,117 +1741,114 @@ public class XinLianQilian implements IUHFService {
 
     private volatile boolean inSearch = false;
     private Runnable inv_thread = new Runnable() {
+        @Override
         public void run() {
-            while (inSearch) {
-                Log.d(TAG, "run: 1111111111111111111111");
-                int[] tagcnt = new int[1];
-                tagcnt[0] = 0;
-                synchronized (this) {
-                    Reader.READER_ERR er;
-                    int[] uants = Rparams.uants;
-                    if (!inSearch) {
-                        continue;
-                    }
-                    Log.d(TAG, "run: 2222222222222222222222222222");
-                    if (nostop) {
-                        er = Mreader.AsyncGetTagCount(tagcnt);
-                    } else {
-                        er = Mreader.TagInventory_Raw(uants,
-                                Rparams.uants.length,
-                                (short) Rparams.readtime, tagcnt);
-                    }
-                    if (er == Reader.READER_ERR.MT_OK_ERR) {
-                        if (tagcnt[0] > 0) {
-                            for (int i = 0; i < tagcnt[0]; i++) {
-                                if (!inSearch) {
-                                    return;
-                                }
-                                Log.d(TAG, "run: 33333333333");
-                                Reader.TAGINFO tfs = Mreader.new TAGINFO();
-                                if (nostop) {
-                                    er = Mreader.AsyncGetNextTag(tfs);
+            Log.d(TAG, "run: 1111111111111111111111");
+            int[] tagcnt = new int[1];
+            tagcnt[0] = 0;
+            synchronized (this) {
+                Reader.READER_ERR er;
+                int[] uants = Rparams.uants;
+                if (!inSearch) {
+                    inventoryStop();
+                }
+                Log.d(TAG, "run: 2222222222222222222222222222");
+                if (nostop) {
+                    er = Mreader.AsyncGetTagCount(tagcnt);
+                } else {
+                    er = Mreader.TagInventory_Raw(uants,
+                            Rparams.uants.length,
+                            (short) Rparams.readtime, tagcnt);
+                }
+                if (er == Reader.READER_ERR.MT_OK_ERR) {
+                    if (tagcnt[0] > 0) {
+                        for (int i = 0; i < tagcnt[0]; i++) {
+                            if (!inSearch) {
+                                inventoryStop();
+                            }
+                            Log.d(TAG, "run: 33333333333");
+                            Reader.TAGINFO tfs = Mreader.new TAGINFO();
+                            if (nostop) {
+                                er = Mreader.AsyncGetNextTag(tfs);
+                            } else {
+                                er = Mreader.GetNextTag(tfs);
+                            }
+
+                            if (er == Reader.READER_ERR.MT_OK_ERR) {
+                                byte[] n_epc = tfs.EpcId;
+                                String strEPCTemp = ByteCharStrUtils.b2hexs(n_epc, n_epc.length);
+                                Log.d(TAG, "run: 4444444444");
+                                String rssi = String.valueOf(tfs.RSSI);
+                                ArrayList<SpdInventoryData> cx = new ArrayList<SpdInventoryData>();
+                                SpdInventoryData tagData = new SpdInventoryData(null, strEPCTemp, rssi);
+                                if (handler_inventer == null) {
+                                    inventoryCallBack(tagData);
                                 } else {
-                                    er = Mreader.GetNextTag(tfs);
-                                }
-
-                                if (er == Reader.READER_ERR.MT_OK_ERR) {
-                                    byte[] n_epc = tfs.EpcId;
-                                    String strEPCTemp = ByteCharStrUtils.b2hexs(n_epc, n_epc.length);
-                                    Log.d(TAG, "run: 4444444444");
-                                    String rssi = String.valueOf(tfs.RSSI);
-                                    ArrayList<SpdInventoryData> cx = new ArrayList<SpdInventoryData>();
-                                    SpdInventoryData tagData = new SpdInventoryData(null, strEPCTemp, rssi);
-                                    if (handler_inventer == null) {
-                                        inventoryCallBack(tagData);
-                                    } else {
-                                        cx.add(tagData);
-                                        Message msg = new Message();
-                                        msg.what = 1;
-                                        msg.obj = cx;
-                                        handler_inventer.sendMessage(msg);
-                                    }
-
+                                    cx.add(tagData);
+                                    Message msg = new Message();
+                                    msg.what = 1;
+                                    msg.obj = cx;
+                                    handler_inventer.sendMessage(msg);
                                 }
                             }
                         }
-
-                    } else {
-                        Log.d(TAG, "run: err");
-                        int errCode = -1;
-                        if (er == Reader.READER_ERR.MT_IO_ERR) {
-                            errCode = 1;
-                        } else if (er == Reader.READER_ERR.MT_INTERNAL_DEV_ERR) {
-                            errCode = 2;
-                        } else if (er == Reader.READER_ERR.MT_CMD_FAILED_ERR) {
-                            errCode = 3;
-                        } else if (er == Reader.READER_ERR.MT_CMD_NO_TAG_ERR) {
-                            errCode = 4;
-                        } else if (er == Reader.READER_ERR.MT_M5E_FATAL_ERR) {
-                            errCode = 5;
-                        } else if (er == Reader.READER_ERR.MT_OP_NOT_SUPPORTED) {
-                            errCode = 6;
-                        } else if (er == Reader.READER_ERR.MT_INVALID_PARA) {
-                            errCode = 7;
-                        } else if (er == Reader.READER_ERR.MT_INVALID_READER_HANDLE) {
-                            errCode = 8;
-                        } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_HIGN_RETURN_LOSS) {
-                            errCode = 9;
-                        } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_TOO_MANY_RESET) {
-                            errCode = 10;
-                        } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_NO_ANTENNAS) {
-                            errCode = 11;
-                        } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_HIGH_TEMPERATURE) {
-                            errCode = 12;
-                        } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_READER_DOWN) {
-                            errCode = 13;
-                        } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_UNKNOWN_ERR) {
-                            errCode = 14;
-                        } else if (er == Reader.READER_ERR.M6E_INIT_FAILED) {
-                            errCode = 15;
-                        } else if (er == Reader.READER_ERR.MT_OP_EXECING) {
-                            errCode = 16;
-                        } else if (er == Reader.READER_ERR.MT_UNKNOWN_READER_TYPE) {
-                            errCode = 17;
-                        } else if (er == Reader.READER_ERR.MT_OP_INVALID) {
-                            errCode = 18;
-                        } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_BY_FAILED_RESET_MODLUE) {
-                            errCode = 19;
-                        } else if (er == Reader.READER_ERR.MT_MAX_ERR_NUM) {
-                            errCode = 20;
-                        } else {
-                            errCode = 20;
-                        }
-                        if (handler_inventer == null) {
-                            inventoryCallBack(null);
-                        } else {
-                            handler_inventer.sendMessage(handler_inventer.obtainMessage(2, errCode));
-                        }
-                        inventory_stop();
                     }
-                }
-                SystemClock.sleep(Rparams.sleep);
-            }
 
+                } else {
+                    Log.d(TAG, "run: err");
+                    int errCode = -1;
+                    if (er == Reader.READER_ERR.MT_IO_ERR) {
+                        errCode = 1;
+                    } else if (er == Reader.READER_ERR.MT_INTERNAL_DEV_ERR) {
+                        errCode = 2;
+                    } else if (er == Reader.READER_ERR.MT_CMD_FAILED_ERR) {
+                        errCode = 3;
+                    } else if (er == Reader.READER_ERR.MT_CMD_NO_TAG_ERR) {
+                        errCode = 4;
+                    } else if (er == Reader.READER_ERR.MT_M5E_FATAL_ERR) {
+                        errCode = 5;
+                    } else if (er == Reader.READER_ERR.MT_OP_NOT_SUPPORTED) {
+                        errCode = 6;
+                    } else if (er == Reader.READER_ERR.MT_INVALID_PARA) {
+                        errCode = 7;
+                    } else if (er == Reader.READER_ERR.MT_INVALID_READER_HANDLE) {
+                        errCode = 8;
+                    } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_HIGN_RETURN_LOSS) {
+                        errCode = 9;
+                    } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_TOO_MANY_RESET) {
+                        errCode = 10;
+                    } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_NO_ANTENNAS) {
+                        errCode = 11;
+                    } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_HIGH_TEMPERATURE) {
+                        errCode = 12;
+                    } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_READER_DOWN) {
+                        errCode = 13;
+                    } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_UNKNOWN_ERR) {
+                        errCode = 14;
+                    } else if (er == Reader.READER_ERR.M6E_INIT_FAILED) {
+                        errCode = 15;
+                    } else if (er == Reader.READER_ERR.MT_OP_EXECING) {
+                        errCode = 16;
+                    } else if (er == Reader.READER_ERR.MT_UNKNOWN_READER_TYPE) {
+                        errCode = 17;
+                    } else if (er == Reader.READER_ERR.MT_OP_INVALID) {
+                        errCode = 18;
+                    } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_BY_FAILED_RESET_MODLUE) {
+                        errCode = 19;
+                    } else if (er == Reader.READER_ERR.MT_MAX_ERR_NUM) {
+                        errCode = 20;
+                    } else {
+                        errCode = 20;
+                    }
+                    if (handler_inventer == null) {
+                        inventoryCallBack(null);
+                    } else {
+                        handler_inventer.sendMessage(handler_inventer.obtainMessage(2, errCode));
+                    }
+                    inventoryStop();
+                }
+            }
+            handler.postDelayed(this, Rparams.sleep);
         }
     };
 

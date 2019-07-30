@@ -19,6 +19,7 @@ import com.speedata.libuhf.IUHFService;
 import com.speedata.libuhf.UHFManager;
 import com.speedata.libuhf.bean.SpdInventoryData;
 import com.speedata.libuhf.interfaces.OnSpdInventoryListener;
+import com.speedata.uhf.dialog.AlertDialogManager;
 
 /**
  * 接受广播  触发盘点，返回EPC
@@ -131,6 +132,7 @@ public class MyService extends Service {
         Log.d(TAG, "===onCreate===");
         initReceive();
         initUHF();
+        AlertDialogManager.getAlertInstance(this);
     }
 
     private void initUHF() {
@@ -155,6 +157,8 @@ public class MyService extends Service {
         filter.addAction(START_SCAN);
         filter.addAction(STOP_SCAN);
         filter.addAction(UPDATE);
+        filter.addAction("com.uhf.low_power");
+        filter.addAction("com.uhf.high_temp");
         registerReceiver(receiver, filter);
     }
 

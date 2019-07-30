@@ -327,6 +327,7 @@ public class InventorySettingDialog extends Dialog implements View.OnClickListen
                 break;
             case R.id.btn_fast_mode:
                 if (!MyApp.isFastMode) {
+                    MyApp.getInstance().getIuhfService().setQueryTagGroup(0,1,0);
                     //没有启用,启用，改变标志位
                     result = MyApp.getInstance().getIuhfService().startFastMode();
                     if (result == 0) {

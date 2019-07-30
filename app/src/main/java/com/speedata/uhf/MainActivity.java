@@ -20,8 +20,10 @@ import android.widget.Toast;
 
 import com.speedata.libuhf.IUHFService;
 import com.speedata.libuhf.UHFManager;
+import com.speedata.libuhf.interfaces.OnSpdBanMsgListener;
 import com.speedata.libuhf.utils.CommonUtils;
 import com.speedata.libuhf.utils.SharedXmlUtil;
+import com.speedata.uhf.dialog.AlertDialogManager;
 import com.speedata.uhf.dialog.DirectionalTagDialog;
 import com.speedata.uhf.dialog.InvSetDialog;
 import com.speedata.uhf.dialog.InventorySettingDialog;
@@ -106,6 +108,8 @@ public class MainActivity extends Activity implements OnClickListener {
         }
         Log.d(TAG, "currenTime 4:" + (System.currentTimeMillis() - currenTime));
 
+        //监听报警
+        AlertDialogManager.getAlertInstance(this);
     }
 
 
