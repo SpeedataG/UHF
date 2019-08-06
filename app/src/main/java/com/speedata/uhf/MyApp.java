@@ -64,6 +64,13 @@ public class MyApp extends Application {
         try {
             iuhfService = UHFManager.getUHFService(getApplicationContext());
             Log.d("UHFService", "iuhfService初始化: " + iuhfService);
+            if (iuhfService != null) {
+                int i = 0;
+                i = iuhfService.setReadTime(50);
+                Log.d("zzc:", "===isFirstInit===setReadTime:" + i);
+                i = iuhfService.setSleep(0);
+                Log.d("zzc:", "===isFirstInit===setSleep:" + i);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             Handler handler = new Handler(Looper.getMainLooper());

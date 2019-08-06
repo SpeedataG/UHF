@@ -310,6 +310,62 @@
                 android:text="@string/Set_Btn_set" />
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <TextView
+                style="@style/TextBlueStyle"
+                android:text="超时时间" />
+
+            <EditText
+                android:id="@+id/et_read_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="number" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dp"
+                android:text="ms" />
+
+            <Button
+                android:id="@+id/set_read_time"
+                style="@style/ButtonStyle"
+                android:text="@string/Set_Btn_set" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <TextView
+                style="@style/TextBlueStyle"
+                android:text="间隔时间" />
+
+            <EditText
+                android:id="@+id/et_sleep_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="number" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dp"
+                android:text="ms" />
+
+            <Button
+                android:id="@+id/set_sleep_time"
+                style="@style/ButtonStyle"
+                android:text="@string/Set_Btn_set" />
+        </LinearLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"

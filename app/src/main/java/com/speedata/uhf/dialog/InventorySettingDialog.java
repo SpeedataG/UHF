@@ -80,6 +80,8 @@ public class InventorySettingDialog extends Dialog implements View.OnClickListen
     private Spinner spQValue, spGen2Target;
     private Button btnQValue, btnGen2Target, getValueBtn;
     private Button btnFastMode;
+    private EditText etReadTime, etSleepTime;
+    private Button btnReadTime, btnSleepTime;
 
     public InventorySettingDialog(@NonNull Context context) {
         super(context);
@@ -102,11 +104,13 @@ public class InventorySettingDialog extends Dialog implements View.OnClickListen
         } else {
             r2kLayout.setVisibility(View.GONE);
             xinLianLayout.setVisibility(View.VISIBLE);
-            if(MyApp.isFastMode){
+            if (MyApp.isFastMode) {
                 btnFastMode.setText(mContext.getResources().getString(R.string.btn_stop_fast));
-            }else {
+            } else {
                 btnFastMode.setText(mContext.getResources().getString(R.string.btn_start_fast));
             }
+            etReadTime.setText("" + MyApp.getInstance().getIuhfService().getReadTime());
+            etSleepTime.setText("" + MyApp.getInstance().getIuhfService().getSleep());
         }
     }
 
@@ -152,6 +156,13 @@ public class InventorySettingDialog extends Dialog implements View.OnClickListen
         getValueBtn.setOnClickListener(this);
         btnFastMode = findViewById(R.id.btn_fast_mode);
         btnFastMode.setOnClickListener(this);
+
+        etReadTime = findViewById(R.id.et_read_time);
+        etSleepTime = findViewById(R.id.et_sleep_time);
+        btnReadTime = findViewById(R.id.set_read_time);
+        btnReadTime.setOnClickListener(this);
+        btnSleepTime = findViewById(R.id.set_sleep_time);
+        btnSleepTime.setOnClickListener(this);
     }
 
     /**
@@ -327,7 +338,7 @@ public class InventorySettingDialog extends Dialog implements View.OnClickListen
                 break;
             case R.id.btn_fast_mode:
                 if (!MyApp.isFastMode) {
-                    MyApp.getInstance().getIuhfService().setQueryTagGroup(0,1,0);
+                    MyApp.getInstance().getIuhfService().setQueryTagGroup(0, 1, 0);
                     //没有启用,启用，改变标志位
                     result = MyApp.getInstance().getIuhfService().startFastMode();
                     if (result == 0) {
@@ -348,6 +359,30 @@ public class InventorySettingDialog extends Dialog implements View.OnClickListen
                     } else {
                         Toast.makeText(mContext, mContext.getResources().getString(R.string.toast_stop_fast_failed), Toast.LENGTH_LONG).show();
                     }
+                }
+                break;
+            case R.id.set_read_time:
+                String readTime = etReadTime.getText().toString();
+                if (readTime.isEmpty()) {
+                    Toast.makeText(mContext, mContext.getResources().getString(R.string.param_not_null), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                int read = Integer.parseInt(readTime);
+                result = MyApp.getInstance().getIuhfService().setReadTime(read);
+                if (result == 0) {
+                    Toast.makeText(mContext, mContext.getResources().getString(R.string.set_success), Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case R.id.set_sleep_time:
+                String sleepTime = etSleepTime.getText().toString();
+                if (sleepTime.isEmpty()) {
+                    Toast.makeText(mContext, mContext.getResources().getString(R.string.param_not_null), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                int sleep = Integer.parseInt(sleepTime);
+                result = MyApp.getInstance().getIuhfService().setSleep(sleep);
+                if (result == 0) {
+                    Toast.makeText(mContext, mContext.getResources().getString(R.string.set_success), Toast.LENGTH_SHORT).show();
                 }
                 break;
             default:

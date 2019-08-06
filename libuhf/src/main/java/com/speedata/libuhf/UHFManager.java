@@ -83,13 +83,15 @@ public class UHFManager {
         if (iuhfService == null) {
             //  判断模块   返回不同的模块接口对象
             mContext = context.getApplicationContext();
-            createTempTimer();
-            //注册广播接受者java代码
-            IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-            //创建广播接受者对象
-            batteryReceiver = new BatteryReceiver();
-            //注册receiver
-            mContext.registerReceiver(batteryReceiver, intentFilter);
+//            createTempTimer();
+//            if (batteryReceiver == null) {
+//                //注册广播接受者java代码
+//                IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+//                //创建广播接受者对象
+//                batteryReceiver = new BatteryReceiver();
+//                //注册receiver
+//                mContext.registerReceiver(batteryReceiver, intentFilter);
+//            }
             if (!judgeModel()) {
                 return null;
             }
@@ -258,7 +260,10 @@ public class UHFManager {
     }
 
 
-    private static void stopTimer() {
+    public static void stopTimer() {
+        if (myTimerTask != null) {
+            myTimerTask.cancel();
+        }
         if (timer != null) {
             timer.cancel();
             timer = null;
@@ -269,11 +274,8 @@ public class UHFManager {
 
     public static void closeUHFService() {
         iuhfService = null;
-        stopTimer();
-        if (myTimerTask != null) {
-            myTimerTask.cancel();
-        }
-        unregisterReceiver();
+//        stopTimer();
+//        unregisterReceiver();
     }
 
     public static void unregisterReceiver() {
@@ -496,7 +498,7 @@ public class UHFManager {
 //        String xinghao = Build.MODEL;
         String xinghao = SystemProperties.get("ro.product.model");
         if ("SD60RT".equalsIgnoreCase(xinghao) || "MST-II-YN".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
-                || xinghao.contains("DXD60RT") || xinghao.contains("C6000")|| "ESUR-H600".equals(xinghao)) {
+                || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "ESUR-H600".equals(xinghao)) {
             try {
                 serialPort.OpenSerial("/dev/ttyMT0", 115200);
             } catch (IOException e) {
