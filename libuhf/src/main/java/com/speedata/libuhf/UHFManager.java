@@ -415,12 +415,11 @@ public class UHFManager {
                 Log.d("ZM", "Build.MODEL: " + xinghao);
                 if ("SD60RT".equalsIgnoreCase(xinghao) || "MST-II-YN".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || "SD55L".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
                         || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "ESUR-H600".equals(xinghao)) {
-//                    powerOn(UHFDeviceControl.PowerType.NEW_MAIN, 86);
                     powerOn(DeviceControlSpd.PowerType.EXPAND, 9, 14);
 
                 } else if (xinghao.equals("SD55PTT")) {
                     powerOn(DeviceControlSpd.PowerType.NEW_MAIN, 8);
-                } else if (xinghao.contains("SD55") || xinghao.contains("R66")) {
+                } else if (xinghao.contains("SD55") || xinghao.contains("R66") || xinghao.contains("A56")) {
                     if (ConfigUtils.getApiVersion() > 23) {
                         powerOn(DeviceControlSpd.PowerType.NEW_MAIN, 12);
                     } else {
@@ -501,7 +500,7 @@ public class UHFManager {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else if (xinghao.contains("SD55") || xinghao.contains("R66")) {
+        } else if (xinghao.contains("SD55") || xinghao.contains("R66") || xinghao.contains("A56")) {
             if (ConfigUtils.getApiVersion() > 23) {
                 try {
                     serialPort.OpenSerial("/dev/ttyMT0", 115200);

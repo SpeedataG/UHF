@@ -296,7 +296,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            } else if (xinghao.contains("SD55") || xinghao.contains("R66")) {
+            } else if (xinghao.contains("SD55") || xinghao.contains("R66") || xinghao.contains("A56")) {
                 if (ConfigUtils.getApiVersion() > 23) {
                     try {
                         pw = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 12);
@@ -388,7 +388,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             result = getLinkage().open_serial(SERIALPORT_SD60);
         } else if (xinghao.equals("SD55PTT")) {
             result = getLinkage().open_serial(SERIALPORT1);
-        } else if (xinghao.contains("SD55") || xinghao.contains("R66")) {
+        } else if (xinghao.contains("SD55") || xinghao.contains("R66") || xinghao.contains("A56")) {
             if (ConfigUtils.getApiVersion() > 23) {
                 result = getLinkage().open_serial(SERIALPORT0);
             } else {

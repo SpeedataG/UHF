@@ -173,7 +173,7 @@ public class XinLianQilian implements IUHFService {
                 } else {
                     return -1;
                 }
-            } else if (xinghao.contains("SD55") || xinghao.contains("R66")) {
+            } else if (xinghao.contains("SD55") || xinghao.contains("R66") || xinghao.contains("A56")) {
                 if (ConfigUtils.getApiVersion() > 23) {
                     try {
                         deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 12);
