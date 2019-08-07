@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.speedata.uhf">
+    coreApp="true"
+    package="com.speedata.uhf"
+    android:sharedUserId="android.uid.system">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!--在新更新需要的权限-->
@@ -11,7 +13,7 @@
     <uses-permission android:name="android.permission.READ_LOGS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
@@ -35,13 +37,14 @@
             android:name="com.tencent.bugly.beta.ui.BetaActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|locale"
             android:theme="@android:style/Theme.Translucent" />
+
         <service
             android:name=".MyService"
             android:enabled="true"
             android:exported="true"></service>
         <receiver android:name=".StartService">
             <intent-filter>
-                <action android:name="com.spd.action.start_server"/>
+                <action android:name="com.spd.action.start_server" />
             </intent-filter>
         </receiver>
 

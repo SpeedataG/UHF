@@ -83,15 +83,7 @@ public class UHFManager {
         if (iuhfService == null) {
             //  判断模块   返回不同的模块接口对象
             mContext = context.getApplicationContext();
-//            createTempTimer();
-//            if (batteryReceiver == null) {
-//                //注册广播接受者java代码
-//                IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-//                //创建广播接受者对象
-//                batteryReceiver = new BatteryReceiver();
-//                //注册receiver
-//                mContext.registerReceiver(batteryReceiver, intentFilter);
-//            }
+            createTempTimer();
             if (!judgeModel()) {
                 return null;
             }
@@ -274,8 +266,7 @@ public class UHFManager {
 
     public static void closeUHFService() {
         iuhfService = null;
-//        stopTimer();
-//        unregisterReceiver();
+        stopTimer();
     }
 
     public static void unregisterReceiver() {
