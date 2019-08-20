@@ -125,8 +125,6 @@ public class UHFManager {
     private static String getCpuTemp() {
         String temp = "Unknow";
         float tempFloat = 0;
-        BufferedReader br = null;
-        FileReader fr = null;
         try {
             File dir = new File("/sys/class/thermal/");
             File[] files = dir.listFiles(new FileFilter() {
@@ -143,16 +141,21 @@ public class UHFManager {
             String line = "";
             String type = "";
             for (int i = 0; i < SIZE; i++) {
-                fr = new FileReader("/sys/class/thermal/thermal_zone" + i + "/type");
-                br = new BufferedReader(fr);
-                line = br.readLine();
+                FileReader frType = new FileReader("/sys/class/thermal/thermal_zone" + i + "/type");
+                BufferedReader brType = new BufferedReader(frType);
+                line = brType.readLine();
                 if (line != null) {
                     type = line;
                 }
+                frType.close();
+                brType.close();
 
-                fr = new FileReader("/sys/class/thermal/thermal_zone" + i + "/temp");
-                br = new BufferedReader(fr);
-                line = br.readLine();
+                FileReader frTemp = new FileReader("/sys/class/thermal/thermal_zone" + i + "/temp");
+                Log.d("input", "fr:" + frTemp);
+                BufferedReader brTemp = new BufferedReader(frTemp);
+                line = brTemp.readLine();
+                frTemp.close();
+                brTemp.close();
                 if (line != null) {
                     // MTK CPU mt6356tsbuck1 mt6356tsbuck2
                     if (type.contains("mt6356tsbuck")) {
@@ -177,35 +180,11 @@ public class UHFManager {
                             temp = temperature + "";
                         }
                     }
-
                 }
-            }
-
-            if (fr != null) {
-                fr.close();
-            }
-            if (br != null) {
-                br.close();
             }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (fr != null) {
-                try {
-                    fr.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
         }
-
         return temp;
     }
 
@@ -218,7 +197,6 @@ public class UHFManager {
             myTimerTask = new TimerTask() {
                 @Override
                 public void run() {
-                    InputStream battTempFile;
                     String mtTemp = "Unknow";
                     double mtTemperature = 0.0;
                     try {
@@ -232,19 +210,20 @@ public class UHFManager {
                                 stopUseUHFByTemp();
                             }
                         } else {
-                            battTempFile = new FileInputStream("sys/class/power_supply/battery/batt_temp");
+                            InputStream battTempFile = new FileInputStream("sys/class/power_supply/battery/batt_temp");
                             String battTempFileStr = convertStreamToString(battTempFile);
                             double t = Integer.parseInt(battTempFileStr) / 10.0;
                             Log.d("zzc:", "battTemp 温度: " + t + " 一直检测：");
                             if (t >= battTemperatureLevel) {
                                 stopUseUHFByTemp();
                             }
+                            battTempFile.close();
                         }
-
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-
                 }
             };
             timer.schedule(myTimerTask, 0, 1000);

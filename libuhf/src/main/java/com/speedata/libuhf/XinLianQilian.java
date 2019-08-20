@@ -15,6 +15,7 @@ import android.util.Log;
 import android.serialport.DeviceControlSpd;
 import android.widget.Toast;
 
+import com.pow.api.cls.RfidPower;
 import com.speedata.libuhf.bean.SpdInventoryData;
 import com.speedata.libuhf.bean.SpdReadData;
 import com.speedata.libuhf.bean.SpdWriteData;
@@ -1744,28 +1745,29 @@ public class XinLianQilian implements IUHFService {
         @Override
         public void run() {
             Log.d(TAG, "run: 1111111111111111111111");
+            String tag = null;
             int[] tagcnt = new int[1];
             tagcnt[0] = 0;
             synchronized (this) {
                 Reader.READER_ERR er;
-                int[] uants = Rparams.uants;
-                if (!inSearch) {
-                    inventoryStop();
-                }
+//                int[] uants = Rparams.uants;
+//                if (!inSearch) {
+//                    inventoryStop();
+//                }
                 Log.d(TAG, "run: 2222222222222222222222222222");
                 if (nostop) {
                     er = Mreader.AsyncGetTagCount(tagcnt);
                 } else {
-                    er = Mreader.TagInventory_Raw(uants,
+                    er = Mreader.TagInventory_Raw(Rparams.uants,
                             Rparams.uants.length,
                             (short) Rparams.readtime, tagcnt);
                 }
                 if (er == Reader.READER_ERR.MT_OK_ERR) {
                     if (tagcnt[0] > 0) {
                         for (int i = 0; i < tagcnt[0]; i++) {
-                            if (!inSearch) {
-                                inventoryStop();
-                            }
+//                            if (!inSearch) {
+//                                inventoryStop();
+//                            }
                             Log.d(TAG, "run: 33333333333");
                             Reader.TAGINFO tfs = Mreader.new TAGINFO();
                             if (nostop) {
