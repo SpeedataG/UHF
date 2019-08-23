@@ -9,6 +9,8 @@ import com.speedata.libuhf.interfaces.OnSpdWriteListener;
 
 import com.uhf.structures.DynamicQParams;
 import com.uhf.structures.FixedQParams;
+import com.uhf.structures.InventoryData;
+import com.uhf.structures.KrSm7Data;
 import com.uhf.structures.RW_Params;
 import com.uhf.structures.SelectCriteria;
 
@@ -19,26 +21,26 @@ import com.uhf.structures.SelectCriteria;
 
 public interface IUHFService {
 
-    public static final int REGION_CHINA_840_845 = 0;
-    public static final int REGION_CHINA_920_925 = 1;
-    public static final int REGION_CHINA_902_928 = 2;
-    public static final int REGION_EURO_865_868 = 3;
+    int REGION_CHINA_840_845 = 0;
+    int REGION_CHINA_920_925 = 1;
+    int REGION_CHINA_902_928 = 2;
+    int REGION_EURO_865_868 = 3;
 //    public static final int REGION_920_5_924_5 = 3;
 
-    public static final int RESERVED_A = 0;
-    public static final int EPC_A = 1;
-    public static final int TID_A = 2;
-    public static final int USER_A = 3;
-    public static final int FAST_MODE = 0;
-    public static final int SMART_MODE = 1;
-    public static final int LOW_POWER_MODE = 2;
-    public static final int USER_MODE = 3;
-    public static final String SERIALPORT0 = "/dev/ttyMT0";
-    public static final String SERIALPORT1 = "/dev/ttyMT1";
-    public static final String SERIALPORT = "/dev/ttyMT2";
-    public static final String SERIALPORT_SD100 = "/dev/ttyHSL2";
-    public static final String SERIALPORT_SD60 = "/dev/ttyMT0";
-    public static final String POWERCTL = "/sys/class/misc/mtgpio/pin";
+    int RESERVED_A = 0;
+    int EPC_A = 1;
+    int TID_A = 2;
+    int USER_A = 3;
+    int FAST_MODE = 0;
+    int SMART_MODE = 1;
+    int LOW_POWER_MODE = 2;
+    int USER_MODE = 3;
+    String SERIALPORT0 = "/dev/ttyMT0";
+    String SERIALPORT1 = "/dev/ttyMT1";
+    String SERIALPORT = "/dev/ttyMT2";
+    String SERIALPORT_SD100 = "/dev/ttyHSL2";
+    String SERIALPORT_SD60 = "/dev/ttyMT0";
+    String POWERCTL = "/sys/class/misc/mtgpio/pin";
 
     //*************************************************共用接口*********************************************************
 
@@ -47,12 +49,12 @@ public interface IUHFService {
      *
      * @return
      */
-    public int openDev();
+    int openDev();
 
     /**
      * 释放模块下电
      */
-    public void closeDev();
+    void closeDev();
 
     //*************************************************新版接口*********************************************************
 
@@ -61,24 +63,24 @@ public interface IUHFService {
      *
      * @param onSpdInventoryListener
      */
-    public void setOnInventoryListener(OnSpdInventoryListener onSpdInventoryListener);
+    void setOnInventoryListener(OnSpdInventoryListener onSpdInventoryListener);
 
     /**
      * 开始盘点
      */
-    public void inventoryStart();
+    void inventoryStart();
 
     /**
      * 停止盘点
      */
-    public void inventoryStop();
+    void inventoryStop();
 
     /**
      * 设置读数据监听
      *
      * @param onSpdReadListener
      */
-    public void setOnReadListener(OnSpdReadListener onSpdReadListener);
+    void setOnReadListener(OnSpdReadListener onSpdReadListener);
 
     /**
      * 读卡
@@ -89,14 +91,14 @@ public interface IUHFService {
      * @param passwd 密码
      * @return 0成功-1失败
      */
-    public int readArea(int area, int addr, int count, String passwd);
+    int readArea(int area, int addr, int count, String passwd);
 
     /**
      * 设置写数据监听
      *
      * @param onSpdWriteListener
      */
-    public void setOnWriteListener(OnSpdWriteListener onSpdWriteListener);
+    void setOnWriteListener(OnSpdWriteListener onSpdWriteListener);
 
     /**
      * 写卡
@@ -108,7 +110,7 @@ public interface IUHFService {
      * @param content 内容
      * @return 返回状态码
      */
-    public int writeArea(int area, int addr, int count, String passwd, byte[] content);
+    int writeArea(int area, int addr, int count, String passwd, byte[] content);
 
     /**
      * 设置密码
@@ -118,7 +120,7 @@ public interface IUHFService {
      * @param new_pass 新密码
      * @return 是否成功通过setOnWriteListener监听回调所得
      */
-    public int setPassword(int which, String cur_pass, String new_pass);
+    int setPassword(int which, String cur_pass, String new_pass);
 
     /**
      * 锁卡
@@ -128,26 +130,28 @@ public interface IUHFService {
      * @param passwd
      * @return
      */
-    public int setLock(int type, int area, String passwd);
+    int setLock(int type, int area, String passwd);
 
     /**
      * 销毁标签
+     *
      * @param accessPassword 访问密码
-     * @param killPassword 销毁密码
+     * @param killPassword   销毁密码
      * @return 0成功
      */
-    public int setKill(String accessPassword, String killPassword);
+    int setKill(String accessPassword, String killPassword);
 
     /**
      * 设置通话项
+     *
      * @param selected 默认0
-     * @param session 0-s0 1-s1 2-s2 3-s3
-     * @param target 默认0
-     * @return  返回0成功 -1失败
+     * @param session  0-s0 1-s1 2-s2 3-s3
+     * @param target   默认0
+     * @return 返回0成功 -1失败
      */
-    public int setQueryTagGroup(int selected, int session, int target);
+    int setQueryTagGroup(int selected, int session, int target);
 
-    public int getQueryTagGroup();
+    int getQueryTagGroup();
 
 
     /**
@@ -159,21 +163,21 @@ public interface IUHFService {
      * @param content 掩码内容
      * @return
      */
-    public int mask(int area, int addr, int length, byte[] content);
+    int mask(int area, int addr, int length, byte[] content);
 
     /**
      * 取消选卡
      *
      * @return
      */
-    public int cancelMask();
+    int cancelMask();
 
     /**
      * 获取掩码信息
      *
      * @return
      */
-    public SelectCriteria getMask();
+    SelectCriteria getMask();
 
     /**
      * @param rpaswd      密码 16进制byte
@@ -183,7 +187,7 @@ public interface IUHFService {
      * @param rangeType   状态类型 0为临时 1为永久
      * @return
      */
-    public int setQT(byte[] rpaswd, int cmdType, int memType, int persistType, int rangeType);
+    int setQT(byte[] rpaswd, int cmdType, int memType, int persistType, int rangeType);
 
     /**
      * 设置4QT标签的模式切换
@@ -193,7 +197,7 @@ public interface IUHFService {
      * @param accessPassword 访问密码
      * @return 0--成功 非零--失败
      */
-    public int setMonzaQtTagMode(int memMap, int maskFlag, byte[] accessPassword);
+    int setMonzaQtTagMode(int memMap, int maskFlag, byte[] accessPassword);
 
     /**
      * @param memMap  0私有区域，1 公有区域
@@ -203,7 +207,7 @@ public interface IUHFService {
      * @param length  读取长度
      * @return 0--成功 非0失败
      */
-    public int readMonzaQtTag(int memMap, byte[] pwd, int bank, int address, int length);
+    int readMonzaQtTag(int memMap, byte[] pwd, int bank, int address, int length);
 
     /**
      * @param memMap    0私有区域，1 公有区域
@@ -215,7 +219,7 @@ public interface IUHFService {
      * @param rw_params 读取的信息
      * @return 0--成功 非0失败
      */
-    public int readMonzaQtTagSync(int memMap, byte[] pwd, int bank, int address, int length, int timeOutMs, RW_Params rw_params);
+    int readMonzaQtTagSync(int memMap, byte[] pwd, int bank, int address, int length, int timeOutMs, RW_Params rw_params);
 
     /**
      * @param memMap    0私有区域，1 公有区域
@@ -226,7 +230,7 @@ public interface IUHFService {
      * @param writeData 写入的数据
      * @return 0--成功 非0失败
      */
-    public int writeMonzaQtTag(int memMap, byte[] pwd, int bank, int address, int length, byte[] writeData);
+    int writeMonzaQtTag(int memMap, byte[] pwd, int bank, int address, int length, byte[] writeData);
 
     /**
      * @param memMap    0私有区域，1 公有区域
@@ -239,7 +243,7 @@ public interface IUHFService {
      * @param rw_params 信息
      * @return 0--成功 非0失败
      */
-    public int writeMonzaQtTagSync(int memMap, byte[] pwd, int bank, int address, int length, byte[] writeData, int timeOutMs, RW_Params rw_params);
+    int writeMonzaQtTagSync(int memMap, byte[] pwd, int bank, int address, int length, byte[] writeData, int timeOutMs, RW_Params rw_params);
 
     /**
      * @param startQ    起始Q值
@@ -255,7 +259,7 @@ public interface IUHFService {
      * -4 不在重试次数0～10的取值范围内，无效重试次数
      * 其他值 查询厂商错误码
      */
-    public int setDynamicAlgorithm(int startQ, int minQ, int maxQ, int tryCount
+    int setDynamicAlgorithm(int startQ, int minQ, int maxQ, int tryCount
             , int target, int threshold);
 
     /**
@@ -268,83 +272,156 @@ public interface IUHFService {
      * -4 不在重试次数0～10的取值范围内，无效重试次数
      * 其他值 查询厂商错误码
      */
-    public int setFixedAlgorithm(int qValue, int tryCount, int target, int repeat);
+    int setFixedAlgorithm(int qValue, int tryCount, int target, int repeat);
 
 
-    public int getDynamicAlgorithm(DynamicQParams dynamicQParams);
+    int getDynamicAlgorithm(DynamicQParams dynamicQParams);
 
-    public int getFixedAlgorithm(FixedQParams fixedQParams);
+    int getFixedAlgorithm(FixedQParams fixedQParams);
 
-    public int setGen2QValue(int qValue);
+    int setGen2QValue(int qValue);
 
-    public int setGen2WriteMode(int wMode);
+    int setGen2WriteMode(int wMode);
 
-    public int setGen2Blf(int blf);
+    int setGen2Blf(int blf);
 
-    public int setGen2MaxLen(int maxLen);
+    default int setGen2MaxLen(int maxLen) {
+        return -1;
+    }
 
-    public int setGen2Target(int target);
+    int setGen2Target(int target);
 
-    public int setGen2Code(int code);
+    int setGen2Code(int code);
 
-    public int setGen2Tari(int tari);
+    int setGen2Tari(int tari);
 
-    public int[] getGen2AllValue();
+    int[] getGen2AllValue();
 
     /**
      * 开启快速模式
      *
      * @return 0成功 -1失败
      */
-    public int startFastMode();
+    int startFastMode();
 
     /**
      * 关闭快速模式
      *
      * @return 0成功 -1失败
      */
-    public int stopFastMode();
+    int stopFastMode();
 
     /**
      * 设置盘点超时时间
+     *
      * @param readTime 毫秒
      * @return
      */
-    public int setReadTime(int readTime);
+    int setReadTime(int readTime);
 
     /**
      * 获取盘点超时时间
+     *
      * @return
      */
-    public int getReadTime();
+    int getReadTime();
 
     /**
      * 设置盘点时间间隔
+     *
      * @param sleep 毫秒
      * @return
      */
-    public int setSleep(int sleep);
+    int setSleep(int sleep);
 
     /**
      * 获取盘点间隔时间
+     *
      * @return
      */
-    public int getSleep();
+    int getSleep();
+
+    //*****************坤瑞sm7认证接口************
+
+    /**
+     * 坤锐sm7盘点
+     *
+     * @param inventoryData 判断数据
+     * @return 默认 返回-1
+     */
+    default int krSm7Inventory(InventoryData inventoryData) {
+        return -1;
+    }
+
+
+    /**
+     * 坤锐sm7blocwrite
+     *
+     * @param length  长度
+     * @param addr    起始地址
+     * @param area    要操作的区
+     * @param pwd     标签密码
+     * @param content 写入的内容
+     * @return 转态码      return -1;
+     */
+    default int krSm7Blockwrite(int length, int addr, int area, byte[] pwd, byte[] content) {
+        return -1;
+    }
+
+    /**
+     * 坤锐正常写
+     *
+     * @param length  长度
+     * @param addr    起始地址
+     * @param area    要操作的区
+     * @param pwd     标签密码
+     * @param content 写入的内容
+     * @return 默认返回-1
+     */
+    default int krSm7Write(int length, int addr, int area, byte[] pwd, byte[] content) {
+        return -1;
+    }
+
+    /**
+     * 坤锐读取
+     *
+     * @param length    长度
+     * @param addr      起始地址
+     * @param area      要操作的区
+     * @param pwd       标签密码
+     * @param krSm7Data 读取内容
+     * @return 默认返回-1
+     */
+    default int krSm7Read(int length, int addr, int area, byte[] pwd, KrSm7Data krSm7Data) {
+        return -1;
+    }
+
+    /**
+     * 坤锐关闭
+     *
+     * @return 默认返回-1
+     */
+    default int krSm7End() {
+        return -1;
+    }
+
+    //****************************
+
 
     //********************************************老版接口（不再维护）***************************************************
 
 
     //开始盘点
-    public void inventory_start();
+    void inventory_start();
 
     // Handler用于处理返回的盘点数据
-    public void inventory_start(Handler hd);
+    void inventory_start(Handler hd);
 
     //设置密码
-    public int set_Password(int which, String cur_pass, String new_pass);
+    int set_Password(int which, String cur_pass, String new_pass);
 
     //停止盘点
-    public int inventory_stop();
+    int inventory_stop();
 
     /**
      * 从标签 area 区的 addr 位置（以 word 计算）读取 count 个值（以 byte 计算）
@@ -356,57 +433,57 @@ public interface IUHFService {
      * @param passwd
      * @return
      */
-    public byte[] read_area(int area, int addr, int count, String passwd);
+    byte[] read_area(int area, int addr, int count, String passwd);
 
-    public String read_area(int area, String str_addr
+    String read_area(int area, String str_addr
             , String str_count, String str_passwd);
 
 
     //把 content 中的数据写到标签 area 区中 addr（以 word 计算）开始的位 置。
-    public int write_area(int area, int addr, int count, String passwd, byte[] content);
+    int write_area(int area, int addr, int count, String passwd, byte[] content);
 
-    public int write_area(int area, String addr, String pwd, String count, String content);
+    int write_area(int area, String addr, String pwd, String count, String content);
 
 
     //选中要进行操作的 epc 标签
-    public int selectCard(int bank, byte[] epc, boolean mFlag);
+    int selectCard(int bank, byte[] epc, boolean mFlag);
 
-    public int selectCard(int bank, String epc, boolean mFlag);
+    int selectCard(int bank, String epc, boolean mFlag);
 
 
     //设置天线功率
-    public int setAntennaPower(int power);
+    int setAntennaPower(int power);
 
     //读取当前天线功率值
-    public int getAntennaPower();
+    int getAntennaPower();
 
     //设置频率区域
-    public int setFreqRegion(int region);
+    int setFreqRegion(int region);
 
-    public int getFreqRegion();
+    int getFreqRegion();
 
     //设置盘点的handler
-    public void reg_handler(Handler hd);
+    void reg_handler(Handler hd);
 
-    public int setlock(int type, int area, String passwd);
+    int setlock(int type, int area, String passwd);
 
     //拿到最近一次详细内部错误信息
-    public String GetLastDetailError();
+    String GetLastDetailError();
 
-    public int setInvMode(int invm, int addr, int length);
+    int setInvMode(int invm, int addr, int length);
 
-    public int getInvMode(int type);
+    int getInvMode(int type);
 
     //设置频点
-    public int setFrequency(double frequency);
+    int setFrequency(double frequency);
 
     //载波测试接口
-    public int enableEngTest(int gain);
+    int enableEngTest(int gain);
 
     /**
      * 设置反转 与 设置算法
      *
      * @return
      */
-    public int setDynamicAlgorithm();
+    int setDynamicAlgorithm();
 }
