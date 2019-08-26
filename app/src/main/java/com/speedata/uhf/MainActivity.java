@@ -136,7 +136,7 @@ public class MainActivity extends Activity implements OnClickListener {
     protected void onStop() {
         try {
             if (iuhfService != null) {
-//                iuhfService.closeDev();
+                iuhfService.closeDev();
                 Log.e("zzc:", "下电");
                 //断点后选卡操作会失效，需要重新选卡（掩码）
                 currentTagEpc = null;

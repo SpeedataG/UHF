@@ -54,7 +54,7 @@ public class XinLianQilian implements IUHFService {
     private static Reader Mreader = new Reader();
     private static int antportc;
     private Handler handler_inventer = null;
-    private Handler handler = new Handler();
+    private Handler handler = null;
     private ReaderParams Rparams = new ReaderParams();
     public boolean nostop = false;
     Reader.TagFilter_ST g2tf = null;
@@ -316,6 +316,10 @@ public class XinLianQilian implements IUHFService {
         if (Mreader != null) {
             Mreader.CloseReader();
         }
+        if (handler != null) {
+            Log.d(TAG, "handler==null==" + handler);
+            handler = null;
+        }
         if (ConfigUtils.isConfigFileExists() && !CommonUtils.subDeviceType().contains("55")) {
             try {
                 newUHFDeviceControl.PowerOffDevice();
@@ -374,9 +378,14 @@ public class XinLianQilian implements IUHFService {
         if (inSearch) {
             return;
         }
+        if (handler == null) {
+            handler = new Handler();
+        }
         inSearch = true;
         cancelSelect();
+        Log.d(TAG, "inventory_start: inv_thread" + inv_thread);
         handler.postDelayed(inv_thread, 0);
+        Log.d(TAG, "inventory_start: start" + handler);
     }
 
     /**
@@ -392,12 +401,13 @@ public class XinLianQilian implements IUHFService {
         try {
             if (handler != null) {
                 handler.removeCallbacks(inv_thread);
+                Log.d(TAG, "inventory_stop: end" + handler);
+                handler = null;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         SystemClock.sleep(500);
-        Log.d(TAG, "inventory_stop: end");
     }
 
     /**
@@ -1145,52 +1155,6 @@ public class XinLianQilian implements IUHFService {
             return -1;
         }
         SystemClock.sleep(500);
-//        if (er == Reader.READER_ERR.MT_OK_ERR) {
-//            return 0;
-//        } else if (er == Reader.READER_ERR.MT_IO_ERR) {
-//            return 1;
-//        } else if (er == Reader.READER_ERR.MT_INTERNAL_DEV_ERR) {
-//            return 2;
-//        } else if (er == Reader.READER_ERR.MT_CMD_FAILED_ERR) {
-//            return 3;
-//        } else if (er == Reader.READER_ERR.MT_CMD_NO_TAG_ERR) {
-//            return 4;
-//        } else if (er == Reader.READER_ERR.MT_M5E_FATAL_ERR) {
-//            return 5;
-//        } else if (er == Reader.READER_ERR.MT_OP_NOT_SUPPORTED) {
-//            return 6;
-//        } else if (er == Reader.READER_ERR.MT_INVALID_PARA) {
-//            return 7;
-//        } else if (er == Reader.READER_ERR.MT_INVALID_READER_HANDLE) {
-//            return 8;
-//        } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_HIGN_RETURN_LOSS) {
-//            return 9;
-//        } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_TOO_MANY_RESET) {
-//            return 10;
-//        } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_NO_ANTENNAS) {
-//            return 11;
-//        } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_HIGH_TEMPERATURE) {
-//            return 12;
-//        } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_READER_DOWN) {
-//            return 13;
-//        } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_UNKNOWN_ERR) {
-//            return 14;
-//        } else if (er == Reader.READER_ERR.M6E_INIT_FAILED) {
-//            return 15;
-//        } else if (er == Reader.READER_ERR.MT_OP_EXECING) {
-//            return 16;
-//        } else if (er == Reader.READER_ERR.MT_UNKNOWN_READER_TYPE) {
-//            return 17;
-//        } else if (er == Reader.READER_ERR.MT_OP_INVALID) {
-//            return 18;
-//        } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_BY_FAILED_RESET_MODLUE) {
-//            return 19;
-//        } else if (er == Reader.READER_ERR.MT_MAX_ERR_NUM) {
-//            return 20;
-//        } else {
-//            return 20;
-//        }
-//        handler.removeCallbacks(inv_thread);
         Log.d(TAG, "inventory_stop: end");
         return 0;
     }
@@ -1756,8 +1720,10 @@ public class XinLianQilian implements IUHFService {
 //                }
                 Log.d(TAG, "run: 2222222222222222222222222222");
                 if (nostop) {
+                    Log.d(TAG, "run: 2222222222222222222222222222==AsyncGetTagCount==");
                     er = Mreader.AsyncGetTagCount(tagcnt);
                 } else {
+                    Log.d(TAG, "run: 2222222222222222222222222222==TagInventory_Raw==");
                     er = Mreader.TagInventory_Raw(Rparams.uants,
                             Rparams.uants.length,
                             (short) Rparams.readtime, tagcnt);
@@ -1771,8 +1737,10 @@ public class XinLianQilian implements IUHFService {
                             Log.d(TAG, "run: 33333333333");
                             Reader.TAGINFO tfs = Mreader.new TAGINFO();
                             if (nostop) {
+                                Log.d(TAG, "run: 33333333333==AsyncGetNextTag");
                                 er = Mreader.AsyncGetNextTag(tfs);
                             } else {
+                                Log.d(TAG, "run: 33333333333==GetNextTag");
                                 er = Mreader.GetNextTag(tfs);
                             }
 
@@ -1784,6 +1752,7 @@ public class XinLianQilian implements IUHFService {
                                 ArrayList<SpdInventoryData> cx = new ArrayList<SpdInventoryData>();
                                 SpdInventoryData tagData = new SpdInventoryData(null, strEPCTemp, rssi);
                                 if (handler_inventer == null) {
+                                    Log.d(TAG, "run: 4444444444==inventoryCallBack");
                                     inventoryCallBack(tagData);
                                 } else {
                                     cx.add(tagData);
@@ -1792,6 +1761,7 @@ public class XinLianQilian implements IUHFService {
                                     msg.obj = cx;
                                     handler_inventer.sendMessage(msg);
                                 }
+                                cx.clear();
                             }
                         }
                     }
@@ -1850,6 +1820,7 @@ public class XinLianQilian implements IUHFService {
                     inventoryStop();
                 }
             }
+            Log.d(TAG, "run:5555555555555==next");
             handler.postDelayed(this, Rparams.sleep);
         }
     };
@@ -1930,8 +1901,8 @@ public class XinLianQilian implements IUHFService {
             invpro.add("GEN2");
             uants = new int[1];
             uants[0] = 1;
-            sleep = 0;
-            readtime = 50;
+            sleep = 50;
+            readtime = 100;
             optime = 1000;
             opro = "GEN2";
             checkant = 1;

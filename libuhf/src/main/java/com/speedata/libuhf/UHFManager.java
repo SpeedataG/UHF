@@ -142,15 +142,31 @@ public class UHFManager {
                 if (line != null) {
                     type = line;
                 }
-                frType.close();
-                brType.close();
+                //不再使用的时候要及时释放对象
+                try{
+                    frType.close();
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
+                try{
+                    brType.close();
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
 
                 FileReader frTemp = new FileReader("/sys/class/thermal/thermal_zone" + i + "/temp");
-                Log.d("input", "fr:" + frTemp);
                 BufferedReader brTemp = new BufferedReader(frTemp);
                 line = brTemp.readLine();
-                frTemp.close();
-                brTemp.close();
+                try{
+                    frTemp.close();
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
+                try{
+                    brTemp.close();
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
                 if (line != null) {
                     // MTK CPU mt6356tsbuck1 mt6356tsbuck2
                     if (type.contains("mt6356tsbuck")) {
