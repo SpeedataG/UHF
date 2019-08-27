@@ -11,6 +11,7 @@ import android.serialport.DeviceControlSpd;
 import android.serialport.SerialPortSpd;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.speedata.libuhf.interfaces.OnSpdBanMsgListener;
 import com.speedata.libuhf.utils.CommonUtils;
@@ -31,6 +32,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Pattern;
+
+import cn.com.example.rfid.driver.Driver;
+import cn.com.example.rfid.driver.RfidDriver;
 
 import static android.content.ContentValues.TAG;
 
@@ -58,6 +62,7 @@ public class UHFManager {
     private final static String FACTORY_FEILIXIN = "feilixin";
     private final static String FACTORY_XINLIAN = "xinlian";
     private final static String FACTORY_R2000 = "r2k";
+    private final static String FACTORY_YIXIN = "yixin";
     private final static String FACTORY_3992 = "as3992";
     private static int fd;
     private static DeviceControlSpd pw;
@@ -143,28 +148,28 @@ public class UHFManager {
                     type = line;
                 }
                 //不再使用的时候要及时释放对象
-                try{
+                try {
                     frType.close();
-                }catch (IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
-                try{
+                try {
                     brType.close();
-                }catch (IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
 
                 FileReader frTemp = new FileReader("/sys/class/thermal/thermal_zone" + i + "/temp");
                 BufferedReader brTemp = new BufferedReader(frTemp);
                 line = brTemp.readLine();
-                try{
+                try {
                     frTemp.close();
-                }catch (IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
-                try{
+                try {
                     brTemp.close();
-                }catch (IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
                 if (line != null) {
@@ -369,6 +374,10 @@ public class UHFManager {
 //            case FACTORY_3992:
 //                iuhfService = new com.android.uhflibs.as3992_native(mContext);
 //                break;
+            case FACTORY_YIXIN:
+                // TODO: 2019/8/26   初始化一芯sdk
+                iuhfService = new YiXin(mContext);
+                break;
             default:
                 initResult = false;
                 break;
@@ -475,56 +484,33 @@ public class UHFManager {
     private static String getModel() {
         String factory = "";
         SerialPortSpd serialPort = new SerialPortSpd();
+        String port = "/dev/ttyMT0";
 //        String xinghao = Build.MODEL;
         String xinghao = SystemProperties.get("ro.product.model");
         if ("SD60RT".equalsIgnoreCase(xinghao) || "MST-II-YN".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
                 || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "ESUR-H600".equals(xinghao)) {
-            try {
-                serialPort.OpenSerial("/dev/ttyMT0", 115200);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            port = "/dev/ttyMT0";
         } else if (xinghao.equals("SD55PTT")) {
-            try {
-                serialPort.OpenSerial("/dev/ttyMT1", 115200);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            port = "/dev/ttyMT1";
         } else if (xinghao.contains("SD55") || xinghao.contains("R66") || xinghao.contains("A56")) {
             if (ConfigUtils.getApiVersion() > 23) {
-                try {
-                    serialPort.OpenSerial("/dev/ttyMT0", 115200);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                port = "/dev/ttyMT0";
             } else {
-                try {
-                    serialPort.OpenSerial("/dev/ttyMT2", 115200);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                port = "/dev/ttyMT2";
             }
         } else if (xinghao.equalsIgnoreCase("SD100")) {
-            try {
-                serialPort.OpenSerial("/dev/ttyHSL2", 115200);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            port = "/dev/ttyHSL2";
         } else if (xinghao.equalsIgnoreCase("SD100T") || xinghao.equalsIgnoreCase("X47")) {
-            try {
-                serialPort.OpenSerial("/dev/ttyMT0", 115200);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            port = "/dev/ttyMT0";
         } else {
-            try {
-                serialPort.OpenSerial("/dev/ttyMT2", 115200);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            port = "/dev/ttyMT2";
         }
-
-        fd = serialPort.getFd();
+        try {
+            serialPort.OpenSerial(port, 115200);
+            fd = serialPort.getFd();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         byte[] bytes = new byte[1024];
 
         //判断是不是R2000
@@ -601,10 +587,44 @@ public class UHFManager {
             }
         }
 
-
         serialPort.CloseSerial(fd);
+        //判断是不是一芯uhf
+        if (!getyiXinVersion(port).isEmpty()) {
+            return FACTORY_YIXIN;
+        }
         powerOff();
         return null;
+    }
+
+    /**
+     * 读取判断一芯uhf版本
+     *
+     * @return 一芯固件版本
+     */
+    private static String getyiXinVersion(String setialPort) {
+        String fwBuffer;
+        Driver driver = new RfidDriver();
+        int status = driver.initRFID(setialPort);
+        if (-1000 == status) {
+            return "";
+        }
+        fwBuffer = driver.readUM7fwOnce();
+        if (fwBuffer.equals("-1000")) {
+            Log.d("ZM", "判断是不是一芯: " + fwBuffer);
+            return "";
+        } else if (fwBuffer.equals("-1020")) {
+            Log.d("ZM", "判断是不是一芯: " + fwBuffer);
+            return "";
+        }
+
+        StringBuilder fw = new StringBuilder(fwBuffer);
+        fw.insert(0, "固件版本号：");
+        fw.insert(8, ".");
+        fw.insert(11, ".");
+        String Sfw = fw.toString();
+        Log.d("ZM", "判断是不是一芯: " + Sfw);
+        driver.Close_Com();
+        return Sfw;
     }
 
     private static void powerOff() {

@@ -29,6 +29,7 @@ import com.speedata.libuhf.UHFManager;
 import com.speedata.libuhf.bean.SpdInventoryData;
 import com.speedata.libuhf.interfaces.OnSpdInventoryListener;
 import com.speedata.libuhf.utils.SharedXmlUtil;
+import com.speedata.uhf.MainActivity;
 import com.speedata.uhf.MsgEvent;
 import com.speedata.uhf.R;
 import com.speedata.uhf.excel.EPCBean;
@@ -112,10 +113,10 @@ public class SearchTagDialog extends Dialog implements
 
 
         //新的Listener回调参考代码
-
         adapter = new ArrayAdapter<>(
                 cont, android.R.layout.simple_list_item_1, firm);
         epcList.setAdapter(adapter);
+
 
         iuhfService.setOnInventoryListener(new OnSpdInventoryListener() {
             @Override
@@ -124,6 +125,7 @@ public class SearchTagDialog extends Dialog implements
                 handler.sendMessage(handler.obtainMessage(1, var1));
             }
         });
+
         file = new File(CHARGING_PATH);
     }
 

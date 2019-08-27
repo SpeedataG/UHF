@@ -91,7 +91,23 @@ public interface IUHFService {
      * @param passwd 密码
      * @return 0成功-1失败
      */
-    int readArea(int area, int addr, int count, String passwd);
+    default int readArea(int area, int addr, int count, String passwd) {
+        return -1;
+    }
+
+    /**
+     * 一芯读卡
+     *
+     * @param pwd   密码
+     * @param data  需要过滤的数据
+     * @param bank1 区域
+     * @param ads1  起始地址1
+     * @param len1  长度1
+     * @return
+     */
+    default int yixinReadArea(String pwd, String data, int bank1, int ads1, int len1) {
+        return -1;
+    }
 
     /**
      * 设置写数据监听
@@ -110,7 +126,23 @@ public interface IUHFService {
      * @param content 内容
      * @return 返回状态码
      */
-    int writeArea(int area, int addr, int count, String passwd, byte[] content);
+    default int writeArea(int area, int addr, int count, String passwd, byte[] content) {
+        return -1;
+    }
+
+    /**
+     * @param pwd   密码
+     * @param data  epc数据
+     * @param bank1 区域
+     * @param ads1  起始地址
+     * @param len1  长度
+     * @param data1 需要修改的数据
+     * @return
+     */
+    default int yixinWriteArea(String pwd, String data, int bank1, int ads1, int len1, byte[] data1) {
+
+        return -1;
+    }
 
     /**
      * 设置密码
@@ -125,12 +157,27 @@ public interface IUHFService {
     /**
      * 锁卡
      *
-     * @param type
-     * @param area
-     * @param passwd
+     * @param type   权限类型
+     * @param area   q区域
+     * @param passwd 密码
      * @return
      */
-    int setLock(int type, int area, String passwd);
+    default int setLock(int type, int area, String passwd) {
+        return -1;
+    }
+
+    /**
+     * 一芯uhf解锁卡
+     *
+     * @param which     是否解锁
+     * @param pwd       访问密码
+     * @param Data      需要过滤的数据 例如epc
+     * @param bankvalue 需要锁定的区域 1：EPC；2：TID；	3：USER
+     * @return
+     */
+    default int yixinSetLock(int which, String pwd, String Data, int bankvalue) {
+        return -1;
+    }
 
     /**
      * 销毁标签
@@ -140,6 +187,16 @@ public interface IUHFService {
      * @return 0成功
      */
     int setKill(String accessPassword, String killPassword);
+
+    /**
+     * 一芯uhf  杀死标签
+     * @param pwd 访问密码
+     * @param data  epc
+     * @return
+     */
+    default int yixinSetKill(String pwd,  String data) {
+        return -1;
+    }
 
     /**
      * 设置通话项

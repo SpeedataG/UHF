@@ -116,9 +116,14 @@ public class WriteTagDialog extends Dialog implements
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    int writeArea = iuhfService.writeArea(which_choose, addr, count, str_passwd, write);
+                    int writeArea = -1;
+                    if ("yixin".equals(model)) {
+                        writeArea = iuhfService.yixinWriteArea(str_passwd, current_tag_epc, which_choose, addr, count, write);
+                    } else {
+                        writeArea = iuhfService.writeArea(which_choose, addr, count, str_passwd, write);
+                    }
                     if (writeArea != 0) {
-                        handler.sendMessage(handler.obtainMessage(1,mContext.getResources().getString(R.string.param_error)));
+                        handler.sendMessage(handler.obtainMessage(1, mContext.getResources().getString(R.string.param_error)));
                     }
                 }
             }).start();

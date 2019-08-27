@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.speedata.libuhf.IUHFService;
 import com.speedata.libuhf.bean.SpdReadData;
 import com.speedata.libuhf.interfaces.OnSpdReadListener;
+import com.speedata.libuhf.utils.SharedXmlUtil;
 import com.speedata.libuhf.utils.StringUtils;
 import com.speedata.uhf.R;
 
@@ -37,6 +38,8 @@ public class ReadTagDialog extends Dialog implements
     private int whichChoose;
     private Context mContext;
 
+    String model = "";
+
     public ReadTagDialog(Context context, IUHFService iuhfService
             , int whichChoose, String currentTagEpc, String model) {
         super(context);
@@ -45,6 +48,7 @@ public class ReadTagDialog extends Dialog implements
         this.currentTagEpc = currentTagEpc;
         this.whichChoose = whichChoose;
         this.mContext = context;
+        this.model = model;
     }
 
     @Override
@@ -103,7 +107,12 @@ public class ReadTagDialog extends Dialog implements
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    int readArea = iuhfService.readArea(whichChoose, addr, count, strPasswd);
+                    int readArea = -1;
+                    if ("yixin".equals(model)) {
+                        readArea = iuhfService.yixinReadArea(strPasswd, currentTagEpc, whichChoose, addr, count);
+                    } else {
+                        readArea = iuhfService.readArea(whichChoose, addr, count, strPasswd);
+                    }
                     if (readArea != 0) {
                         handler.sendMessage(handler.obtainMessage(1, mContext.getResources().getString(R.string.param_error)));
                     }

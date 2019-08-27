@@ -58,7 +58,9 @@ public class LockTagDialog extends Dialog implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.locktag);
-
+        if ("yixin".equals(model)) {
+            area_list = new String[]{"EPC", "TID", "USER"};
+        }
         Ok = (Button) findViewById(R.id.btn_lock_ok);
         Ok.setOnClickListener(this);
         Cancle = (Button) findViewById(R.id.btn_lock_cancle);
@@ -120,9 +122,14 @@ public class LockTagDialog extends Dialog implements
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    int reval = iuhfService.setLock(style_nr, area_nr, ps);
+                    int reval = -1;
+                    if ("yixin".equals(model)) {
+                        reval = iuhfService.yixinSetLock(style_nr, ps, current_tag_epc, area_nr+1);
+                    } else {
+                        reval = iuhfService.setLock(style_nr, area_nr, ps);
+                    }
                     if (reval != 0) {
-                        handler.sendMessage(handler.obtainMessage(1,mContext.getResources().getString(R.string.param_error)));
+                        handler.sendMessage(handler.obtainMessage(1, mContext.getResources().getString(R.string.param_error)));
                     }
                 }
             }).start();

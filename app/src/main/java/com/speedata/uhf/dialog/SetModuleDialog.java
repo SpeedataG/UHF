@@ -27,6 +27,7 @@ public class SetModuleDialog extends Dialog implements View.OnClickListener {
 
     //其他模块频段
     private final String[] freq_area_item = {"840-845", "920-925", "902-928", "865-868", "..."};
+    private final String[] yixin_freq_area_item = {"中国1", "中国2", "欧洲", "美国", "韩国", "日本", "..."};
     //R2000模块频段
     private final String[] r2k_freq_area_item = {"840-845", "920-925", "902-928",
             "865-868", "当前状态为定频", "..."};
@@ -47,8 +48,6 @@ public class SetModuleDialog extends Dialog implements View.OnClickListener {
     private boolean isSet = false;
 
 
-
-
     public SetModuleDialog(Context context, IUHFService iuhfService, String model) {
         super(context);
         this.iuhfService = iuhfService;
@@ -67,6 +66,9 @@ public class SetModuleDialog extends Dialog implements View.OnClickListener {
             ll_dianpin.setVisibility(View.VISIBLE);
             tmp = new ArrayAdapter<String>(this.getContext(),
                     android.R.layout.simple_spinner_item, r2k_freq_area_item);
+        } else if ("yixin".equals(model)) {
+            tmp = new ArrayAdapter<String>(this.getContext(),
+                    android.R.layout.simple_spinner_item, yixin_freq_area_item);
         } else {
             tmp = new ArrayAdapter<String>(this.getContext(),
                     android.R.layout.simple_spinner_item, freq_area_item);
@@ -93,6 +95,30 @@ public class SetModuleDialog extends Dialog implements View.OnClickListener {
                 et_pin_dian.setText(String.valueOf(new DecimalFormat("0.000").format(re / 1000.0)));
                 ll_zaibo.setVisibility(View.VISIBLE);
             }
+        } else if ("yixin".equals(model)) {
+            switch (re) {
+                case 0x01:
+                    lf.setSelection(0);
+                    break;
+                case 0x02:
+                    lf.setSelection(1);
+                    break;
+                case 0x04:
+                    lf.setSelection(2);
+                    break;
+                case 0x08:
+                    lf.setSelection(3);
+                    break;
+                case 0x16:
+                    lf.setSelection(4);
+                    break;
+                case 0x32:
+                    lf.setSelection(5);
+                    break;
+                default:
+                    break;
+            }
+
         } else {
             if (re == IUHFService.REGION_CHINA_920_925) {
                 lf.setSelection(1, true);
@@ -162,13 +188,13 @@ public class SetModuleDialog extends Dialog implements View.OnClickListener {
             }
 
         } else if (v == back) {
-            if (isSet){
+            if (isSet) {
                 new toast_thread().setr(mContext.getResources().getString(R.string.toast_update_now)).start();
             }
             dismiss();
         } else if (v == setp) {
             String power = pv.getText().toString();
-            if (power.isEmpty()){
+            if (power.isEmpty()) {
                 status.setText(R.string.param_not_null);
                 return;
             }
@@ -178,7 +204,7 @@ public class SetModuleDialog extends Dialog implements View.OnClickListener {
             } else {
                 int rv = iuhfService.setAntennaPower(ivp);
                 if (rv < 0) {
-                    status.setText(R.string.set_power_fail );
+                    status.setText(R.string.set_power_fail);
                 } else {
                     status.setText(R.string.set_power_ok);
                     back.setText(R.string.update_set);
@@ -188,7 +214,7 @@ public class SetModuleDialog extends Dialog implements View.OnClickListener {
             }
         } else if (v == button_set_pindian) {
             String parse = et_pin_dian.getText().toString();
-            if (parse.isEmpty()){
+            if (parse.isEmpty()) {
                 status.setText(R.string.param_not_null);
                 return;
             }
@@ -203,7 +229,7 @@ public class SetModuleDialog extends Dialog implements View.OnClickListener {
             }
         } else if (v == button_zaibo) {
             String parse = et_zaibo.getText().toString();
-            if (parse.isEmpty()){
+            if (parse.isEmpty()) {
                 status.setText(R.string.param_not_null);
                 return;
             }
