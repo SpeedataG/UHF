@@ -155,6 +155,17 @@ public interface IUHFService {
     int setPassword(int which, String cur_pass, String new_pass);
 
     /**
+     *
+     * @param which
+     * @param cur_pass  原始密码
+     * @param new_pass  新密码
+     * @param data  要设置密码的卡片epc
+     * @return
+     */
+    default int yixinSetPwd(int which, String cur_pass, String new_pass,String data) {
+        return -1;
+    }
+    /**
      * 锁卡
      *
      * @param type   权限类型
@@ -164,6 +175,22 @@ public interface IUHFService {
      */
     default int setLock(int type, int area, String passwd) {
         return -1;
+    }
+
+    /**
+     * 一芯寻标签过滤
+     * 取消过滤 ads=0 len=0
+     *
+     * @param bank 区域
+     * @param ads  起始地址
+     * @param len  长度
+     * @param data 数据 epc
+     * @param save 是否要掉电保存 	True：要；False：不要
+     * @return 0成功 失败 -1
+     */
+    default int yixinFilterEpc(int bank, int ads, int len, String data, Boolean save) {
+        return -1;
+
     }
 
     /**
@@ -189,12 +216,25 @@ public interface IUHFService {
     int setKill(String accessPassword, String killPassword);
 
     /**
-     * 一芯uhf  杀死标签
-     * @param pwd 访问密码
-     * @param data  epc
+     * 一芯 单独设置epc接口
+     *
+     * @param PwdWr 密码
+     * @param len   长度
+     * @param data
      * @return
      */
-    default int yixinSetKill(String pwd,  String data) {
+    default int yixinSetNewEpc(String PwdWr, int len, byte[] data) {
+        return -1;
+    }
+
+    /**
+     * 一芯uhf  杀死标签
+     *
+     * @param pwd  访问密码
+     * @param data epc
+     * @return
+     */
+    default int yixinSetKill(String pwd, String data) {
         return -1;
     }
 

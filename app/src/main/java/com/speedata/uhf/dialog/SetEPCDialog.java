@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.text.TextUtils;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,19 +32,21 @@ public class SetEPCDialog extends Dialog implements
     private TextView EPC;
     private TextView status;
     private EditText passwd;
-    private EditText newepc;
+    private EditText newepc ,epcLen;
     private EditText newepclength;
     private IUHFService iuhfService;
     private String currentTagEpc;
     private boolean isSuccess = false;
     private Context mContext;
+    private  String model;
 
-    public SetEPCDialog(Context context, IUHFService iuhfService, String currentTagEpc) {
+    public SetEPCDialog(Context context, IUHFService iuhfService, String currentTagEpc,String model) {
         super(context);
         // TODO Auto-generated constructor stub
         this.iuhfService = iuhfService;
         this.currentTagEpc = currentTagEpc;
         this.mContext = context;
+        this.model = model;
     }
 
     @Override
@@ -113,9 +116,17 @@ public class SetEPCDialog extends Dialog implements
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    int writeArea = set_EPC(epcl, password, write);
+                    int    writeArea = -1;
+                    if ("yixin".equals(model)) {
+                         writeArea= iuhfService.yixinSetNewEpc(password, epcl, write);
+                    }else {
+                        writeArea = set_EPC(epcl, password, write);
+                    }
                     if (writeArea != 0) {
                         handler.sendMessage(handler.obtainMessage(1, mContext.getResources().getString(R.string.param_error)));
+                    }else {
+                        handler.sendMessage(handler.obtainMessage(1, mContext.getResources().getString(R.string.toast_set_success)));
+
                     }
                 }
             }).start();

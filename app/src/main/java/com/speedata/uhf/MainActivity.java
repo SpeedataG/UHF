@@ -350,7 +350,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 return;
             }
             //写EPC
-            SetEPCDialog setEPCDialog = new SetEPCDialog(this, iuhfService, currentTagEpc);
+            SetEPCDialog setEPCDialog = new SetEPCDialog(this, iuhfService, currentTagEpc,model);
             setEPCDialog.setTitle(R.string.SetEPC_Btn);
             setEPCDialog.show();
         } else if (arg0 == lockTag)

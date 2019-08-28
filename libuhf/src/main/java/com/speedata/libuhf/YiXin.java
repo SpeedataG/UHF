@@ -398,67 +398,67 @@ public class YiXin implements IUHFService, OnSpdInventoryListener, OnReadWriteLi
      */
     @Override
     public void getReadWriteData(RW_Params rw_params) {
-        byte[] resultData = new byte[rw_params.EPCLen];
-        try {
-            byte[] epcData = rw_params.EPCData;
-            System.arraycopy(epcData, 0, resultData, 0, rw_params.EPCLen);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if (rw_params.type == 2) {
-            SpdReadData spdReadData = new SpdReadData();
-            spdReadData.setEPCData(resultData);
-            spdReadData.setEPCLen(rw_params.EPCLen);
-            Log.d("ZM", "读卡状态: " + rw_params.status);
-            if (rw_params.status == 0) {
-                byte[] readResultData = new byte[rw_params.DataLen];
-                byte[] readData = rw_params.ReadData;
-                System.arraycopy(readData, 0, readResultData, 0, rw_params.DataLen);
-                spdReadData.setReadData(readResultData);
-                this.epcData = readResultData;
-                isReadSuccess = true;
-                isReadOutTime = true;
-                Log.d("ZM", "读卡状态: " + isReadSuccess + isReadOutTime);
-            } else {
-//                this.epcData = null;
-                isReadOutTime = true;
-                spdReadData.setReadData(null);
-            }
-            spdReadData.setDataLen(rw_params.DataLen);
-            spdReadData.setRSS(rw_params.RSS);
-            spdReadData.setStatus(rw_params.status);
-            readCallBack(spdReadData);
-        } else if (rw_params.type == 3) {
-            writeStatus = rw_params.status;
-            Log.d("ZM", "写卡状态: " + rw_params.status);
-            if (rw_params.status == 0) {
-                isWriteSuccess = true;
-                isWriteOutTime = true;
-            }
-
-            SpdWriteData spdWriteData = new SpdWriteData();
-            spdWriteData.setEPCData(resultData);
-            spdWriteData.setEPCLen(rw_params.EPCLen);
-            spdWriteData.setRSS(rw_params.RSS);
-            spdWriteData.setStatus(rw_params.status);
-            writeCallBack(spdWriteData);
-        } else if (rw_params.type == 4 || rw_params.type == 5) {
-            lockStatus = rw_params.status;
-            Log.d("ZM", "锁卡状态: " + rw_params.status);
-            if (rw_params.status == 0) {
-                isLockSuccess = true;
-                isLockOutTime = true;
-            }
-
-            SpdWriteData spdWriteData = new SpdWriteData();
-            spdWriteData.setEPCData(resultData);
-            spdWriteData.setEPCLen(rw_params.EPCLen);
-            spdWriteData.setRSS(rw_params.RSS);
-            spdWriteData.setStatus(rw_params.status);
-            writeCallBack(spdWriteData);
-        }
-
+//        byte[] resultData = new byte[rw_params.EPCLen];
+//        try {
+//            byte[] epcData = rw_params.EPCData;
+//            System.arraycopy(epcData, 0, resultData, 0, rw_params.EPCLen);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        if (rw_params.type == 2) {
+//            SpdReadData spdReadData = new SpdReadData();
+//            spdReadData.setEPCData(resultData);
+//            spdReadData.setEPCLen(rw_params.EPCLen);
+//            Log.d("ZM", "读卡状态: " + rw_params.status);
+//            if (rw_params.status == 0) {
+//                byte[] readResultData = new byte[rw_params.DataLen];
+//                byte[] readData = rw_params.ReadData;
+//                System.arraycopy(readData, 0, readResultData, 0, rw_params.DataLen);
+//                spdReadData.setReadData(readResultData);
+//                this.epcData = readResultData;
+//                isReadSuccess = true;
+//                isReadOutTime = true;
+//                Log.d("ZM", "读卡状态: " + isReadSuccess + isReadOutTime);
+//            } else {
+////                this.epcData = null;
+//                isReadOutTime = true;
+//                spdReadData.setReadData(null);
+//            }
+//            spdReadData.setDataLen(rw_params.DataLen);
+//            spdReadData.setRSS(rw_params.RSS);
+//            spdReadData.setStatus(rw_params.status);
+//            readCallBack(spdReadData);
+//        } else if (rw_params.type == 3) {
+//            writeStatus = rw_params.status;
+//            Log.d("ZM", "写卡状态: " + rw_params.status);
+//            if (rw_params.status == 0) {
+//                isWriteSuccess = true;
+//                isWriteOutTime = true;
+//            }
+//
+//            SpdWriteData spdWriteData = new SpdWriteData();
+//            spdWriteData.setEPCData(resultData);
+//            spdWriteData.setEPCLen(rw_params.EPCLen);
+//            spdWriteData.setRSS(rw_params.RSS);
+//            spdWriteData.setStatus(rw_params.status);
+//            writeCallBack(spdWriteData);
+//        } else if (rw_params.type == 4 || rw_params.type == 5) {
+//            lockStatus = rw_params.status;
+//            Log.d("ZM", "锁卡状态: " + rw_params.status);
+//            if (rw_params.status == 0) {
+//                isLockSuccess = true;
+//                isLockOutTime = true;
+//            }
+//
+//            SpdWriteData spdWriteData = new SpdWriteData();
+//            spdWriteData.setEPCData(resultData);
+//            spdWriteData.setEPCLen(rw_params.EPCLen);
+//            spdWriteData.setRSS(rw_params.RSS);
+//            spdWriteData.setStatus(rw_params.status);
+//            writeCallBack(spdWriteData);
+//        }
+//
     }
 
     /**
@@ -512,20 +512,46 @@ public class YiXin implements IUHFService, OnSpdInventoryListener, OnReadWriteLi
         return 0;
     }
 
+    @Override
+    public int yixinSetPwd(int which, String cur_pass, String new_pass, String data) {
+        if (which > 1 || which < 0) {
+            return -1;
+        }
+        byte[] stringToByte = StringUtils.stringToByte(new_pass);
+        try {
+            if (which == 0) {
+                return yixinWriteArea(cur_pass, data, 0, 0, 2, stringToByte);
+            } else {
+                return yixinWriteArea(cur_pass, data, 0, 2, 2, stringToByte);
+            }
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
 
     @Override
     public int yixinSetLock(int which, String pwd, String Data, int bankvalue) {
+
         if (which == 0) {
             int ret = getDeriver().unLock_Tag_Data(pwd, 1, 32, 96, Data, bankvalue);
             if (ret == 0) {
+                SpdWriteData spdWriteData = new SpdWriteData();
+                spdWriteData.setEPCData(StringUtils.stringToByte(Data));
+                spdWriteData.setEPCLen(StringUtils.stringToByte(Data).length);
+                spdWriteData.setStatus(0);
+                writeCallBack(spdWriteData);
                 return 0;
             } else {
                 return -1;
             }
         } else if (which == 1) {
             int ret = getDeriver().Lock_Tag_Data(pwd, 1, 32, 96, Data, bankvalue);
-
             if (ret == 0) {
+                SpdWriteData spdWriteData = new SpdWriteData();
+                spdWriteData.setEPCData(StringUtils.stringToByte(Data));
+                spdWriteData.setEPCLen(StringUtils.stringToByte(Data).length);
+                spdWriteData.setStatus(0);
+                writeCallBack(spdWriteData);
                 return 0;
             } else {
                 return -1;
@@ -539,11 +565,34 @@ public class YiXin implements IUHFService, OnSpdInventoryListener, OnReadWriteLi
         }
     }
 
+    class LockTimeOutThread extends Thread {
+        @Override
+        public void run() {
+            super.run();
+            SystemClock.sleep(1000);
+            isLockOutTime = true;
+        }
+    }
+
     @Override
     public int setKill(String accessPassword, String killPassword) {
 
-
         return 0;
+    }
+
+    @Override
+    public int yixinSetNewEpc(String PwdWr, int len, byte[] data) {
+        int ret = getDeriver().Write_Epc_Data(PwdWr, 2, len, StringUtils.byteToHexString(data, data.length));
+        if (ret == 0) {
+            return 0;
+        } else {
+            return -1;
+        }
+    }
+
+    @Override
+    public int yixinFilterEpc(int bank, int ads, int len, String data, Boolean save) {
+        return getDeriver().Set_Filter_Data(bank, ads, len, data, save);
     }
 
     @Override
@@ -748,7 +797,7 @@ public class YiXin implements IUHFService, OnSpdInventoryListener, OnReadWriteLi
             return -1;
         } else {
             int status = getDeriver().setTxPowerOnce(power);
-            if (status == 1020) {
+            if (status == 1) {
                 return 0;
             } else {
                 return -1;
@@ -784,7 +833,7 @@ public class YiXin implements IUHFService, OnSpdInventoryListener, OnReadWriteLi
         } else if (-1020 == status) {
             // "数据错误", Toast.LENGTH_SHORT).show();
             return -1;
-        }else {
+        } else {
             return 0;
         }
     }
