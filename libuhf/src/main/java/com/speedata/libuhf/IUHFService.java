@@ -155,16 +155,16 @@ public interface IUHFService {
     int setPassword(int which, String cur_pass, String new_pass);
 
     /**
-     *
      * @param which
-     * @param cur_pass  原始密码
-     * @param new_pass  新密码
-     * @param data  要设置密码的卡片epc
+     * @param cur_pass 原始密码
+     * @param new_pass 新密码
+     * @param data     要设置密码的卡片epc
      * @return
      */
-    default int yixinSetPwd(int which, String cur_pass, String new_pass,String data) {
+    default int yixinSetPwd(int which, String cur_pass, String new_pass, String data) {
         return -1;
     }
+
     /**
      * 锁卡
      *
@@ -356,8 +356,10 @@ public interface IUHFService {
      * -4 不在重试次数0～10的取值范围内，无效重试次数
      * 其他值 查询厂商错误码
      */
-    int setDynamicAlgorithm(int startQ, int minQ, int maxQ, int tryCount
-            , int target, int threshold);
+    default int setDynamicAlgorithm(int startQ, int minQ, int maxQ, int tryCount
+            , int target, int threshold) {
+        return 0;
+    }
 
     /**
      * @param qValue   起始Q值  0～15
@@ -369,74 +371,106 @@ public interface IUHFService {
      * -4 不在重试次数0～10的取值范围内，无效重试次数
      * 其他值 查询厂商错误码
      */
-    int setFixedAlgorithm(int qValue, int tryCount, int target, int repeat);
+    default int setFixedAlgorithm(int qValue, int tryCount, int target, int repeat) {
+        return 0;
+    }
 
 
-    int getDynamicAlgorithm(DynamicQParams dynamicQParams);
+    default int getDynamicAlgorithm(DynamicQParams dynamicQParams) {
+        return 0;
+    }
 
-    int getFixedAlgorithm(FixedQParams fixedQParams);
+    default int getFixedAlgorithm(FixedQParams fixedQParams) {
+        return 0;
+    }
 
-    int setGen2QValue(int qValue);
+    default int setGen2QValue(int qValue) {
+        return 0;
+    }
 
-    int setGen2WriteMode(int wMode);
+    default int setGen2WriteMode(int wMode) {
+        return 0;
+    }
 
-    int setGen2Blf(int blf);
+    default int setGen2Blf(int blf) {
+        return 0;
+    }
 
     default int setGen2MaxLen(int maxLen) {
         return -1;
     }
 
-    int setGen2Target(int target);
+    default int setGen2Target(int target) {
+        return 0;
+    }
 
-    int setGen2Code(int code);
+    default int setGen2Code(int code) {
+        return 0;
+    }
 
-    int setGen2Tari(int tari);
+    default int setGen2Tari(int tari) {
+        return 0;
+    }
 
-    int[] getGen2AllValue();
+    default int[] getGen2AllValue() {
+        return null;
+    }
 
     /**
      * 开启快速模式
      *
      * @return 0成功 -1失败
      */
-    int startFastMode();
+    default int startFastMode() {
+        return 0;
+    }
 
     /**
      * 关闭快速模式
      *
      * @return 0成功 -1失败
      */
-    int stopFastMode();
+    default int stopFastMode() {
+        return 0;
+    }
 
     /**
      * 设置盘点超时时间
      *
      * @param readTime 毫秒
-     * @return
+     * @return -
      */
-    int setReadTime(int readTime);
+    default int setReadTime(int readTime) {
+        return 0;
+    }
 
     /**
      * 获取盘点超时时间
      *
-     * @return
+     * @return -
      */
-    int getReadTime();
+    default int getReadTime() {
+        return 0;
+    }
 
     /**
      * 设置盘点时间间隔
      *
      * @param sleep 毫秒
-     * @return
+     * @return -
      */
-    int setSleep(int sleep);
+    default int setSleep(int sleep) {
+        return 0;
+    }
 
     /**
      * 获取盘点间隔时间
      *
-     * @return
+     * @return -
      */
-    int getSleep();
+    default int getSleep() {
+        return 0;
+    }
 
     //*****************坤瑞sm7认证接口************
 

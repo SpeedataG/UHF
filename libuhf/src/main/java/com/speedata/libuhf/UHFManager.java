@@ -91,32 +91,6 @@ public class UHFManager {
         return iuhfService;
     }
 
-    private static void createTimer() {
-        if (timer == null) {
-            timer = new Timer();
-            if (myTimerTask != null) {
-                myTimerTask.cancel();
-            }
-            myTimerTask = new TimerTask() {
-                @Override
-                public void run() {
-                    InputStream battVoltFile;
-                    try {
-                        battVoltFile = new FileInputStream("sys/class/power_supply/battery/batt_vol");
-                        String battVoltFileStr = convertStreamToString(battVoltFile);
-                        double v = Integer.parseInt(battVoltFileStr) / 1000000.0;
-                        int antennaPower = SharedXmlUtil.getInstance(mContext).read("AntennaPower", 30);
-                        Log.d("zzc:", "battVolt: " + v + " antennaPower：" + antennaPower + " 一直检测：");
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            };
-            timer.schedule(myTimerTask, 0, 1000);
-        }
-    }
-
     /**
      * 读内核信息获取CPU温度
      *
@@ -403,7 +377,7 @@ public class UHFManager {
     }
 
     private static void noXmlJudgeModule() {
-        factory = SharedXmlUtil.getInstance(mContext).read("model", "");
+        factory = getUHFModel();
         if (TextUtils.isEmpty(factory)) {
             Log.d("ZM", String.valueOf(System.currentTimeMillis()));
             if (Build.VERSION.RELEASE.equals("4.4.2")) {
@@ -677,5 +651,9 @@ public class UHFManager {
             }
         }
         return sb.toString();
+    }
+
+    public static String getUHFModel() {
+        return SharedXmlUtil.getInstance(mContext).read("model", "");
     }
 }
