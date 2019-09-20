@@ -91,9 +91,7 @@ public interface IUHFService {
      * @param passwd 密码
      * @return 0成功-1失败
      */
-    default int readArea(int area, int addr, int count, String passwd) {
-        return -1;
-    }
+    int readArea(int area, int addr, int count, String passwd);
 
     /**
      * 一芯读卡
@@ -126,9 +124,7 @@ public interface IUHFService {
      * @param content 内容
      * @return 返回状态码
      */
-    default int writeArea(int area, int addr, int count, String passwd, byte[] content) {
-        return -1;
-    }
+    int writeArea(int area, int addr, int count, String passwd, byte[] content);
 
     /**
      * @param pwd   密码
@@ -173,9 +169,7 @@ public interface IUHFService {
      * @param passwd 密码
      * @return
      */
-    default int setLock(int type, int area, String passwd) {
-        return -1;
-    }
+    int setLock(int type, int area, String passwd);
 
     /**
      * 一芯寻标签过滤
@@ -230,7 +224,7 @@ public interface IUHFService {
     /**
      * 一芯uhf  杀死标签
      *
-     * @param pwd  访问密码
+     * @param pwd  销毁密码
      * @param data epc
      * @return
      */

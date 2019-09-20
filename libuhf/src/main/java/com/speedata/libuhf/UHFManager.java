@@ -575,10 +575,10 @@ public class UHFManager {
      *
      * @return 一芯固件版本
      */
-    private static String getyiXinVersion(String setialPort) {
+    private static String getyiXinVersion(String serialPort) {
         String fwBuffer;
         Driver driver = new RfidDriver();
-        int status = driver.initRFID(setialPort);
+        int status = driver.initRFID(serialPort);
         if (-1000 == status) {
             return "";
         }

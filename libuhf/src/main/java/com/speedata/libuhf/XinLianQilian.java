@@ -1711,9 +1711,6 @@ public class XinLianQilian implements IUHFService {
                 if (er == Reader.READER_ERR.MT_OK_ERR) {
                     if (tagcnt[0] > 0) {
                         for (int i = 0; i < tagcnt[0]; i++) {
-//                            if (!inSearch) {
-//                                inventoryStop();
-//                            }
                             Log.d(TAG, "run: 33333333333");
                             Reader.TAGINFO tfs = Mreader.new TAGINFO();
                             if (nostop) {
@@ -1801,7 +1798,9 @@ public class XinLianQilian implements IUHFService {
                 }
             }
             Log.d(TAG, "run:5555555555555==next");
-            handler.postDelayed(this, Rparams.sleep);
+            if (handler != null) {
+                handler.postDelayed(this, Rparams.sleep);
+            }
         }
     };
 
