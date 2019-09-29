@@ -24,11 +24,13 @@ import com.speedata.libuhf.utils.ReadBean;
 import com.speedata.libuhf.utils.SharedXmlUtil;
 import com.speedata.libuhf.utils.StringUtils;
 import com.uhf.linkage.Linkage;
+import com.uhf.structures.AntennaPorts;
 import com.uhf.structures.DynamicQParams;
 import com.uhf.structures.FixedQParams;
 import com.uhf.structures.InventoryData;
 import com.uhf.structures.InventoryParams;
-import com.uhf.structures.KrSm7Data;
+import com.uhf.structures.KrReadData;
+import com.uhf.structures.LowpowerParams;
 import com.uhf.structures.OnInventoryListener;
 import com.uhf.structures.OnReadWriteListener;
 import com.uhf.structures.RW_Params;
@@ -69,6 +71,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
     private int type = 0;
     private volatile boolean isWriteOutTime = false;
     private volatile boolean isWriteSuccess = false;
+    private int mode = 1;
 
     public FLX(Context mContext, int type) {
         this.mContext = mContext;
@@ -474,7 +477,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
      */
     @Override
     public void inventoryStart() {
-        getLinkage().startInventory(1,0);
+        getLinkage().startInventory(mode, 0);
     }
 
     /**
@@ -764,29 +767,29 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         return getLinkage().Radio_GetSingulationAlgorithmFixedParameters(fixedQParams);
     }
 
-    @Override
-    public int krSm7Inventory(InventoryData inventoryData) {
-        int result = getLinkage().krSm7Inventory(inventoryData);
-        return result;
-    }
-
-    @Override
-    public int krSm7Blockwrite(int length, int addr, int area, byte[] pwd, byte[] content) {
-        int result = getLinkage().krSm7Blockwrite(length, addr, area, pwd, content);
-        return result;
-    }
-
-    @Override
-    public int krSm7Write(int length, int addr, int area, byte[] pwd, byte[] content) {
-        int result = getLinkage().krSm7Write(length, addr, area, pwd, content);
-        return result;
-    }
-
-    @Override
-    public int krSm7Read(int length, int addr, int area, byte[] pwd, KrSm7Data krSm7Data) {
-        int result = getLinkage().krSm7Read(length, addr, area, pwd, krSm7Data);
-        return result;
-    }
+//    @Override
+//    public int krSm7Inventory(InventoryData inventoryData) {
+//        int result = getLinkage().krSm7Inventory(inventoryData);
+//        return result;
+//    }
+//
+//    @Override
+//    public int krSm7Blockwrite(int length, int addr, int area, byte[] pwd, byte[] content) {
+//        int result = getLinkage().krSm7Blockwrite(length, addr, area, pwd, content);
+//        return result;
+//    }
+//
+//    @Override
+//    public int krSm7Write(int length, int addr, int area, byte[] pwd, byte[] content) {
+//        int result = getLinkage().krSm7Write(length, addr, area, pwd, content);
+//        return result;
+//    }
+//
+//    @Override
+//    public int krSm7Read(int length, int addr, int area, byte[] pwd, KrReadData krReadData) {
+//        int result = getLinkage().krSm7Read(pwd, addr, area, length, krReadData);
+//        return result;
+//    }
 
     @Override
     public int krSm7End() {
@@ -794,6 +797,44 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         return result;
     }
 
+    @Override
+    public void setInvMode(int mode) {
+        this.mode = mode;
+    }
+
+    @Override
+    public int setLowpowerScheduler(int invOnTime, int invOffTime) {
+        LowpowerParams lowpoerParams = new LowpowerParams(0, invOnTime, invOffTime);
+        int result = getLinkage().setLowpowerScheduler(lowpoerParams);
+        return result;
+    }
+
+    @Override
+    public int[] getLowpowerScheduler() {
+        int[] a = new int[2];
+        LowpowerParams lowpowerParams = new LowpowerParams();
+        int res = getLinkage().getLowpowerScheduler(lowpowerParams);
+        if (res == 0) {
+            a[0] = lowpowerParams.getInventoryOnTime();
+            a[1] = lowpowerParams.getInventoryOffTime();
+            return a;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public int setDwellTime(int dwellTime) {
+        AntennaPorts antennaPorts = getAntennaPort();
+        int power = antennaPorts.getPowerLevel();
+        return getLinkage().setAntennaPort(0, 1, power, dwellTime, antennaPorts.getNumberInventoryCycles());
+    }
+
+    public AntennaPorts getAntennaPort() {
+        AntennaPorts antennaPorts = new AntennaPorts();
+        getLinkage().getAntennaPort(0, antennaPorts);
+        return antennaPorts;
+    }
 
     //********************************************老版接口（不再维护）******************************************
 
@@ -812,7 +853,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
 
     @Override
     public void inventory_start() {
-        getLinkage().startInventory(1,0);
+        getLinkage().startInventory(1, 0);
     }
 
     @Override

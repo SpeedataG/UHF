@@ -10,7 +10,7 @@ import com.speedata.libuhf.interfaces.OnSpdWriteListener;
 import com.uhf.structures.DynamicQParams;
 import com.uhf.structures.FixedQParams;
 import com.uhf.structures.InventoryData;
-import com.uhf.structures.KrSm7Data;
+import com.uhf.structures.KrReadData;
 import com.uhf.structures.RW_Params;
 import com.uhf.structures.SelectCriteria;
 
@@ -517,7 +517,7 @@ public interface IUHFService {
      * @param krSm7Data 读取内容
      * @return 默认返回-1
      */
-    default int krSm7Read(int length, int addr, int area, byte[] pwd, KrSm7Data krSm7Data) {
+    default int krSm7Read(int length, int addr, int area, byte[] pwd, KrReadData krSm7Data) {
         return -1;
     }
 
@@ -528,6 +528,40 @@ public interface IUHFService {
      */
     default int krSm7End() {
         return -1;
+    }
+
+    /**
+     * 飞利信设置盘点模式
+     *
+     * @param mode 1-高性能盘点 2-低功耗盘点
+     */
+    default void setInvMode(int mode) {
+
+    }
+
+    /**
+     * 设置低功耗模式调度计划
+     *
+     * @param invOnTime  持续工作时间
+     * @param invOffTime 休息时间
+     * @return 0成功
+     */
+    default int setLowpowerScheduler(int invOnTime, int invOffTime) {
+        return 0;
+    }
+
+    default int[] getLowpowerScheduler() {
+        return null;
+    }
+
+    /**
+     * 设置驻留时间
+     *
+     * @param dwellTime 驻留时间
+     * @return 0成功
+     */
+    default int setDwellTime(int dwellTime) {
+        return 0;
     }
 
     //****************************
@@ -595,8 +629,22 @@ public interface IUHFService {
     //拿到最近一次详细内部错误信息
     String GetLastDetailError();
 
+    /**
+     * 设置盘点模式（附加数据）
+     *
+     * @param invm   附加数据区
+     * @param addr   起始地址
+     * @param length 长度
+     * @return 0成功
+     */
     int setInvMode(int invm, int addr, int length);
 
+    /**
+     * 获取盘点模式
+     *
+     * @param type 0-附加区，1-起始地址，2-长度
+     * @return -1失败 非-1成功
+     */
     int getInvMode(int type);
 
     //设置频点

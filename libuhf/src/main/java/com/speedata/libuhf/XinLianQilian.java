@@ -1041,8 +1041,6 @@ public class XinLianQilian implements IUHFService {
     @Override
     public int startFastMode() {
         try {
-            Rparams.option = 0;
-            Rparams.sleep = 0;
             int[] uants = Rparams.uants;
             Reader.READER_ERR er = Mreader.AsyncStartReading(uants, Rparams.uants.length, 0);
             if (er == Reader.READER_ERR.MT_OK_ERR) {
@@ -1069,6 +1067,13 @@ public class XinLianQilian implements IUHFService {
         } catch (Exception e) {
             return -1;
         }
+    }
+
+    @Override
+    public int setLowpowerScheduler(int invOnTime, int invOffTime) {
+        Rparams.readtime = invOnTime;
+        Rparams.sleep = invOffTime;
+        return 0;
     }
 
     @Override
@@ -1650,12 +1655,55 @@ public class XinLianQilian implements IUHFService {
 
     @Override
     public int setInvMode(int invm, int addr, int length) {
-        return 0;
+        try {
+            Reader.EmbededData_ST edst = Mreader.new EmbededData_ST();
+            edst.accesspwd = null;
+            if (invm == 0) {
+                edst.bytecnt = 0;
+            } else {
+                edst.bank = invm + 1;
+                edst.startaddr = addr;
+                edst.bytecnt = length;
+            }
+            Reader.READER_ERR er = Mreader.ParamSet(
+                    Reader.Mtr_Param.MTR_PARAM_TAG_EMBEDEDDATA, edst);
+            if (er == Reader.READER_ERR.MT_OK_ERR) {
+                Rparams.emdadr = edst.startaddr;
+                Rparams.emdbank = edst.bank;
+                Rparams.emdbytec = edst.bytecnt;
+                Rparams.emdenable = 1;
+                return 0;
+            } else {
+                return -1;
+            }
+        } catch (Exception e) {
+            return -1;
+        }
     }
 
     @Override
     public int getInvMode(int type) {
-        return 0;
+        try {
+            Reader.EmbededData_ST edst2 = Mreader.new EmbededData_ST();
+            Reader.READER_ERR er = Mreader.ParamGet(
+                    Reader.Mtr_Param.MTR_PARAM_TAG_EMBEDEDDATA, edst2);
+            if (er == Reader.READER_ERR.MT_OK_ERR) {
+                switch (type) {
+                    case 0:
+                        return edst2.bank;
+                    case 1:
+                        return edst2.startaddr;
+                    case 2:
+                        return edst2.bytecnt;
+                    default:
+                        return -1;
+                }
+            } else {
+                return -1;
+            }
+        } catch (Exception e) {
+            return -1;
+        }
     }
 
     @Override
@@ -1742,7 +1790,10 @@ public class XinLianQilian implements IUHFService {
                             }
                         }
                     }
-
+                    Log.d(TAG, "run:5555555555555==next");
+                    if (handler != null) {
+                        handler.postDelayed(this, Rparams.sleep);
+                    }
                 } else {
                     Log.d(TAG, "run: err");
                     int errCode = -1;
@@ -1796,10 +1847,6 @@ public class XinLianQilian implements IUHFService {
                     }
                     inventoryStop();
                 }
-            }
-            Log.d(TAG, "run:5555555555555==next");
-            if (handler != null) {
-                handler.postDelayed(this, Rparams.sleep);
             }
         }
     };
