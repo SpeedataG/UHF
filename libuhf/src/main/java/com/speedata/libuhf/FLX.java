@@ -830,6 +830,12 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         return getLinkage().setAntennaPort(0, 1, power, dwellTime, antennaPorts.getNumberInventoryCycles());
     }
 
+    @Override
+    public int getDwellTime() {
+        AntennaPorts antennaPorts = getAntennaPort();
+        return antennaPorts.dwellTime;
+    }
+
     public AntennaPorts getAntennaPort() {
         AntennaPorts antennaPorts = new AntennaPorts();
         getLinkage().getAntennaPort(0, antennaPorts);

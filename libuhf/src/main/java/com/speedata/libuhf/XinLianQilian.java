@@ -1659,6 +1659,7 @@ public class XinLianQilian implements IUHFService {
             Reader.EmbededData_ST edst = Mreader.new EmbededData_ST();
             edst.accesspwd = null;
             if (invm == 0) {
+                edst.bank = invm + 1;
                 edst.bytecnt = 0;
             } else {
                 edst.bank = invm + 1;
@@ -1690,7 +1691,7 @@ public class XinLianQilian implements IUHFService {
             if (er == Reader.READER_ERR.MT_OK_ERR) {
                 switch (type) {
                     case 0:
-                        return edst2.bank;
+                        return edst2.bank - 1;
                     case 1:
                         return edst2.startaddr;
                     case 2:
@@ -1771,11 +1772,16 @@ public class XinLianQilian implements IUHFService {
 
                             if (er == Reader.READER_ERR.MT_OK_ERR) {
                                 byte[] n_epc = tfs.EpcId;
+                                byte[] n_tid = tfs.EmbededData;
                                 String strEPCTemp = ByteCharStrUtils.b2hexs(n_epc, n_epc.length);
+                                String strDataTemp = null;
+                                if (n_tid != null) {
+                                    strDataTemp = ByteCharStrUtils.b2hexs(n_tid, n_tid.length);
+                                }
                                 Log.d(TAG, "run: 4444444444");
                                 String rssi = String.valueOf(tfs.RSSI);
                                 ArrayList<SpdInventoryData> cx = new ArrayList<SpdInventoryData>();
-                                SpdInventoryData tagData = new SpdInventoryData(null, strEPCTemp, rssi);
+                                SpdInventoryData tagData = new SpdInventoryData(strDataTemp, strEPCTemp, rssi);
                                 if (handler_inventer == null) {
                                     Log.d(TAG, "run: 4444444444==inventoryCallBack");
                                     inventoryCallBack(tagData);

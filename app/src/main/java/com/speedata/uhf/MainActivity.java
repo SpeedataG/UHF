@@ -102,10 +102,8 @@ public class MainActivity extends Activity implements OnClickListener {
         setPassword.setEnabled(true);
         lockTag.setEnabled(true);
         areaSelect.setEnabled(true);
-        if ("r2k".equals(model)) {
-            btnInvSet.setVisibility(View.VISIBLE);
-            btnInvSet.setEnabled(true);
-        }
+        btnInvSet.setVisibility(View.VISIBLE);
+        btnInvSet.setEnabled(true);
         Log.d(TAG, "currenTime 4:" + (System.currentTimeMillis() - currenTime));
 
         //监听报警
@@ -320,17 +318,13 @@ public class MainActivity extends Activity implements OnClickListener {
             //方向判断
             DirectionalTagDialog directionalTagDialog = new DirectionalTagDialog(this, iuhfService);
             directionalTagDialog.show();
-        } else if (arg0 == setTag)
-
-        {
+        } else if (arg0 == setTag) {
             //设置频率频段
             SetModuleDialog setDialog = new SetModuleDialog(this, iuhfService, model);
             setDialog.setTitle(R.string.Item_Set_Title);
             setDialog.show();
 
-        } else if (arg0 == setPassword)
-
-        {
+        } else if (arg0 == setPassword) {
             if (currentTagEpc == null) {
                 status.setText(R.string.Status_No_Card_Select);
                 Toast.makeText(this, R.string.Status_No_Card_Select, Toast.LENGTH_SHORT).show();
@@ -341,21 +335,17 @@ public class MainActivity extends Activity implements OnClickListener {
                     , iuhfService, currentTagEpc, model);
             setPasswordDialog.setTitle(R.string.SetPasswd_Btn);
             setPasswordDialog.show();
-        } else if (arg0 == setEpc)
-
-        {
+        } else if (arg0 == setEpc) {
             if (currentTagEpc == null) {
                 status.setText(R.string.Status_No_Card_Select);
                 Toast.makeText(this, R.string.Status_No_Card_Select, Toast.LENGTH_SHORT).show();
                 return;
             }
             //写EPC
-            SetEPCDialog setEPCDialog = new SetEPCDialog(this, iuhfService, currentTagEpc,model);
+            SetEPCDialog setEPCDialog = new SetEPCDialog(this, iuhfService, currentTagEpc, model);
             setEPCDialog.setTitle(R.string.SetEPC_Btn);
             setEPCDialog.show();
-        } else if (arg0 == lockTag)
-
-        {
+        } else if (arg0 == lockTag) {
             if (currentTagEpc == null) {
                 status.setText(R.string.Status_No_Card_Select);
                 Toast.makeText(this, R.string.Status_No_Card_Select, Toast.LENGTH_SHORT).show();
@@ -366,9 +356,7 @@ public class MainActivity extends Activity implements OnClickListener {
                     , currentTagEpc, model);
             lockTagDialog.setTitle(R.string.Lock_Btn);
             lockTagDialog.show();
-        } else if (arg0 == btnInvSet)
-
-        {
+        } else if (arg0 == btnInvSet) {
             //盘点内容设置
             InvSetDialog invSetDialog = new InvSetDialog(this, iuhfService);
             invSetDialog.setTitle("Inv Set");

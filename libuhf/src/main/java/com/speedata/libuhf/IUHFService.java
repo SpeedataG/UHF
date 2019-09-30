@@ -564,6 +564,15 @@ public interface IUHFService {
         return 0;
     }
 
+    /**
+     * 获取驻留时间
+     *
+     * @return 返回驻留时间
+     */
+    default int getDwellTime() {
+        return 0;
+    }
+
     //****************************
 
 
