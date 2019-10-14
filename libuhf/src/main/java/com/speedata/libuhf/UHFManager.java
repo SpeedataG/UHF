@@ -340,6 +340,7 @@ public class UHFManager {
                 iuhfService = new FLX(mContext, 1);
                 break;
             case FACTORY_XINLIAN:
+            case FACTORY_XINLIAN_R2K:
                 iuhfService = new XinLianQilian(mContext);
                 break;
             case FACTORY_R2000:
