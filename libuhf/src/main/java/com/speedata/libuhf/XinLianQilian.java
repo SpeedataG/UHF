@@ -1679,7 +1679,6 @@ public class XinLianQilian implements IUHFService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("zzc:", String.valueOf(e));
             return -1;
         }
     }
