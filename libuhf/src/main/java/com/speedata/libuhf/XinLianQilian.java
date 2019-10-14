@@ -1678,6 +1678,8 @@ public class XinLianQilian implements IUHFService {
                 return -1;
             }
         } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("zzc:", String.valueOf(e));
             return -1;
         }
     }
@@ -1702,7 +1704,8 @@ public class XinLianQilian implements IUHFService {
             } else {
                 return -1;
             }
-        } catch (Exception e) {
+        }catch (Exception e){
+            e.printStackTrace();
             return -1;
         }
     }

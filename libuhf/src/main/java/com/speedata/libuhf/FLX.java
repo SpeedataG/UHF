@@ -833,7 +833,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
     @Override
     public int getDwellTime() {
         AntennaPorts antennaPorts = getAntennaPort();
-        return antennaPorts.dwellTime;
+        return antennaPorts.getDwellTime();
     }
 
     public AntennaPorts getAntennaPort() {
