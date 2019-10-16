@@ -1041,8 +1041,6 @@ public class XinLianQilian implements IUHFService {
     @Override
     public int startFastMode() {
         try {
-            Rparams.option = 0;
-            Rparams.sleep = 0;
             int[] uants = Rparams.uants;
             Reader.READER_ERR er = Mreader.AsyncStartReading(uants, Rparams.uants.length, 0);
             if (er == Reader.READER_ERR.MT_OK_ERR) {
@@ -1069,6 +1067,13 @@ public class XinLianQilian implements IUHFService {
         } catch (Exception e) {
             return -1;
         }
+    }
+
+    @Override
+    public int setLowpowerScheduler(int invOnTime, int invOffTime) {
+        Rparams.readtime = invOnTime;
+        Rparams.sleep = invOffTime;
+        return 0;
     }
 
     @Override
@@ -1650,12 +1655,58 @@ public class XinLianQilian implements IUHFService {
 
     @Override
     public int setInvMode(int invm, int addr, int length) {
-        return 0;
+        try {
+            Reader.EmbededData_ST edst = Mreader.new EmbededData_ST();
+            edst.accesspwd = null;
+            if (invm == 0) {
+                edst.bank = invm + 1;
+                edst.bytecnt = 0;
+            } else {
+                edst.bank = invm + 1;
+                edst.startaddr = addr;
+                edst.bytecnt = length;
+            }
+            Reader.READER_ERR er = Mreader.ParamSet(
+                    Reader.Mtr_Param.MTR_PARAM_TAG_EMBEDEDDATA, edst);
+            if (er == Reader.READER_ERR.MT_OK_ERR) {
+                Rparams.emdadr = edst.startaddr;
+                Rparams.emdbank = edst.bank;
+                Rparams.emdbytec = edst.bytecnt;
+                Rparams.emdenable = 1;
+                return 0;
+            } else {
+                return -1;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
     @Override
     public int getInvMode(int type) {
-        return 0;
+        try {
+            Reader.EmbededData_ST edst2 = Mreader.new EmbededData_ST();
+            Reader.READER_ERR er = Mreader.ParamGet(
+                    Reader.Mtr_Param.MTR_PARAM_TAG_EMBEDEDDATA, edst2);
+            if (er == Reader.READER_ERR.MT_OK_ERR) {
+                switch (type) {
+                    case 0:
+                        return edst2.bank - 1;
+                    case 1:
+                        return edst2.startaddr;
+                    case 2:
+                        return edst2.bytecnt;
+                    default:
+                        return -1;
+                }
+            } else {
+                return -1;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return -1;
+        }
     }
 
     @Override
@@ -1711,9 +1762,6 @@ public class XinLianQilian implements IUHFService {
                 if (er == Reader.READER_ERR.MT_OK_ERR) {
                     if (tagcnt[0] > 0) {
                         for (int i = 0; i < tagcnt[0]; i++) {
-//                            if (!inSearch) {
-//                                inventoryStop();
-//                            }
                             Log.d(TAG, "run: 33333333333");
                             Reader.TAGINFO tfs = Mreader.new TAGINFO();
                             if (nostop) {
@@ -1726,11 +1774,16 @@ public class XinLianQilian implements IUHFService {
 
                             if (er == Reader.READER_ERR.MT_OK_ERR) {
                                 byte[] n_epc = tfs.EpcId;
+                                byte[] n_tid = tfs.EmbededData;
                                 String strEPCTemp = ByteCharStrUtils.b2hexs(n_epc, n_epc.length);
+                                String strDataTemp = null;
+                                if (n_tid != null) {
+                                    strDataTemp = ByteCharStrUtils.b2hexs(n_tid, n_tid.length);
+                                }
                                 Log.d(TAG, "run: 4444444444");
                                 String rssi = String.valueOf(tfs.RSSI);
                                 ArrayList<SpdInventoryData> cx = new ArrayList<SpdInventoryData>();
-                                SpdInventoryData tagData = new SpdInventoryData(null, strEPCTemp, rssi);
+                                SpdInventoryData tagData = new SpdInventoryData(strDataTemp, strEPCTemp, rssi);
                                 if (handler_inventer == null) {
                                     Log.d(TAG, "run: 4444444444==inventoryCallBack");
                                     inventoryCallBack(tagData);
@@ -1745,7 +1798,10 @@ public class XinLianQilian implements IUHFService {
                             }
                         }
                     }
-
+                    Log.d(TAG, "run:5555555555555==next");
+                    if (handler != null) {
+                        handler.postDelayed(this, Rparams.sleep);
+                    }
                 } else {
                     Log.d(TAG, "run: err");
                     int errCode = -1;
@@ -1800,8 +1856,6 @@ public class XinLianQilian implements IUHFService {
                     inventoryStop();
                 }
             }
-            Log.d(TAG, "run:5555555555555==next");
-            handler.postDelayed(this, Rparams.sleep);
         }
     };
 

@@ -80,8 +80,8 @@ public class InventorySettingDialog extends Dialog implements View.OnClickListen
     private Spinner spQValue, spGen2Target;
     private Button btnQValue, btnGen2Target, getValueBtn;
     private Button btnFastMode;
-    private EditText etReadTime, etSleepTime;
-    private Button btnReadTime, btnSleepTime;
+    private EditText etReadTime, etSleepTime, etDwellTime;
+    private Button btnSetTime, btnGetTime, btnSetMode;
 
     public InventorySettingDialog(@NonNull Context context) {
         super(context);
@@ -101,6 +101,11 @@ public class InventorySettingDialog extends Dialog implements View.OnClickListen
         if ("r2k".equals(model)) {
             r2kLayout.setVisibility(View.VISIBLE);
             xinLianLayout.setVisibility(View.GONE);
+            if (MyApp.isFastMode) {
+                btnSetMode.setText("关闭低功耗模式");
+            } else {
+                btnSetMode.setText("开启低功耗模式");
+            }
         } else {
             r2kLayout.setVisibility(View.GONE);
             xinLianLayout.setVisibility(View.VISIBLE);
@@ -159,10 +164,14 @@ public class InventorySettingDialog extends Dialog implements View.OnClickListen
 
         etReadTime = findViewById(R.id.et_read_time);
         etSleepTime = findViewById(R.id.et_sleep_time);
-        btnReadTime = findViewById(R.id.set_read_time);
-        btnReadTime.setOnClickListener(this);
-        btnSleepTime = findViewById(R.id.set_sleep_time);
-        btnSleepTime.setOnClickListener(this);
+        btnSetTime = findViewById(R.id.set_time);
+        btnSetTime.setOnClickListener(this);
+        btnGetTime = findViewById(R.id.get_time);
+        btnGetTime.setOnClickListener(this);
+        btnSetMode = findViewById(R.id.btn_set_mode);
+        btnSetMode.setOnClickListener(this);
+        etDwellTime = findViewById(R.id.et_dwell_time);
+        findViewById(R.id.set_dwell_time).setOnClickListener(this);
     }
 
     /**
@@ -361,29 +370,52 @@ public class InventorySettingDialog extends Dialog implements View.OnClickListen
                     }
                 }
                 break;
-            case R.id.set_read_time:
+            case R.id.set_time:
                 String readTime = etReadTime.getText().toString();
-                if (readTime.isEmpty()) {
+                String sleepTime = etSleepTime.getText().toString();
+                if (readTime.isEmpty() || sleepTime.isEmpty()) {
                     Toast.makeText(mContext, mContext.getResources().getString(R.string.param_not_null), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 int read = Integer.parseInt(readTime);
-                result = MyApp.getInstance().getIuhfService().setReadTime(read);
+                int sleep = Integer.parseInt(sleepTime);
+                result = MyApp.getInstance().getIuhfService().setLowpowerScheduler(read, sleep);
                 if (result == 0) {
                     Toast.makeText(mContext, mContext.getResources().getString(R.string.set_success), Toast.LENGTH_SHORT).show();
                 }
                 break;
-            case R.id.set_sleep_time:
-                String sleepTime = etSleepTime.getText().toString();
-                if (sleepTime.isEmpty()) {
-                    Toast.makeText(mContext, mContext.getResources().getString(R.string.param_not_null), Toast.LENGTH_SHORT).show();
-                    return;
+            case R.id.set_dwell_time:
+                if ("r2k".equals(UHFManager.getUHFModel())){
+                    String dwellTime = etDwellTime.getText().toString();
+                    if (dwellTime.isEmpty()) {
+                        Toast.makeText(mContext, mContext.getResources().getString(R.string.param_not_null), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    int dwell = Integer.parseInt(dwellTime);
+                    result = MyApp.getInstance().getIuhfService().setDwellTime(dwell);
+                    if (result == 0) {
+                        Toast.makeText(mContext, mContext.getResources().getString(R.string.set_success), Toast.LENGTH_SHORT).show();
+                    }
                 }
-                int sleep = Integer.parseInt(sleepTime);
-                result = MyApp.getInstance().getIuhfService().setSleep(sleep);
-                if (result == 0) {
-                    Toast.makeText(mContext, mContext.getResources().getString(R.string.set_success), Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.get_time:
+                int[] res = MyApp.getInstance().getIuhfService().getLowpowerScheduler();
+                if (res != null) {
+                    etReadTime.setText(res[0] + "");
+                    etSleepTime.setText(res[1] + "");
                 }
+                break;
+            case R.id.btn_set_mode:
+                if (!MyApp.isFastMode) {
+                    MyApp.getInstance().getIuhfService().setInvMode(2);
+                    MyApp.isFastMode = true;
+                    btnSetMode.setText("关闭低功耗模式");
+                } else {
+                    MyApp.getInstance().getIuhfService().setInvMode(1);
+                    MyApp.isFastMode = false;
+                    btnSetMode.setText("开启低功耗模式");
+                }
+
                 break;
             default:
                 break;

@@ -313,63 +313,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical">
-
-            <TextView
-                style="@style/TextBlueStyle"
-                android:text="超时时间" />
-
-            <EditText
-                android:id="@+id/et_read_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:inputType="number" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"
-                android:text="ms" />
-
-            <Button
-                android:id="@+id/set_read_time"
-                style="@style/ButtonStyle"
-                android:text="@string/Set_Btn_set" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical">
-
-            <TextView
-                style="@style/TextBlueStyle"
-                android:text="间隔时间" />
-
-            <EditText
-                android:id="@+id/et_sleep_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:inputType="number" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"
-                android:text="ms" />
-
-            <Button
-                android:id="@+id/set_sleep_time"
-                style="@style/ButtonStyle"
-                android:text="@string/Set_Btn_set" />
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:gravity="center">
 
@@ -384,6 +327,102 @@
                 android:layout_marginLeft="10dp"
                 android:text="@string/btn_get_value" />
         </LinearLayout>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical">
+
+        <TextView
+            style="@style/TextBlueStyle"
+            android:text="驻留时间" />
+
+        <EditText
+            android:id="@+id/et_dwell_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="number"
+            android:text="100"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:text="ms" />
+        <Button
+            android:id="@+id/set_dwell_time"
+            style="@style/ButtonStyle"
+            android:text="设置时间" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical">
+        <TextView
+            style="@style/TextBlueStyle"
+            android:text="超时时间" />
+
+
+        <EditText
+            android:id="@+id/et_read_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="number"
+            android:text="100"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:text="ms" />
+
+        </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical">
+
+        <TextView
+            style="@style/TextBlueStyle"
+            android:text="间隔时间" />
+
+        <EditText
+            android:id="@+id/et_sleep_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="number"
+            android:text="400"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:text="ms" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+        <Button
+            android:id="@+id/set_time"
+            style="@style/ButtonStyle"
+            android:text="设置时间" />
+        <Button
+            android:id="@+id/get_time"
+            style="@style/ButtonStyle"
+            android:text="获取时间" />
+        <Button
+            android:id="@+id/btn_set_mode"
+            style="@style/ButtonStyle"
+            android:text="开启低功耗模式" />
 
     </LinearLayout>
 

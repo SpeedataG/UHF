@@ -117,11 +117,12 @@ public class WriteTagDialog extends Dialog implements
                 @Override
                 public void run() {
                     int writeArea = -1;
-                    if ("yixin".equals(model)) {
-                        writeArea = iuhfService.yixinWriteArea(str_passwd, current_tag_epc, which_choose, addr, count, write);
-                    } else {
-                        writeArea = iuhfService.writeArea(which_choose, addr, count, str_passwd, write);
-                    }
+//                    if ("yixin".equals(model)) {
+//                        writeArea = iuhfService.yixinWriteArea(str_passwd, current_tag_epc, which_choose, addr, count, write);
+//                    } else {
+//                        writeArea = iuhfService.writeArea(which_choose, addr, count, str_passwd, write);
+//                    }
+                    writeArea = iuhfService.writeArea(which_choose, addr, count, str_passwd, write);
                     if (writeArea != 0) {
                         handler.sendMessage(handler.obtainMessage(1, mContext.getResources().getString(R.string.param_error)));
                     }

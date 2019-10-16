@@ -11,7 +11,6 @@ import android.serialport.DeviceControlSpd;
 import android.serialport.SerialPortSpd;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.speedata.libuhf.interfaces.OnSpdBanMsgListener;
 import com.speedata.libuhf.utils.CommonUtils;
@@ -59,11 +58,12 @@ public class UHFManager {
      */
     private static byte[] xinlian_cmd = {(byte) 0xFF, 0x00, 0x03, 0x1d, 0x0C};
 
-    private final static String FACTORY_FEILIXIN = "feilixin";
-    private final static String FACTORY_XINLIAN = "xinlian";
-    private final static String FACTORY_R2000 = "r2k";
-    private final static String FACTORY_YIXIN = "yixin";
-    private final static String FACTORY_3992 = "as3992";
+    public final static String FACTORY_FEILIXIN = "feilixin";
+    public final static String FACTORY_XINLIAN = "xinlian";
+    public final static String FACTORY_XINLIAN_R2K = "xinlian_r2k";
+    public final static String FACTORY_R2000 = "r2k";
+    public final static String FACTORY_YIXIN = "yixin";
+    public final static String FACTORY_3992 = "as3992";
     private static int fd;
     private static DeviceControlSpd pw;
     @SuppressLint("StaticFieldLeak")
@@ -340,6 +340,7 @@ public class UHFManager {
                 iuhfService = new FLX(mContext, 1);
                 break;
             case FACTORY_XINLIAN:
+            case FACTORY_XINLIAN_R2K:
                 iuhfService = new XinLianQilian(mContext);
                 break;
             case FACTORY_R2000:
@@ -532,8 +533,12 @@ public class UHFManager {
             length = bytes.length;
             Log.d("ZM", "判断是不是旗联-芯联 length: " + length);
             if (length == 27) {
+                String hexStr = Integer.toHexString(bytes[9] & 0xFF);
                 serialPort.CloseSerial(fd);
                 powerOff();
+                if ("A0".equalsIgnoreCase(hexStr)||"A1".equalsIgnoreCase(hexStr)){
+                    return FACTORY_XINLIAN_R2K;
+                }
                 return FACTORY_XINLIAN;
             }
         }
@@ -575,10 +580,10 @@ public class UHFManager {
      *
      * @return 一芯固件版本
      */
-    private static String getyiXinVersion(String setialPort) {
+    private static String getyiXinVersion(String serialPort) {
         String fwBuffer;
         Driver driver = new RfidDriver();
-        int status = driver.initRFID(setialPort);
+        int status = driver.initRFID(serialPort);
         if (-1000 == status) {
             return "";
         }
