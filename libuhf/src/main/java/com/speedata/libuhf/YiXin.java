@@ -2,13 +2,10 @@ package com.speedata.libuhf;
 
 import android.content.Context;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Message;
 import android.os.SystemClock;
 import android.os.SystemProperties;
 import android.serialport.DeviceControlSpd;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.rscja.utility.StringUtility;
 import com.speedata.libuhf.bean.SpdInventoryData;
@@ -22,17 +19,11 @@ import com.speedata.libuhf.utils.ConfigUtils;
 import com.speedata.libuhf.utils.DataConversionUtils;
 import com.speedata.libuhf.utils.ReadBean;
 import com.speedata.libuhf.utils.StringUtils;
-import com.uhf.structures.DynamicQParams;
-import com.uhf.structures.FixedQParams;
-import com.uhf.structures.OnReadWriteListener;
-import com.uhf.structures.RW_Params;
-import com.uhf.structures.SelectCriteria;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
 
 import cn.com.example.rfid.driver.Driver;
 import cn.com.example.rfid.driver.RfidDriver;
@@ -42,26 +33,16 @@ import cn.com.example.rfid.driver.RfidDriver;
  * 创建日期: 2019/8/26 15:36
  * 说明:
  **/
-public class YiXin implements IUHFService, OnSpdInventoryListener {
+public class YiXin extends IUHFServiceAdapter implements OnSpdInventoryListener {
 
     private ReadBean mRead = null;
-    private Context mContext = null;
+    private Context mContext;
     private DeviceControlSpd newUHFDeviceControl = null;
     private DeviceControlSpd pw = null;
     private Driver driver = null;
     private OnSpdInventoryListener onInventoryListener = null;
     private OnSpdReadListener onSpdReadListener = null;
     private OnSpdWriteListener onSpdWriteListener = null;
-    private int writeStatus;
-    private int lockStatus;
-    private byte[] epcData;
-    private volatile boolean isReadOutTime = false;
-    private volatile boolean isReadSuccess = false;
-    private volatile boolean isWriteOutTime = false;
-    private volatile boolean isWriteSuccess = false;
-
-    private volatile boolean isLockOutTime = false;
-    private volatile boolean isLockSuccess = false;
     private boolean loopFlag = false;
     private YiXinParams yiXinParams = new YiXinParams();
 
@@ -490,15 +471,6 @@ public class YiXin implements IUHFService, OnSpdInventoryListener {
     }
 
 
-    class LockTimeOutThread extends Thread {
-        @Override
-        public void run() {
-            super.run();
-            SystemClock.sleep(1000);
-            isLockOutTime = true;
-        }
-    }
-
     @Override
     public int setKill(String accessPassword, String killPassword) {
         return getDeriver().Kill_Tag(killPassword, yiXinParams.bank, yiXinParams.ads, yiXinParams.len, yiXinParams.epcData);
@@ -517,101 +489,6 @@ public class YiXin implements IUHFService, OnSpdInventoryListener {
     @Override
     public int yixinFilterEpc(int bank, int ads, int len, String data, Boolean save) {
         return getDeriver().Set_Filter_Data(bank, ads, len, data, save);
-    }
-
-    @Override
-    public int setQueryTagGroup(int selected, int session, int target) {
-        return 0;
-    }
-
-    @Override
-    public int getQueryTagGroup() {
-        return 0;
-    }
-
-    @Override
-    public int mask(int area, int addr, int length, byte[] content) {
-        return 0;
-    }
-
-    @Override
-    public int cancelMask() {
-        return 0;
-    }
-
-    @Override
-    public SelectCriteria getMask() {
-        return null;
-    }
-
-    @Override
-    public int setQT(byte[] rpaswd, int cmdType, int memType, int persistType, int rangeType) {
-        return 0;
-    }
-
-    @Override
-    public int setMonzaQtTagMode(int memMap, int maskFlag, byte[] accessPassword) {
-        return 0;
-    }
-
-    @Override
-    public int readMonzaQtTag(int memMap, byte[] pwd, int bank, int address, int length) {
-        return 0;
-    }
-
-    @Override
-    public int readMonzaQtTagSync(int memMap, byte[] pwd, int bank, int address, int length, int timeOutMs, RW_Params rw_params) {
-        return 0;
-    }
-
-    @Override
-    public int writeMonzaQtTag(int memMap, byte[] pwd, int bank, int address, int length, byte[] writeData) {
-        return 0;
-    }
-
-    @Override
-    public int writeMonzaQtTagSync(int memMap, byte[] pwd, int bank, int address, int length, byte[] writeData, int timeOutMs, RW_Params rw_params) {
-        return 0;
-    }
-
-    @Override
-    public void inventory_start() {
-
-    }
-
-    @Override
-    public void inventory_start(Handler hd) {
-
-    }
-
-    @Override
-    public int set_Password(int which, String cur_pass, String new_pass) {
-        return 0;
-    }
-
-    @Override
-    public int inventory_stop() {
-        return 0;
-    }
-
-    @Override
-    public byte[] read_area(int area, int addr, int count, String passwd) {
-        return new byte[0];
-    }
-
-    @Override
-    public String read_area(int area, String str_addr, String str_count, String str_passwd) {
-        return null;
-    }
-
-    @Override
-    public int write_area(int area, int addr, int count, String passwd, byte[] content) {
-        return 0;
-    }
-
-    @Override
-    public int write_area(int area, String addr, String pwd, String count, String content) {
-        return 0;
     }
 
     @Override
@@ -638,7 +515,6 @@ public class YiXin implements IUHFService, OnSpdInventoryListener {
 
     @Override
     public int setAntennaPower(int power) {
-
         if (power < 5 || power > 30) {
             return -1;
         } else {
@@ -649,7 +525,6 @@ public class YiXin implements IUHFService, OnSpdInventoryListener {
                 return -1;
             }
         }
-
     }
 
     @Override
@@ -674,10 +549,10 @@ public class YiXin implements IUHFService, OnSpdInventoryListener {
     public int setFreqRegion(int region) {
         int status = getDeriver().SetRegion(region);
         if (-1000 == status) {
-            //"设备未连接", Toast.LENGTH_SHORT).show();
+            //"设备未连接"
             return -1;
         } else if (-1020 == status) {
-            // "数据错误", Toast.LENGTH_SHORT).show();
+            // "数据错误"
             return -1;
         } else {
             return 0;
@@ -700,46 +575,6 @@ public class YiXin implements IUHFService, OnSpdInventoryListener {
         }
     }
 
-    @Override
-    public void reg_handler(Handler hd) {
-
-    }
-
-    @Override
-    public int setlock(int type, int area, String passwd) {
-        return 0;
-    }
-
-    @Override
-    public String GetLastDetailError() {
-        return null;
-    }
-
-    @Override
-    public int setInvMode(int invm, int addr, int length) {
-        return 0;
-    }
-
-    @Override
-    public int getInvMode(int type) {
-        return 0;
-    }
-
-    @Override
-    public int setFrequency(double frequency) {
-        return 0;
-    }
-
-    @Override
-    public int enableEngTest(int gain) {
-        return 0;
-    }
-
-    @Override
-    public int setDynamicAlgorithm() {
-        return 0;
-    }
-
     public class YiXinParams {
         String epcData;
         int bank;
@@ -754,108 +589,5 @@ public class YiXin implements IUHFService, OnSpdInventoryListener {
             save = false;
         }
     }
-
-    //*****************************************************************************************************//
-    @Override
-    public int yixinReadArea(String pwd, String data, int bank1, int ads1, int len1) {
-        if (bank1 > 3 || bank1 < 0) {
-            return -1;
-        }
-        //默认指定标签区域为epc 起始地址32  长度96
-        String result = getDeriver().Read_Data_Tag(pwd, 1, 32, 96, data, bank1, ads1, len1);
-        if (result != null) {
-            SpdReadData spdReadData = new SpdReadData();
-            spdReadData.setReadData(DataConversionUtils.hexStringToByteArray(result));
-            spdReadData.setDataLen(DataConversionUtils.hexStringToByteArray(result).length);
-            readCallBack(spdReadData);
-            return 0;
-        } else {
-            return -1;
-        }
-    }
-
-    @Override
-    public int yixinWriteArea(String pwd, String data, int bank1, int ads1, int len1, byte[] data1) {
-        int length = data1.length;
-        if ((length % 2) != 0) {
-            return -3;
-        }
-        if ((length / 2) != len1) {
-            return -3;
-        }
-        if ((bank1 >= 0) && (bank1 <= 3)) {
-            int ret = getDeriver().Write_Data_Tag(pwd, 1, 32, 96, data, bank1, ads1, len1, StringUtils.byteToHexString(data1, data1.length));
-            SpdWriteData spdWriteData = new SpdWriteData();
-            if (ret == 0) {
-                spdWriteData.setStatus(0);
-                writeCallBack(spdWriteData);
-                return 0;
-            } else {
-                spdWriteData.setStatus(-1);
-                writeCallBack(spdWriteData);
-                return -1;
-            }
-        }
-        return -1;
-    }
-
-    @Override
-    public int yixinSetPwd(int which, String cur_pass, String new_pass, String data) {
-        if (which > 1 || which < 0) {
-            return -1;
-        }
-        byte[] stringToByte = StringUtils.stringToByte(new_pass);
-        try {
-            if (which == 0) {
-                return yixinWriteArea(cur_pass, data, 0, 0, 2, stringToByte);
-            } else {
-                return yixinWriteArea(cur_pass, data, 0, 2, 2, stringToByte);
-            }
-        } catch (NumberFormatException e) {
-            return -1;
-        }
-    }
-
-    @Override
-    public int yixinSetLock(int which, String pwd, String Data, int bankvalue) {
-
-        if (which == 0) {
-            int ret = getDeriver().unLock_Tag_Data(pwd, 1, 32, 96, Data, bankvalue);
-            if (ret == 0) {
-                SpdWriteData spdWriteData = new SpdWriteData();
-                spdWriteData.setEPCData(StringUtils.stringToByte(Data));
-                spdWriteData.setEPCLen(StringUtils.stringToByte(Data).length);
-                spdWriteData.setStatus(0);
-                writeCallBack(spdWriteData);
-                return 0;
-            } else {
-                return -1;
-            }
-        } else if (which == 1) {
-            int ret = getDeriver().Lock_Tag_Data(pwd, 1, 32, 96, Data, bankvalue);
-            if (ret == 0) {
-                SpdWriteData spdWriteData = new SpdWriteData();
-                spdWriteData.setEPCData(StringUtils.stringToByte(Data));
-                spdWriteData.setEPCLen(StringUtils.stringToByte(Data).length);
-                spdWriteData.setStatus(0);
-                writeCallBack(spdWriteData);
-                return 0;
-            } else {
-                return -1;
-            }
-        } else if (which == 2) {
-            return -1;
-        } else if (which == 3) {
-            return -1;
-        } else {
-            return -1;
-        }
-    }
-
-    @Override
-    public int yixinSetKill(String pwd, String data) {
-        return getDeriver().Kill_Tag(pwd, 1, 32, 96, data);
-    }
-
 
 }

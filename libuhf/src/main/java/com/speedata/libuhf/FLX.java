@@ -7,17 +7,14 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.os.SystemProperties;
 import android.serialport.DeviceControlSpd;
-import android.text.TextUtils;
 import android.util.Log;
 
-import com.power.control.DeviceControl;
 import com.speedata.libuhf.bean.SpdInventoryData;
 import com.speedata.libuhf.bean.SpdReadData;
 import com.speedata.libuhf.bean.SpdWriteData;
 import com.speedata.libuhf.interfaces.OnSpdInventoryListener;
 import com.speedata.libuhf.interfaces.OnSpdReadListener;
 import com.speedata.libuhf.interfaces.OnSpdWriteListener;
-import com.speedata.libuhf.utils.ByteCharStrUtils;
 import com.speedata.libuhf.utils.CommonUtils;
 import com.speedata.libuhf.utils.ConfigUtils;
 import com.speedata.libuhf.utils.ReadBean;
@@ -29,7 +26,6 @@ import com.uhf.structures.DynamicQParams;
 import com.uhf.structures.FixedQParams;
 import com.uhf.structures.InventoryData;
 import com.uhf.structures.InventoryParams;
-import com.uhf.structures.KrReadData;
 import com.uhf.structures.LowpowerParams;
 import com.uhf.structures.OnInventoryListener;
 import com.uhf.structures.OnReadWriteListener;
@@ -50,27 +46,17 @@ import java.util.ArrayList;
  * Created by 张明_ on 2017/11/15.
  */
 
-public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListener {
+public class FLX extends IUHFServiceAdapter implements OnInventoryListener, OnReadWriteListener {
     private Linkage lk = null;
     private Handler h = null;
     private DeviceControlSpd pw = null;
-    private Context mContext = null;
+    private Context mContext;
     private ReadBean mRead = null;
     private DeviceControlSpd newUHFDeviceControl = null;
-    private byte[] epcData;
-    private volatile boolean isReadOutTime = false;
-    private volatile boolean isReadSuccess = false;
-    private int writeStatus;
-    private int lockStatus;
-    private volatile boolean isLockOutTime = false;
-    private volatile boolean isLockSuccess = false;
-    //    private volatile List<Integer> writeStatusLists = new ArrayList<>();
     public static final int InvModeType = 0;
     public static final int InvAddrType = 1;
     public static final int InvSizeType = 2;
     private int type = 0;
-    private volatile boolean isWriteOutTime = false;
-    private volatile boolean isWriteSuccess = false;
     private int mode = 1;
 
     public FLX(Context mContext, int type) {
@@ -184,13 +170,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
                 byte[] readData = rw_params.ReadData;
                 System.arraycopy(readData, 0, readResultData, 0, rw_params.DataLen);
                 spdReadData.setReadData(readResultData);
-                this.epcData = readResultData;
-                isReadSuccess = true;
-                isReadOutTime = true;
-                Log.d("ZM", "读卡状态: " + isReadSuccess + isReadOutTime);
             } else {
-//                this.epcData = null;
-                isReadOutTime = true;
                 spdReadData.setReadData(null);
             }
             spdReadData.setDataLen(rw_params.DataLen);
@@ -198,13 +178,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             spdReadData.setStatus(rw_params.status);
             readCallBack(spdReadData);
         } else if (rw_params.type == 3) {
-            writeStatus = rw_params.status;
             Log.d("ZM", "写卡状态: " + rw_params.status);
-            if (rw_params.status == 0) {
-                isWriteSuccess = true;
-                isWriteOutTime = true;
-            }
-
             SpdWriteData spdWriteData = new SpdWriteData();
             spdWriteData.setEPCData(resultData);
             spdWriteData.setEPCLen(rw_params.EPCLen);
@@ -212,13 +186,7 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             spdWriteData.setStatus(rw_params.status);
             writeCallBack(spdWriteData);
         } else if (rw_params.type == 4 || rw_params.type == 5) {
-            lockStatus = rw_params.status;
             Log.d("ZM", "锁卡状态: " + rw_params.status);
-            if (rw_params.status == 0) {
-                isLockSuccess = true;
-                isLockOutTime = true;
-            }
-
             SpdWriteData spdWriteData = new SpdWriteData();
             spdWriteData.setEPCData(resultData);
             spdWriteData.setEPCLen(rw_params.EPCLen);
@@ -682,11 +650,6 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
     }
 
     @Override
-    public int setQT(byte[] rpaswd, int cmdType, int memType, int persistType, int rangeType) {
-        return -1;
-    }
-
-    @Override
     public int setMonzaQtTagMode(int memMap, int maskFlag, byte[] accessPassword) {
         return getLinkage().setMonzaQtTagMode(memMap, maskFlag, accessPassword);
     }
@@ -754,7 +717,6 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         } else {
             return fixedResult;
         }
-
     }
 
     @Override
@@ -825,53 +787,24 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
 
     @Override
     public int setDwellTime(int dwellTime) {
-        AntennaPorts antennaPorts = getAntennaPort();
+        AntennaPorts antennaPorts = new AntennaPorts();
+        int i = getLinkage().getAntennaPort(0, antennaPorts);
+        if (i != 0) {
+            return -1;
+        }
         int power = antennaPorts.getPowerLevel();
         return getLinkage().setAntennaPort(0, 1, power, dwellTime, antennaPorts.getNumberInventoryCycles());
     }
 
     @Override
     public int getDwellTime() {
-        AntennaPorts antennaPorts = getAntennaPort();
-        return antennaPorts.getDwellTime();
-    }
-
-    public AntennaPorts getAntennaPort() {
         AntennaPorts antennaPorts = new AntennaPorts();
-        getLinkage().getAntennaPort(0, antennaPorts);
-        return antennaPorts;
-    }
-
-    //********************************************老版接口（不再维护）******************************************
-
-
-    @Override
-    public void reg_handler(Handler hd) {
-        h = hd;
-    }
-
-    @Override
-    public String GetLastDetailError() {
-        //无定义
-        return null;
-    }
-
-
-    @Override
-    public void inventory_start() {
-        getLinkage().startInventory(1, 0);
-    }
-
-    @Override
-    public void inventory_start(Handler hd) {
-        reg_handler(hd);
-        inventory_start();
-    }
-
-    @Override
-    public int inventory_stop() {
-        getLinkage().stopInventory();
-        return 0;
+        int i = getLinkage().getAntennaPort(0, antennaPorts);
+        if (i == 0) {
+            return antennaPorts.getDwellTime();
+        } else {
+            return -1;
+        }
     }
 
     public final int KILL_PW_L = 0;
@@ -893,115 +826,6 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             Linkage.RFID_18K6C_TAG_MEM_PERM.SECURED_WRITEABLE.getValue(), Linkage.RFID_18K6C_TAG_MEM_PERM
             .ALWAYS_WRITEABLE.getValue(), Linkage.RFID_18K6C_TAG_MEM_PERM.ALWAYS_NOT_WRITEABLE.getValue
             (),};
-
-    @Override
-    public int setlock(int type, int area, String passwd) {
-        lockStatus = -1;
-        isLockOutTime = false;
-        isLockSuccess = false;
-        int kp = Linkage.RFID_18K6C_TAG_PWD_PERM.NO_CHANGE.getValue();
-        int ap = Linkage.RFID_18K6C_TAG_PWD_PERM.NO_CHANGE.getValue();
-        int ta = Linkage.RFID_18K6C_TAG_MEM_PERM.NO_CHANGE.getValue();
-        int ea = Linkage.RFID_18K6C_TAG_MEM_PERM.NO_CHANGE.getValue();
-        int ua = Linkage.RFID_18K6C_TAG_MEM_PERM.NO_CHANGE.getValue();
-
-        int res = -1;
-        if ((type >= 0) && (type <= 3) && (area >= 0) && (area <= 4)) {
-            switch (area) {
-                case KILL_PW_L:
-                    kp = vp[type];
-                    break;
-                case ACCESS_PW_L:
-                    ap = vp[type];
-                    break;
-                case EPC_L:
-                    ea = va[type];
-                    break;
-                case TID_L:
-                    ta = va[type];
-                    break;
-                case USER_L:
-                    ua = va[type];
-                    break;
-                default:
-                    break;
-            }
-            byte[] rpaswd = StringUtils.stringToByte(passwd);
-            res = getLinkage().Radio_LockTag(rpaswd, ap, kp, ea, ta, ua);
-            if (res == 0) {
-                LockTimeOutThread timeOutThread = new LockTimeOutThread();
-                timeOutThread.start();
-
-                while (!isLockOutTime) {
-                    if (isLockSuccess) {
-                        return 0;
-                    }
-                }
-                return lockStatus;
-            } else {
-                return -1;
-            }
-        }
-        return -1;
-    }
-
-
-    @Override
-    public byte[] read_area(int area, int addr, int count, String passwd) {
-        epcData = null;
-        isReadOutTime = false;
-        isReadSuccess = false;
-        if ((area > 3) || (area < 0)) {
-            return null;
-        }
-        byte[] pwdBytes = StringUtils.stringToByte(passwd);
-        int Read_status = getLinkage().Radio_ReadTag(count, addr, area, pwdBytes);
-        if (Read_status == 0) {
-            ReadTimeOutThread timeOutThread = new ReadTimeOutThread();
-            timeOutThread.start();
-
-            while (!isReadOutTime) {
-                Log.d("zm", "read_area-isReadSuccess状态： " + isReadSuccess + "isReadOutTime状态：" + isReadOutTime);
-                if (isReadSuccess) {
-                    Log.d("zm", "read_area: success");
-                    return epcData;
-                }
-            }
-            Log.d("zm", "read_area: failed");
-            return null;
-        } else {
-            Log.d("zm", "read_area: failed");
-            return null;
-        }
-    }
-
-    @Override
-    public String read_area(int area, String str_addr
-            , String str_count, String str_passwd) {
-        if (TextUtils.isEmpty(str_passwd)) {
-            return null;
-        }
-        if (!ByteCharStrUtils.IsHex(str_passwd)) {
-            return null;
-        }
-        int num_addr;
-        int num_count;
-        try {
-            num_addr = Integer.parseInt(str_addr);
-            num_count = Integer.parseInt(str_count);
-        } catch (NumberFormatException p) {
-            return null;
-        }
-        return read_card(area, num_addr, num_count, str_passwd);
-    }
-
-    private String read_card(int area, int addr, int count, String passwd) {
-        byte[] v = read_area(area, addr, count, passwd);
-        if (v == null) {
-            return null;
-        }
-        return StringUtils.byteToHexString(v, count);
-    }
 
     @Override
     public int setFreqRegion(int region) {
@@ -1034,82 +858,6 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         return res;
     }
 
-    //设置定频频点
-    @Override
-    public int setFrequency(double frequency) {
-        int singleFrequency = (int) (frequency * 1000);
-        if (singleFrequency < 840000 || singleFrequency > 960000 || (singleFrequency % 125 != 0)) {
-            return -1;
-        }
-        return getLinkage().Radio_SetSingleFrequency(singleFrequency);
-    }
-
-    //载波测试接口
-    @Override
-    public int enableEngTest(int gain) {
-//        return getLinkage().enableEngTest(gain);
-        return 0;
-    }
-
-    @Override
-    public int setDynamicAlgorithm() {
-//        if (TextUtils.isEmpty(etTry.getText().toString())) {
-//            MyApp.getToast().showShortToast(this, "请输入重试次数");
-//            return;
-//
-//        } else if (TextUtils.isEmpty(etStartQ.getText().toString())) {
-//            MyApp.getToast().showShortToast(this, "请输入起始Q值");
-//            return;
-//        } else if (TextUtils.isEmpty(etMinValue.getText().toString())) {
-//            MyApp.getToast().showShortToast(this, "请输入最小Q值");
-//            return;
-//        } else if (TextUtils.isEmpty(etMaxValue.getText().toString())) {
-//            MyApp.getToast().showShortToast(this, "请输入最大Q值");
-//            return;
-//        } else if (TextUtils.isEmpty(etThreshold.getText().toString())) {
-//            MyApp.getToast().showShortToast(this, "请输入阀值");
-//            return;
-//        }
-        int tryCount = 0;
-        int start_Q = 4;
-        int minQ = 0;
-        int maxQ = 15;
-        int threshold = 4;
-//        if (start_Q < 0 || start_Q > 15 || minQ < 0 || minQ > 15 || maxQ < 0 || maxQ > 15 || threshold < 0 || threshold > 255) {
-//            MyApp.getToast().showShortToast(this, "不在Q值0～15的取值范围内，无效Q值");
-//            return;
-//        }
-//
-//        if (minQ > maxQ) {
-//            MyApp.getToast().showShortToast(this, "Q值范围设置错误");
-//            return;
-//        }
-//        if (threshold < 0 || threshold > 255) {
-//            MyApp.getToast().showShortToast(this, "不在阀值0～255的取值范围内，无效阀值");
-//            return;
-//        }
-//        if (tryCount < 0 || tryCount > 10) {
-//            MyApp.getToast().showShortToast(this, "不在重试次数0～10的取值范围内，无效重试次数");
-//            return;
-//        }
-
-        DynamicQParams dp = new DynamicQParams();
-        dp.setValue(start_Q, minQ, maxQ, tryCount, 1, threshold);
-        int dynamicResult = getLinkage().Radio_SetSingulationAlgorithmDyParameters(dp);
-
-        if (dynamicResult == 0) {
-            return 0;
-//            MyApp.getToast().showShortToast(this, "设置成功");
-        } else if (dynamicResult == -1000) {
-            return -1000;
-//            MyApp.getToast().showShortToast(this, "正在盘点");
-        } else {
-//            MyApp.getToast().showShortToast(this, "设置失败");
-            return -1;
-        }
-
-    }
-
     @Override
     public int getFreqRegion() {
         Rfid_Value rfid_value = new Rfid_Value();
@@ -1139,121 +887,6 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         return -1;
     }
 
-    @Override
-    public int write_area(int area, int addr, int count, String passwd, byte[] content) {
-        isWriteOutTime = false;
-        isWriteSuccess = false;
-        writeStatus = -1;
-        int length = content.length;
-        if ((length % 2) != 0) {
-            return -3;
-        }
-        if ((length / 2) != count) {
-            return -3;
-        }
-        if ((area >= 0) && (area <= 3) && ((length % 2) == 0)) {
-            byte[] pwdBytes = StringUtils.stringToByte(passwd);
-            int status = getLinkage().Radio_WriteTag(count,
-                    addr, area, pwdBytes, content);
-            Log.d("ZM", "write_card: 状态" + status);
-            if (status == 0) {
-                TimeOutThread timeOutThread = new TimeOutThread();
-                timeOutThread.start();
-
-                while (!isWriteOutTime) {
-                    if (isWriteSuccess) {
-                        Log.d("ZM", "write_card: 状态" + "成功");
-                        return 0;
-                    }
-                }
-                return writeStatus;
-            } else {
-                return -1;
-            }
-        }
-        return -1;
-    }
-
-    @Override
-    public int write_area(int area, String addr, String pwd, String count, String content) {
-        isWriteOutTime = false;
-        isWriteSuccess = false;
-        writeStatus = -1;
-        if (TextUtils.isEmpty(pwd)) {
-            return -3;
-        }
-        if (!ByteCharStrUtils.IsHex(pwd)) {
-            return -3;
-        }
-        int num_addr;
-        int num_count;
-        try {
-            num_addr = Integer.parseInt(addr);
-            num_count = Integer.parseInt(count);
-        } catch (NumberFormatException p) {
-            return -3;
-        }
-        return write_card(area, num_addr, num_count, pwd, content);
-    }
-
-
-    public int write_card(int area, int addr, int count, String passwd, String content) {
-        if ((content.length() % 2) != 0) {
-            return -3;
-        }
-        byte[] stringToByte = StringUtils.stringToByte(content);
-        if ((stringToByte.length / 2) != count) {
-            return -3;
-        }
-        if ((area >= 0) && (area <= 3)) {
-            byte[] pwdBytes = StringUtils.stringToByte(passwd);
-            int status = getLinkage().Radio_WriteTag(count,
-                    addr, area, pwdBytes, stringToByte);
-            Log.d("ZM", "write_card: 状态" + status);
-            if (status == 0) {
-                TimeOutThread timeOutThread = new TimeOutThread();
-                timeOutThread.start();
-                while (!isWriteOutTime) {
-                    if (isWriteSuccess) {
-                        Log.d("ZM", "write_card: 状态" + "成功");
-                        return 0;
-                    }
-                }
-                return writeStatus;
-            } else {
-                return -1;
-            }
-        }
-        return -1;
-    }
-
-    class TimeOutThread extends Thread {
-        @Override
-        public void run() {
-            super.run();
-            SystemClock.sleep(1000);
-            isWriteOutTime = true;
-        }
-    }
-
-    class LockTimeOutThread extends Thread {
-        @Override
-        public void run() {
-            super.run();
-            SystemClock.sleep(1000);
-            isLockOutTime = true;
-        }
-    }
-
-    class ReadTimeOutThread extends Thread {
-        @Override
-        public void run() {
-            super.run();
-            SystemClock.sleep(1000);
-            isReadOutTime = true;
-        }
-    }
-
     private final int ANTENNA_P_MIN = 10;
     private final int ANTENNA_P_MAX = 33;
 
@@ -1277,23 +910,6 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
             return -1;
         }
         return rv.value / 10;
-    }
-
-    public int set_link_prof(int pf) {
-        int res = -1;
-        if ((pf >= 0) && (pf < 4)) {
-            res = getLinkage().Radio_SetCurrentLinkProfile(pf);
-        }
-        return res;
-    }
-
-    public int get_link_prof() {
-        Rfid_Value rv = new Rfid_Value();
-        int p = getLinkage().Radio_GetCurrentLinkProfile(rv);
-        if (p != 0) {
-            return -1;
-        }
-        return rv.value;
     }
 
     @Override
@@ -1323,21 +939,23 @@ public class FLX implements IUHFService, OnInventoryListener, OnReadWriteListene
         return selectCard(bank, writeByte, mFlag);
     }
 
-    //设置密码
+    //********************************************老版接口（不再维护）******************************************
+
+    //设置定频频点
     @Override
-    public int set_Password(int which, String cur_pass, String new_pass) {
-        if (which > 1 || which < 0) {
+    public int setFrequency(double frequency) {
+        int singleFrequency = (int) (frequency * 1000);
+        if (singleFrequency < 840000 || singleFrequency > 960000 || (singleFrequency % 125 != 0)) {
             return -1;
         }
-        try {
-            if (which == 0) {
-                return write_area(0, "0", cur_pass, "2", new_pass);
-            } else {
-                return write_area(0, "2", cur_pass, "2", new_pass);
-            }
-        } catch (NumberFormatException e) {
-            return -1;
-        }
+        return getLinkage().Radio_SetSingleFrequency(singleFrequency);
+    }
+
+    //载波测试接口
+    @Override
+    public int enableEngTest(int gain) {
+//        return getLinkage().enableEngTest(gain);
+        return 0;
     }
 
 }

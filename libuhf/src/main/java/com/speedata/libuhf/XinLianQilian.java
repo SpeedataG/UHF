@@ -1,21 +1,15 @@
 package com.speedata.libuhf;
 
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.os.SystemProperties;
-import android.support.annotation.RequiresApi;
-import android.text.TextUtils;
+import android.serialport.DeviceControlSpd;
 import android.util.Log;
 
-import android.serialport.DeviceControlSpd;
-import android.widget.Toast;
-
-import com.pow.api.cls.RfidPower;
 import com.speedata.libuhf.bean.SpdInventoryData;
 import com.speedata.libuhf.bean.SpdReadData;
 import com.speedata.libuhf.bean.SpdWriteData;
@@ -30,10 +24,6 @@ import com.speedata.libuhf.utils.SharedXmlUtil;
 import com.speedata.libuhf.utils.StringUtils;
 import com.uhf.api.cls.ErrInfo;
 import com.uhf.api.cls.Reader;
-import com.uhf.structures.DynamicQParams;
-import com.uhf.structures.FixedQParams;
-import com.uhf.structures.RW_Params;
-import com.uhf.structures.SelectCriteria;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -49,7 +39,7 @@ import static android.content.ContentValues.TAG;
  * 旗连芯片  芯联方案
  * Created by 张明_ on 2016/11/29.
  */
-public class XinLianQilian implements IUHFService {
+public class XinLianQilian extends IUHFServiceAdapter {
 
     private static Reader Mreader = new Reader();
     private static int antportc;
@@ -62,7 +52,6 @@ public class XinLianQilian implements IUHFService {
     private Context mContext;
     private ReadBean mRead;
     private DeviceControlSpd newUHFDeviceControl;
-    private Thread myInvThread = null;
 
     public XinLianQilian(Context mContext) {
         this.mContext = mContext;
@@ -305,8 +294,6 @@ public class XinLianQilian implements IUHFService {
                 }
             }
         }
-//        Log.d(TAG, "openDev: end");
-//        return -1;
     }
 
     //关闭模块
@@ -786,11 +773,6 @@ public class XinLianQilian implements IUHFService {
     }
 
     @Override
-    public int setKill(String accessPassword, String killPassword) {
-        return 0;
-    }
-
-    @Override
     public int setQueryTagGroup(int selected, int session, int target) {
         try {
             int[] val = new int[]{-1};
@@ -828,21 +810,6 @@ public class XinLianQilian implements IUHFService {
     }
 
     @Override
-    public int mask(int area, int addr, int length, byte[] content) {
-        return 0;
-    }
-
-    @Override
-    public int cancelMask() {
-        return 0;
-    }
-
-    @Override
-    public SelectCriteria getMask() {
-        return null;
-    }
-
-    @Override
     public int setQT(byte[] rpaswd, int cmdType, int memType, int persistType, int rangeType) {
         // m4 qt
         try {
@@ -864,31 +831,6 @@ public class XinLianQilian implements IUHFService {
             return -1;
         }
 
-    }
-
-    @Override
-    public int setMonzaQtTagMode(int memMap, int maskFlag, byte[] accessPassword) {
-        return -1;
-    }
-
-    @Override
-    public int readMonzaQtTag(int memMap, byte[] pwd, int bank, int address, int length) {
-        return -1;
-    }
-
-    @Override
-    public int readMonzaQtTagSync(int memMap, byte[] pwd, int bank, int address, int length, int timeOutMs, RW_Params rw_params) {
-        return -1;
-    }
-
-    @Override
-    public int writeMonzaQtTag(int memMap, byte[] pwd, int bank, int address, int length, byte[] writeData) {
-        return -1;
-    }
-
-    @Override
-    public int writeMonzaQtTagSync(int memMap, byte[] pwd, int bank, int address, int length, byte[] writeData, int timeOutMs, RW_Params rw_params) {
-        return -1;
     }
 
     @Override
@@ -1099,267 +1041,6 @@ public class XinLianQilian implements IUHFService {
     }
 
 
-    //********************************************老版接口（不再维护）******************************************
-
-    //注册过 Handler 后调用此函数开始盘点过程
-    @Override
-    public void inventory_start() {
-        if (inSearch) {
-            return;
-        }
-        inSearch = true;
-        cancelSelect();
-        myInvThread = new Thread(inv_thread);
-        myInvThread.start();
-        Log.d(TAG, "inventory_start: end");
-    }
-
-    @Override
-    public void inventory_start(Handler hd) {
-        Log.d(TAG, "inventory_start: start");
-        reg_handler(hd);
-        inventory_start();
-    }
-
-    //停止盘点。
-    @Override
-    public int inventory_stop() {
-        if (!inSearch) {
-            return -1;
-        }
-        Log.d(TAG, "inventory_stop: start");
-        inSearch = false;
-        try {
-            if (myInvThread != null) {
-                myInvThread.interrupt();
-                myInvThread = null;
-
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return -1;
-        }
-        SystemClock.sleep(500);
-        Log.d(TAG, "inventory_stop: end");
-        return 0;
-    }
-
-    //从标签 area 区的 addr 位置（以 word 计算）读取 count 个值（以 byte 计算）
-    // passwd 是访问密码，如果区域没被锁就给 0 值。
-    @Override
-    public byte[] read_area(int area, int addr, int count, String passwd) {
-        Log.d(TAG, "read_area: start22222");
-        if ((area > 3) || (area < 0)) {
-            return new byte[]{(byte) 0xFF, 0x07, (byte) 0xEE};
-        }
-        try {
-            byte[] rdata = new byte[count * 2];
-            byte[] rpaswd = new byte[4];
-            if (!"".equals(passwd)) {
-                Mreader.Str2Hex(passwd, passwd.length(), rpaswd);
-            }
-            Reader.READER_ERR er = Reader.READER_ERR.MT_OK_ERR;
-            int trycount = 3;
-            do {
-                er = Mreader.GetTagData(Rparams.opant,
-                        (char) area, addr, count,
-                        rdata, rpaswd, (short) Rparams.optime);
-
-                trycount--;
-                if (trycount < 1) {
-                    break;
-                }
-            } while (er != Reader.READER_ERR.MT_OK_ERR);
-            Log.d(TAG, "read_area: end");
-            if (er == Reader.READER_ERR.MT_OK_ERR) {
-                return rdata;
-            } else if (er == Reader.READER_ERR.MT_IO_ERR) {
-                return new byte[]{(byte) 0xFF, 0x01, (byte) 0xEE};
-            } else if (er == Reader.READER_ERR.MT_INTERNAL_DEV_ERR) {
-                return new byte[]{(byte) 0xFF, 0x02, (byte) 0xEE};
-            } else if (er == Reader.READER_ERR.MT_CMD_FAILED_ERR) {
-                return new byte[]{(byte) 0xFF, 0x03, (byte) 0xEE};
-            } else if (er == Reader.READER_ERR.MT_CMD_NO_TAG_ERR) {
-                return new byte[]{(byte) 0xFF, 0x04, (byte) 0xEE};
-            } else if (er == Reader.READER_ERR.MT_M5E_FATAL_ERR) {
-                return new byte[]{(byte) 0xFF, 0x05, (byte) 0xEE};
-            } else if (er == Reader.READER_ERR.MT_OP_NOT_SUPPORTED) {
-                return new byte[]{(byte) 0xFF, 0x06, (byte) 0xEE};
-            } else if (er == Reader.READER_ERR.MT_INVALID_PARA) {
-                return new byte[]{(byte) 0xFF, 0x07, (byte) 0xEE};
-            } else if (er == Reader.READER_ERR.MT_INVALID_READER_HANDLE) {
-                return new byte[]{(byte) 0xFF, 0x08, (byte) 0xEE};
-            } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_HIGN_RETURN_LOSS) {
-                return new byte[]{(byte) 0xFF, 0x09, (byte) 0xEE};
-            } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_TOO_MANY_RESET) {
-                return new byte[]{(byte) 0xFF, 0x10, (byte) 0xEE};
-            } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_NO_ANTENNAS) {
-                return new byte[]{(byte) 0xFF, 0x11, (byte) 0xEE};
-            } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_HIGH_TEMPERATURE) {
-                return new byte[]{(byte) 0xFF, 0x12, (byte) 0xEE};
-            } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_READER_DOWN) {
-                return new byte[]{(byte) 0xFF, 0x13, (byte) 0xEE};
-            } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_UNKNOWN_ERR) {
-                return new byte[]{(byte) 0xFF, 0x14, (byte) 0xEE};
-            } else if (er == Reader.READER_ERR.M6E_INIT_FAILED) {
-                return new byte[]{(byte) 0xFF, 0x15, (byte) 0xEE};
-            } else if (er == Reader.READER_ERR.MT_OP_EXECING) {
-                return new byte[]{(byte) 0xFF, 0x16, (byte) 0xEE};
-            } else if (er == Reader.READER_ERR.MT_UNKNOWN_READER_TYPE) {
-                return new byte[]{(byte) 0xFF, 0x17, (byte) 0xEE};
-            } else if (er == Reader.READER_ERR.MT_OP_INVALID) {
-                return new byte[]{(byte) 0xFF, 0x18, (byte) 0xEE};
-            } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_BY_FAILED_RESET_MODLUE) {
-                return new byte[]{(byte) 0xFF, 0x19, (byte) 0xEE};
-            } else if (er == Reader.READER_ERR.MT_MAX_ERR_NUM) {
-                return new byte[]{(byte) 0xFF, 0x20, (byte) 0xEE};
-            } else {
-                return new byte[]{(byte) 0xFF, 0x20, (byte) 0xEE};
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new byte[]{(byte) 0xFF, 0x20, (byte) 0xEE};
-        }
-    }
-
-    @Override
-    public String read_area(int area, String str_addr
-            , String str_count, String str_passwd) {
-        Log.d(TAG, "read_card: start1111");
-        if (TextUtils.isEmpty(str_passwd)) {
-            return null;
-        }
-        if (!ByteCharStrUtils.IsHex(str_passwd)) {
-            return null;
-        }
-        int num_addr;
-        int num_count;
-        try {
-            num_addr = Integer.parseInt(str_addr, 16);
-            num_count = Integer.parseInt(str_count, 10);
-        } catch (NumberFormatException p) {
-            return null;
-        }
-        String res = read_card(area, num_addr, num_count, str_passwd);
-        return res;
-    }
-
-    private String read_card(int area, int addr, int count, String passwd) {
-        byte[] v = read_area(area, addr, count, passwd);
-        if (v == null) {
-            return null;
-        }
-        String hexs = ByteCharStrUtils.b2hexs(v, v.length);
-        return hexs;
-    }
-
-
-    //把 content 中的数据写到标签 area 区中 addr（以 word 计算）开始的位 置。
-    @Override
-    public int write_area(int area, int addr, int count, String passwd, byte[] content) {
-        Log.d(TAG, "write_area: start22222");
-        try {
-            if ((content.length % 2) != 0) {
-                return -3;
-            }
-            if ((content.length / 2) != count) {
-                return -3;
-            }
-            byte[] rpaswd = new byte[4];
-            if (!passwd.equals("")) {
-                Mreader.Str2Hex(passwd, passwd.length(), rpaswd);
-            }
-            Reader.READER_ERR er = Reader.READER_ERR.MT_OK_ERR;
-            int trycount = 3;
-            do {
-                er = Mreader.WriteTagData(Rparams.opant,
-                        (char) area, addr, content, content.length, rpaswd,
-                        (short) Rparams.optime);
-                trycount--;
-                if (trycount < 1) {
-                    break;
-                }
-            } while (er != Reader.READER_ERR.MT_OK_ERR);
-            Log.d(TAG, "write_area: end");
-            if (er == Reader.READER_ERR.MT_OK_ERR) {
-                return 0;
-            } else if (er == Reader.READER_ERR.MT_IO_ERR) {
-                return 1;
-            } else if (er == Reader.READER_ERR.MT_INTERNAL_DEV_ERR) {
-                return 2;
-            } else if (er == Reader.READER_ERR.MT_CMD_FAILED_ERR) {
-                return 3;
-            } else if (er == Reader.READER_ERR.MT_CMD_NO_TAG_ERR) {
-                return 4;
-            } else if (er == Reader.READER_ERR.MT_M5E_FATAL_ERR) {
-                return 5;
-            } else if (er == Reader.READER_ERR.MT_OP_NOT_SUPPORTED) {
-                return 6;
-            } else if (er == Reader.READER_ERR.MT_INVALID_PARA) {
-                return 7;
-            } else if (er == Reader.READER_ERR.MT_INVALID_READER_HANDLE) {
-                return 8;
-            } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_HIGN_RETURN_LOSS) {
-                return 9;
-            } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_TOO_MANY_RESET) {
-                return 10;
-            } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_NO_ANTENNAS) {
-                return 11;
-            } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_HIGH_TEMPERATURE) {
-                return 12;
-            } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_READER_DOWN) {
-                return 13;
-            } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_UNKNOWN_ERR) {
-                return 14;
-            } else if (er == Reader.READER_ERR.M6E_INIT_FAILED) {
-                return 15;
-            } else if (er == Reader.READER_ERR.MT_OP_EXECING) {
-                return 16;
-            } else if (er == Reader.READER_ERR.MT_UNKNOWN_READER_TYPE) {
-                return 17;
-            } else if (er == Reader.READER_ERR.MT_OP_INVALID) {
-                return 18;
-            } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_BY_FAILED_RESET_MODLUE) {
-                return 19;
-            } else if (er == Reader.READER_ERR.MT_MAX_ERR_NUM) {
-                return 20;
-            } else {
-                return 20;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return -1;
-        }
-    }
-
-    @Override
-    public int write_area(int area, String addr, String pwd, String count, String content) {
-        Log.d(TAG, "write_area: start11111");
-        if (TextUtils.isEmpty(pwd)) {
-            return -3;
-        }
-        if (!ByteCharStrUtils.IsHex(pwd)) {
-            return -3;
-        }
-        int num_addr;
-        int num_count;
-        try {
-            num_addr = Integer.parseInt(addr, 16);
-            num_count = Integer.parseInt(count, 10);
-        } catch (NumberFormatException p) {
-            return -3;
-        }
-        int rev = write_card(area, num_addr, num_count,
-                pwd, content);
-        return rev;
-    }
-
-    public int write_card(int area, int addr, int count, String passwd, String cnt) {
-        byte[] cf = ByteCharStrUtils.toByteArray(cnt);
-        return write_area(area, addr, count, passwd, cf);
-    }
-
-
     //选中要进行操作的 epc 标签
     @Override
     public int selectCard(int bank, byte[] epc, boolean mFlag) {
@@ -1403,7 +1084,6 @@ public class XinLianQilian implements IUHFService {
         }
         byte[] fdata = new byte[ln / 2];
         Mreader.Str2Hex(epc, epc.length(), fdata);
-//        byte[] writeByte = ByteCharStrUtils.toByteArray(epc);
         if (selectCard(bank, fdata, mFlag) != 0) {
             Log.d(TAG, "selectCard: failed");
             return -1;
@@ -1411,7 +1091,6 @@ public class XinLianQilian implements IUHFService {
         Log.d(TAG, "selectCard: end");
         return 0;
     }
-
 
     //设置天线功率
     @Override
@@ -1468,108 +1147,6 @@ public class XinLianQilian implements IUHFService {
         }
         return rv;
     }
-
-    //设定区域锁定状态。
-    @Override
-    public int setlock(int type, int area, String passwd) {
-        try {
-            Reader.Lock_Obj lobj = null;
-            Reader.Lock_Type ltyp = null;
-            if (area == 0) {
-                lobj = Reader.Lock_Obj.LOCK_OBJECT_KILL_PASSWORD;
-                if (type == 0) {
-                    ltyp = Reader.Lock_Type.KILL_PASSWORD_UNLOCK;
-                } else if (type == 1) {
-                    ltyp = Reader.Lock_Type.KILL_PASSWORD_LOCK;
-                } else if (type == 2) {
-                    return -1;
-                } else if (type == 3) {
-                    ltyp = Reader.Lock_Type.KILL_PASSWORD_PERM_LOCK;
-                }
-
-            } else if (area == 1) {
-                lobj = Reader.Lock_Obj.LOCK_OBJECT_ACCESS_PASSWD;
-                if (type == 0) {
-                    ltyp = Reader.Lock_Type.ACCESS_PASSWD_UNLOCK;
-                } else if (type == 1) {
-                    ltyp = Reader.Lock_Type.ACCESS_PASSWD_LOCK;
-                } else if (type == 2) {
-                    return -1;
-                } else if (type == 3) {
-                    ltyp = Reader.Lock_Type.ACCESS_PASSWD_PERM_LOCK;
-                }
-            } else if (area == 2) {
-                lobj = Reader.Lock_Obj.LOCK_OBJECT_BANK1;
-                if (type == 0) {
-                    ltyp = Reader.Lock_Type.BANK1_UNLOCK;
-                } else if (type == 1) {
-                    ltyp = Reader.Lock_Type.BANK1_LOCK;
-                } else if (type == 2) {
-                    return -1;
-                } else if (type == 3) {
-                    ltyp = Reader.Lock_Type.BANK1_PERM_LOCK;
-                }
-            } else if (area == 3) {
-                lobj = Reader.Lock_Obj.LOCK_OBJECT_BANK2;
-                if (type == 0) {
-                    ltyp = Reader.Lock_Type.BANK2_UNLOCK;
-                } else if (type == 1) {
-                    ltyp = Reader.Lock_Type.BANK2_LOCK;
-                } else if (type == 2) {
-                    return -1;
-                } else if (type == 3) {
-                    ltyp = Reader.Lock_Type.BANK2_PERM_LOCK;
-                }
-            } else if (area == 4) {
-                lobj = Reader.Lock_Obj.LOCK_OBJECT_BANK3;
-                if (type == 0) {
-                    ltyp = Reader.Lock_Type.BANK3_UNLOCK;
-                } else if (type == 1) {
-                    ltyp = Reader.Lock_Type.BANK3_LOCK;
-                } else if (type == 2) {
-                    return -1;
-                } else if (type == 3) {
-                    ltyp = Reader.Lock_Type.BANK3_PERM_LOCK;
-                }
-            }
-            byte[] rpaswd = new byte[4];
-            if (!"".equals(passwd)) {
-                Mreader.Str2Hex(passwd, passwd.length(), rpaswd);
-            }
-
-            assert lobj != null;
-            assert ltyp != null;
-            Reader.READER_ERR er = Mreader.LockTag(Rparams.opant,
-                    (byte) lobj.value(), (short) ltyp.value(),
-                    rpaswd, (short) Rparams.optime);
-            if (er != Reader.READER_ERR.MT_OK_ERR) {
-                return -1;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return -1;
-        }
-        return 0;
-    }
-
-    //设置密码
-    @Override
-    public int set_Password(int which, String cur_pass, String new_pass) {
-        if (which > 1 || which < 0) {
-            return -1;
-        }
-        try {
-            if (which == 0) {
-                return write_area(0, "0", cur_pass, "2", new_pass);
-            } else {
-                return write_area(0, "2", cur_pass, "2", new_pass);
-            }
-
-        } catch (NumberFormatException e) {
-            return -1;
-        }
-    }
-
 
     //设置频率区域
     @Override
@@ -1634,25 +1211,6 @@ public class XinLianQilian implements IUHFService {
         }
     }
 
-    //设置模式
-    public int set_inventory_mode(int m) {
-//        int[] val = new int[]{m};
-//        Reader.READER_ERR er = Mreader.ParamSet(
-//                Reader.Mtr_Param.MTR_PARAM_TAG_SEARCH_MODE, val);
-//        if (er != Reader.READER_ERR.MT_OK_ERR) {
-//            return -1;
-//        }
-        return -1;
-    }
-
-    //拿到最近一次详细内部错误信息
-    @Override
-    public String GetLastDetailError() {
-        ErrInfo ei = new ErrInfo();
-        Mreader.GetLastDetailError(ei);
-        return ei.derrcode + "-" + ei.errstr;
-    }
-
     @Override
     public int setInvMode(int invm, int addr, int length) {
         try {
@@ -1703,36 +1261,10 @@ public class XinLianQilian implements IUHFService {
             } else {
                 return -1;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return -1;
         }
-    }
-
-    @Override
-    public int setFrequency(double frequency) {
-        return -1;
-    }
-
-    @Override
-    public int enableEngTest(int gain) {
-        return 0;
-    }
-
-    @Override
-    public int setDynamicAlgorithm() {
-        return -1;
-    }
-
-    //获得模式
-    public int get_inventory_mode() {
-//        int[] val = new int[]{-1};
-//        Reader.READER_ERR er = Mreader.ParamGet(
-//                Reader.Mtr_Param.MTR_PARAM_TAG_SEARCH_MODE, val);
-//        if (er == Reader.READER_ERR.MT_OK_ERR) {
-//            return val[0];
-//        }
-        return -1;
     }
 
     private volatile boolean inSearch = false;
@@ -1746,9 +1278,6 @@ public class XinLianQilian implements IUHFService {
             synchronized (this) {
                 Reader.READER_ERR er;
 //                int[] uants = Rparams.uants;
-//                if (!inSearch) {
-//                    inventoryStop();
-//                }
                 Log.d(TAG, "run: 2222222222222222222222222222");
                 if (nostop) {
                     Log.d(TAG, "run: 2222222222222222222222222222==AsyncGetTagCount==");
@@ -1859,6 +1388,16 @@ public class XinLianQilian implements IUHFService {
         }
     };
 
+    //********************************************老版接口（不再维护）******************************************
+
+    //拿到最近一次详细内部错误信息
+    @Override
+    public String GetLastDetailError() {
+        ErrInfo ei = new ErrInfo();
+        Mreader.GetLastDetailError(ei);
+        return ei.derrcode + "-" + ei.errstr;
+    }
+
     private void cancelSelect() {
         Reader.TagFilter_ST tfst = Mreader.new TagFilter_ST();
         tfst = null;
@@ -1872,10 +1411,6 @@ public class XinLianQilian implements IUHFService {
     // Message.obj 就是保存了 EPC 数据的 Tag_Data类的ArrayList。
     // SpdInventoryData 类有两个byte[ ]型的public 成员，一个是 epc，一个是 tid，如果为 null，
     // 代表对应的值不存在。
-    @Override
-    public void reg_handler(Handler hd) {
-        handler_inventer = hd;
-    }
 
     public class ReaderParams {
 

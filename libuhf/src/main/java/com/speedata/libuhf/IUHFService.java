@@ -94,20 +94,6 @@ public interface IUHFService {
     int readArea(int area, int addr, int count, String passwd);
 
     /**
-     * 一芯读卡
-     *
-     * @param pwd   密码
-     * @param data  需要过滤的数据
-     * @param bank1 区域
-     * @param ads1  起始地址1
-     * @param len1  长度1
-     * @return
-     */
-    default int yixinReadArea(String pwd, String data, int bank1, int ads1, int len1) {
-        return -1;
-    }
-
-    /**
      * 设置写数据监听
      *
      * @param onSpdWriteListener
@@ -127,20 +113,6 @@ public interface IUHFService {
     int writeArea(int area, int addr, int count, String passwd, byte[] content);
 
     /**
-     * @param pwd   密码
-     * @param data  epc数据
-     * @param bank1 区域
-     * @param ads1  起始地址
-     * @param len1  长度
-     * @param data1 需要修改的数据
-     * @return
-     */
-    default int yixinWriteArea(String pwd, String data, int bank1, int ads1, int len1, byte[] data1) {
-
-        return -1;
-    }
-
-    /**
      * 设置密码
      *
      * @param which    区域
@@ -149,17 +121,6 @@ public interface IUHFService {
      * @return 是否成功通过setOnWriteListener监听回调所得
      */
     int setPassword(int which, String cur_pass, String new_pass);
-
-    /**
-     * @param which
-     * @param cur_pass 原始密码
-     * @param new_pass 新密码
-     * @param data     要设置密码的卡片epc
-     * @return
-     */
-    default int yixinSetPwd(int which, String cur_pass, String new_pass, String data) {
-        return -1;
-    }
 
     /**
      * 锁卡
@@ -172,35 +133,6 @@ public interface IUHFService {
     int setLock(int type, int area, String passwd);
 
     /**
-     * 一芯寻标签过滤
-     * 取消过滤 ads=0 len=0
-     *
-     * @param bank 区域
-     * @param ads  起始地址
-     * @param len  长度
-     * @param data 数据 epc
-     * @param save 是否要掉电保存 	True：要；False：不要
-     * @return 0成功 失败 -1
-     */
-    default int yixinFilterEpc(int bank, int ads, int len, String data, Boolean save) {
-        return -1;
-
-    }
-
-    /**
-     * 一芯uhf解锁卡
-     *
-     * @param which     是否解锁
-     * @param pwd       访问密码
-     * @param Data      需要过滤的数据 例如epc
-     * @param bankvalue 需要锁定的区域 1：EPC；2：TID；	3：USER
-     * @return
-     */
-    default int yixinSetLock(int which, String pwd, String Data, int bankvalue) {
-        return -1;
-    }
-
-    /**
      * 销毁标签
      *
      * @param accessPassword 访问密码
@@ -208,29 +140,6 @@ public interface IUHFService {
      * @return 0成功
      */
     int setKill(String accessPassword, String killPassword);
-
-    /**
-     * 一芯 单独设置epc接口
-     *
-     * @param PwdWr 密码
-     * @param len   长度
-     * @param data
-     * @return
-     */
-    default int yixinSetNewEpc(String PwdWr, int len, byte[] data) {
-        return -1;
-    }
-
-    /**
-     * 一芯uhf  杀死标签
-     *
-     * @param pwd  销毁密码
-     * @param data epc
-     * @return
-     */
-    default int yixinSetKill(String pwd, String data) {
-        return -1;
-    }
 
     /**
      * 设置通话项
@@ -242,11 +151,115 @@ public interface IUHFService {
      */
     int setQueryTagGroup(int selected, int session, int target);
 
+    /**
+     * 获取通话项
+     *
+     * @return -
+     */
     int getQueryTagGroup();
 
+    /**
+     * 选中要操作的标签（掩码操作）
+     *
+     * @param bank  -掩码区域
+     * @param epc   -掩码内容
+     * @param mFlag true-掩码  false-取消掩码
+     * @return 0成功
+     */
+    int selectCard(int bank, byte[] epc, boolean mFlag);
+
+    int selectCard(int bank, String epc, boolean mFlag);
 
     /**
-     * 掩码
+     * 设置天线功率
+     *
+     * @param power -功率
+     * @return 0成功 -1失败
+     */
+    int setAntennaPower(int power);
+
+    /**
+     * 读取当前天线功率值
+     *
+     * @return -1失败   成功 返回功率值
+     */
+    int getAntennaPower();
+
+    /**
+     * 设置频率区域
+     *
+     * @param region -
+     * @return 0成功 -1失败
+     */
+    int setFreqRegion(int region);
+
+    /**
+     * 获取频率区域
+     *
+     * @return -1失败
+     */
+    int getFreqRegion();
+
+    /**
+     * 设置盘点模式（附加数据）
+     *
+     * @param invm   附加数据区
+     * @param addr   起始地址
+     * @param length 长度
+     * @return 0成功
+     */
+    int setInvMode(int invm, int addr, int length);
+
+    /**
+     * 获取盘点模式
+     *
+     * @param type 0-附加区，1-起始地址，2-长度
+     * @return -1失败 非-1成功
+     */
+    int getInvMode(int type);
+
+    //***** 飞利信接口 *****************************************************************//
+
+    /**
+     * 飞利信设置盘点模式
+     *
+     * @param mode 1-高性能盘点 2-低功耗盘点
+     */
+    void setInvMode(int mode);
+
+    /**
+     * 设置低功耗时间调度计划
+     *
+     * @param invOnTime  持续工作时间
+     * @param invOffTime 休息时间
+     * @return -
+     */
+    int setLowpowerScheduler(int invOnTime, int invOffTime);
+
+    /**
+     * 获取调度计划
+     *
+     * @return -null失败
+     * int[0] 持续时间
+     * int[1] 休息时间
+     */
+    int[] getLowpowerScheduler();
+
+    /**
+     * 设置驻留时间
+     *
+     * @param dwellTime 驻留时间
+     * @return - 0成功
+     */
+    int setDwellTime(int dwellTime);
+
+    /**
+     * @return
+     */
+    int getDwellTime();
+
+    /**
+     * U8标签掩码
      *
      * @param area    区域
      * @param addr    起始地址 bit
@@ -259,26 +272,16 @@ public interface IUHFService {
     /**
      * 取消选卡
      *
-     * @return
+     * @return -
      */
     int cancelMask();
 
     /**
      * 获取掩码信息
      *
-     * @return
+     * @return -
      */
     SelectCriteria getMask();
-
-    /**
-     * @param rpaswd      密码 16进制byte
-     * @param cmdType     命令类型 0为读 1为写
-     * @param memType     内存视图 0为私密 1为公共
-     * @param persistType 识别距离 0为远场 1为近场
-     * @param rangeType   状态类型 0为临时 1为永久
-     * @return
-     */
-    int setQT(byte[] rpaswd, int cmdType, int memType, int persistType, int rangeType);
 
     /**
      * 设置4QT标签的模式切换
@@ -343,17 +346,14 @@ public interface IUHFService {
      * @param tryCount  尝试次数
      * @param target    是否翻转 0启用 1禁止
      * @param threshold 阀值 0~255
-     * @return 0设置成功
+     * @return <p> 0设置成功
      * -1 startQ  minQ  maxQ threshold取值范围不对
      * -2 Q值范围设置错误 最小不能大于最大
      * -3 不在阀值0～255的取值范围内，无效阀值
      * -4 不在重试次数0～10的取值范围内，无效重试次数
-     * 其他值 查询厂商错误码
+     * 其他值 查询厂商错误码</p>
      */
-    default int setDynamicAlgorithm(int startQ, int minQ, int maxQ, int tryCount
-            , int target, int threshold) {
-        return 0;
-    }
+    int setDynamicAlgorithm(int startQ, int minQ, int maxQ, int tryCount, int target, int threshold);
 
     /**
      * @param qValue   起始Q值  0～15
@@ -365,68 +365,46 @@ public interface IUHFService {
      * -4 不在重试次数0～10的取值范围内，无效重试次数
      * 其他值 查询厂商错误码
      */
-    default int setFixedAlgorithm(int qValue, int tryCount, int target, int repeat) {
-        return 0;
-    }
+    int setFixedAlgorithm(int qValue, int tryCount, int target, int repeat);
 
 
-    default int getDynamicAlgorithm(DynamicQParams dynamicQParams) {
-        return 0;
-    }
+    int getDynamicAlgorithm(DynamicQParams dynamicQParams);
 
-    default int getFixedAlgorithm(FixedQParams fixedQParams) {
-        return 0;
-    }
+    int getFixedAlgorithm(FixedQParams fixedQParams);
 
-    default int setGen2QValue(int qValue) {
-        return 0;
-    }
+    //设置频点
+    int setFrequency(double frequency);
 
-    default int setGen2WriteMode(int wMode) {
-        return 0;
-    }
+    //载波测试接口
+    int enableEngTest(int gain);
 
-    default int setGen2Blf(int blf) {
-        return 0;
-    }
-
-    default int setGen2MaxLen(int maxLen) {
-        return -1;
-    }
-
-    default int setGen2Target(int target) {
-        return 0;
-    }
-
-    default int setGen2Code(int code) {
-        return 0;
-    }
-
-    default int setGen2Tari(int tari) {
-        return 0;
-    }
-
-    default int[] getGen2AllValue() {
-        return null;
-    }
+    //***** 芯联接口 ******************************************************************//
 
     /**
-     * 开启快速模式
-     *
-     * @return 0成功 -1失败
+     * @param rpaswd      密码 16进制byte
+     * @param cmdType     命令类型 0为读 1为写
+     * @param memType     内存视图 0为私密 1为公共
+     * @param persistType 识别距离 0为远场 1为近场
+     * @param rangeType   状态类型 0为临时 1为永久
+     * @return
      */
-    default int startFastMode() {
-        return 0;
-    }
+    int setQT(byte[] rpaswd, int cmdType, int memType, int persistType, int rangeType);
 
-    /**
-     * 关闭快速模式
-     *
-     * @return 0成功 -1失败
-     */
-    default int stopFastMode() {
-        return 0;
-    }
+    int setGen2QValue(int qValue);
+
+    int setGen2Target(int target);
+
+    int[] getGen2AllValue();
+
+    int setGen2WriteMode(int wMode);
+
+    int setGen2Blf(int blf);
+
+    int setGen2MaxLen(int maxLen);
+
+    int setGen2Code(int code);
+
+    int setGen2Tari(int tari);
 
     /**
      * 设置盘点超时时间
@@ -434,18 +412,14 @@ public interface IUHFService {
      * @param readTime 毫秒
      * @return -
      */
-    default int setReadTime(int readTime) {
-        return 0;
-    }
+    int setReadTime(int readTime);
 
     /**
      * 获取盘点超时时间
      *
      * @return -
      */
-    default int getReadTime() {
-        return 0;
-    }
+    int getReadTime();
 
     /**
      * 设置盘点时间间隔
@@ -453,18 +427,54 @@ public interface IUHFService {
      * @param sleep 毫秒
      * @return -
      */
-    default int setSleep(int sleep) {
-        return 0;
-    }
+    int setSleep(int sleep);
 
     /**
      * 获取盘点间隔时间
      *
      * @return -
      */
-    default int getSleep() {
-        return 0;
-    }
+    int getSleep();
+
+    /**
+     * 开启快速模式
+     *
+     * @return 0成功 -1失败
+     */
+    int startFastMode();
+
+    /**
+     * 关闭快速模式
+     *
+     * @return 0成功 -1失败
+     */
+    int stopFastMode();
+
+    //***** 一芯接口 ******************************************************************//
+
+    /**
+     * 一芯寻标签过滤
+     * 取消过滤 ads=0 len=0
+     *
+     * @param bank 区域
+     * @param ads  起始地址
+     * @param len  长度
+     * @param data 数据 epc
+     * @param save 是否要掉电保存 	True：要；False：不要
+     * @return 0成功 失败 -1
+     */
+    int yixinFilterEpc(int bank, int ads, int len, String data, Boolean save);
+
+    /**
+     * 一芯 单独设置epc接口
+     *
+     * @param PwdWr 密码
+     * @param len   长度
+     * @param data
+     * @return
+     */
+    int yixinSetNewEpc(String PwdWr, int len, byte[] data);
+
 
     //*****************坤瑞sm7认证接口************
 
@@ -474,9 +484,7 @@ public interface IUHFService {
      * @param inventoryData 判断数据
      * @return 默认 返回-1
      */
-    default int krSm7Inventory(InventoryData inventoryData) {
-        return -1;
-    }
+    int krSm7Inventory(InventoryData inventoryData);
 
 
     /**
@@ -489,9 +497,7 @@ public interface IUHFService {
      * @param content 写入的内容
      * @return 转态码      return -1;
      */
-    default int krSm7Blockwrite(int length, int addr, int area, byte[] pwd, byte[] content) {
-        return -1;
-    }
+    int krSm7Blockwrite(int length, int addr, int area, byte[] pwd, byte[] content);
 
     /**
      * 坤锐正常写
@@ -503,9 +509,7 @@ public interface IUHFService {
      * @param content 写入的内容
      * @return 默认返回-1
      */
-    default int krSm7Write(int length, int addr, int area, byte[] pwd, byte[] content) {
-        return -1;
-    }
+    int krSm7Write(int length, int addr, int area, byte[] pwd, byte[] content);
 
     /**
      * 坤锐读取
@@ -517,155 +521,40 @@ public interface IUHFService {
      * @param krSm7Data 读取内容
      * @return 默认返回-1
      */
-    default int krSm7Read(int length, int addr, int area, byte[] pwd, KrReadData krSm7Data) {
-        return -1;
-    }
+    int krSm7Read(int length, int addr, int area, byte[] pwd, KrReadData krSm7Data);
 
     /**
      * 坤锐关闭
      *
      * @return 默认返回-1
      */
-    default int krSm7End() {
-        return -1;
-    }
-
-    /**
-     * 飞利信设置盘点模式
-     *
-     * @param mode 1-高性能盘点 2-低功耗盘点
-     */
-    default void setInvMode(int mode) {
-
-    }
-
-    /**
-     * 设置低功耗模式调度计划
-     *
-     * @param invOnTime  持续工作时间
-     * @param invOffTime 休息时间
-     * @return 0成功
-     */
-    default int setLowpowerScheduler(int invOnTime, int invOffTime) {
-        return 0;
-    }
-
-    default int[] getLowpowerScheduler() {
-        return null;
-    }
-
-    /**
-     * 设置驻留时间
-     *
-     * @param dwellTime 驻留时间
-     * @return 0成功
-     */
-    default int setDwellTime(int dwellTime) {
-        return 0;
-    }
-
-    /**
-     * 获取驻留时间
-     *
-     * @return 返回驻留时间
-     */
-    default int getDwellTime() {
-        return 0;
-    }
-
-    //****************************
+    int krSm7End();
 
 
     //********************************************老版接口（不再维护）***************************************************
 
-
-    //开始盘点
     void inventory_start();
 
-    // Handler用于处理返回的盘点数据
     void inventory_start(Handler hd);
 
-    //设置密码
-    int set_Password(int which, String cur_pass, String new_pass);
-
-    //停止盘点
     int inventory_stop();
 
-    /**
-     * 从标签 area 区的 addr 位置（以 word 计算）读取 count 个值（以 byte 计算）
-     * passwd 是访问密码，如果区域没被锁就给 0 值。
-     *
-     * @param area
-     * @param addr
-     * @param count
-     * @param passwd
-     * @return
-     */
     byte[] read_area(int area, int addr, int count, String passwd);
 
-    String read_area(int area, String str_addr
-            , String str_count, String str_passwd);
+    String read_area(int area, String str_addr, String str_count, String str_passwd);
 
-
-    //把 content 中的数据写到标签 area 区中 addr（以 word 计算）开始的位 置。
     int write_area(int area, int addr, int count, String passwd, byte[] content);
 
     int write_area(int area, String addr, String pwd, String count, String content);
 
-
-    //选中要进行操作的 epc 标签
-    int selectCard(int bank, byte[] epc, boolean mFlag);
-
-    int selectCard(int bank, String epc, boolean mFlag);
-
-
-    //设置天线功率
-    int setAntennaPower(int power);
-
-    //读取当前天线功率值
-    int getAntennaPower();
-
-    //设置频率区域
-    int setFreqRegion(int region);
-
-    int getFreqRegion();
-
-    //设置盘点的handler
     void reg_handler(Handler hd);
 
     int setlock(int type, int area, String passwd);
 
-    //拿到最近一次详细内部错误信息
+    int set_Password(int which, String cur_pass, String new_pass);
+
     String GetLastDetailError();
 
-    /**
-     * 设置盘点模式（附加数据）
-     *
-     * @param invm   附加数据区
-     * @param addr   起始地址
-     * @param length 长度
-     * @return 0成功
-     */
-    int setInvMode(int invm, int addr, int length);
-
-    /**
-     * 获取盘点模式
-     *
-     * @param type 0-附加区，1-起始地址，2-长度
-     * @return -1失败 非-1成功
-     */
-    int getInvMode(int type);
-
-    //设置频点
-    int setFrequency(double frequency);
-
-    //载波测试接口
-    int enableEngTest(int gain);
-
-    /**
-     * 设置反转 与 设置算法
-     *
-     * @return
-     */
     int setDynamicAlgorithm();
+
 }

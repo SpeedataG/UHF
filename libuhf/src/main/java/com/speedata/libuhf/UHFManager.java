@@ -346,9 +346,6 @@ public class UHFManager {
             case FACTORY_R2000:
                 iuhfService = new FLX(mContext, 0);
                 break;
-//            case FACTORY_3992:
-//                iuhfService = new com.android.uhflibs.as3992_native(mContext);
-//                break;
             case FACTORY_YIXIN:
                 // TODO: 2019/8/26   初始化一芯sdk
                 iuhfService = new YiXin(mContext);
