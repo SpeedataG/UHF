@@ -407,11 +407,11 @@ public class InventorySettingDialog extends Dialog implements View.OnClickListen
                 break;
             case R.id.btn_set_mode:
                 if (!MyApp.isFastMode) {
-                    MyApp.getInstance().getIuhfService().setInvMode(2);
+                    MyApp.getInstance().getIuhfService().switchInvMode(2);
                     MyApp.isFastMode = true;
                     btnSetMode.setText("关闭低功耗模式");
                 } else {
-                    MyApp.getInstance().getIuhfService().setInvMode(1);
+                    MyApp.getInstance().getIuhfService().switchInvMode(1);
                     MyApp.isFastMode = false;
                     btnSetMode.setText("开启低功耗模式");
                 }

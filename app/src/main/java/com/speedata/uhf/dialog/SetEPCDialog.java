@@ -15,7 +15,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.speedata.libuhf.IUHFService;
+import com.speedata.libuhf.bean.SpdReadData;
 import com.speedata.libuhf.bean.SpdWriteData;
+import com.speedata.libuhf.interfaces.OnSpdReadListener;
 import com.speedata.libuhf.interfaces.OnSpdWriteListener;
 import com.speedata.libuhf.utils.StringUtils;
 import com.speedata.uhf.R;
@@ -32,15 +34,16 @@ public class SetEPCDialog extends Dialog implements
     private TextView EPC;
     private TextView status;
     private EditText passwd;
-    private EditText newepc ,epcLen;
+    private EditText newepc, epcLen;
     private EditText newepclength;
     private IUHFService iuhfService;
     private String currentTagEpc;
     private boolean isSuccess = false;
     private Context mContext;
-    private  String model;
+    private String model;
+    private byte[] readData = null;
 
-    public SetEPCDialog(Context context, IUHFService iuhfService, String currentTagEpc,String model) {
+    public SetEPCDialog(Context context, IUHFService iuhfService, String currentTagEpc, String model) {
         super(context);
         // TODO Auto-generated constructor stub
         this.iuhfService = iuhfService;
@@ -90,6 +93,17 @@ public class SetEPCDialog extends Dialog implements
             }
         });
 
+        iuhfService.setOnReadListener(new OnSpdReadListener() {
+            @Override
+            public void getReadData(SpdReadData var1) {
+                if (var1.getStatus() == 0) {
+                    readData = var1.getReadData();
+                } else {
+                    readData = null;
+                }
+            }
+        });
+
     }
 
     @Override
@@ -116,15 +130,10 @@ public class SetEPCDialog extends Dialog implements
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    int    writeArea = -1;
-                    if ("yixin".equals(model)) {
-                         writeArea= iuhfService.yixinSetNewEpc(password, epcl, write);
-                    }else {
-                        writeArea = set_EPC(epcl, password, write);
-                    }
+                    int writeArea = iuhfService.setNewEpc(password, epcl, write);
                     if (writeArea != 0) {
                         handler.sendMessage(handler.obtainMessage(1, mContext.getResources().getString(R.string.param_error)));
-                    }else {
+                    } else {
                         handler.sendMessage(handler.obtainMessage(1, mContext.getResources().getString(R.string.toast_set_success)));
 
                     }
@@ -144,14 +153,15 @@ public class SetEPCDialog extends Dialog implements
         if (epclength * 2 < EPC.length) {
             return -3;
         }
-        res = iuhfService.read_area(IUHFService.EPC_A, 1, 1, passwd);
-        if (res == null) {
+        iuhfService.readArea(IUHFService.EPC_A, 1, 1, passwd);
+        SystemClock.sleep(500);
+        if (readData == null) {
             return -5;
         }
-        res[0] = (byte) ((res[0] & 0x7) | (epclength << 3));
+        readData[0] = (byte) ((readData[0] & 0x7) | (epclength << 3));
         byte[] f = new byte[2 + epclength * 2];
         try {
-            System.arraycopy(res, 0, f, 0, 2);
+            System.arraycopy(readData, 0, f, 0, 2);
             System.arraycopy(EPC, 0, f, 2, epclength * 2);
         } catch (Exception e) {
             e.printStackTrace();

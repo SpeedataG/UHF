@@ -23,4 +23,9 @@ public class ExampleInstrumentedTest {
 
         assertEquals("com.speedata.uhf", appContext.getPackageName());
     }
+
+    @Test
+    public void test(){
+        System.out.println("sss");
+    }
 }

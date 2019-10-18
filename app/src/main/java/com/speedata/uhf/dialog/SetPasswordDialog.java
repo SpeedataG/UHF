@@ -116,12 +116,7 @@ public class SetPasswordDialog extends Dialog implements
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    int setPassword = -1;
-                    if ("yixin".equals(model)) {
-                        setPassword = iuhfService.yixinSetPwd(which, cur_pass, new_pass, current_tag_epc);
-                    } else {
-                        setPassword = iuhfService.setPassword(which, cur_pass, new_pass);
-                    }
+                    int setPassword = iuhfService.setPassword(which, cur_pass, new_pass);
                     if (setPassword != 0) {
                         handler.sendMessage(handler.obtainMessage(1, context.getResources().getString(R.string.param_error)));
                     }

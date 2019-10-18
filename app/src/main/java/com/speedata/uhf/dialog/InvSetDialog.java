@@ -87,12 +87,12 @@ public class InvSetDialog extends Dialog implements android.view.View.OnClickLis
 
         });
 
-        int curmode = iuhfService.getInvMode(FLX.InvModeType);
-        int curaddr = iuhfService.getInvMode(FLX.InvAddrType);
-        int cursize = iuhfService.getInvMode(FLX.InvSizeType);
-        addr.setText(curaddr + "");
-        size.setText(cursize + "");
-        mode.setSelection(curmode);
+//        int curmode = iuhfService.getInvMode(FLX.InvModeType);
+//        int curaddr = iuhfService.getInvMode(FLX.InvAddrType);
+//        int cursize = iuhfService.getInvMode(FLX.InvSizeType);
+//        addr.setText(curaddr + "");
+//        size.setText(cursize + "");
+//        mode.setSelection(curmode);
         Log.e("r2000_native", "oncreate over");
     }
 
@@ -114,29 +114,32 @@ public class InvSetDialog extends Dialog implements android.view.View.OnClickLis
             } else {
                 iuhfService.cancelMask();
                 SharedXmlUtil.getInstance(context).write("U8", false);
-                int caddr = 0, csize = 0;
-                String saddr = addr.getText().toString();
-                String ssize = size.getText().toString();
-                if (w != 0) {
-                    try {
-                        caddr = Integer.parseInt(saddr);
-                        csize = Integer.parseInt(ssize);
-                        if (csize == 0) {
-                            throw new NumberFormatException("size cannot be 0");
-                        }
-
-                    } catch (NumberFormatException p) {
-                        status.setText(R.string.Status_InvalidNumber);
-                        status.append("\n" + p.getMessage());
-                        return;
-                    }
-                }
+//                int caddr = 0, csize = 0;
+                int caddr = 0, csize = 6;
+//                String saddr = addr.getText().toString();
+//                String ssize = size.getText().toString();
+//                if (w != 0) {
+//                    try {
+//                        caddr = Integer.parseInt(saddr);
+//                        csize = Integer.parseInt(ssize);
+//                        if (csize == 0) {
+//                            throw new NumberFormatException("size cannot be 0");
+//                        }
+//
+//                    } catch (NumberFormatException p) {
+//                        status.setText(R.string.Status_InvalidNumber);
+//                        status.append("\n" + p.getMessage());
+//                        return;
+//                    }
+//                }
                 iuhfService.setInvMode(w, caddr, csize);
             }
 
             dismiss();
         } else if (v == cancel) {
-            dismiss();
+//            dismiss();
+            int curmode = iuhfService.getInvMode(0);
+            mode.setSelection(curmode);
         }
     }
 }

@@ -45,6 +45,8 @@ public class YiXin extends IUHFServiceAdapter implements OnSpdInventoryListener 
     private OnSpdWriteListener onSpdWriteListener = null;
     private boolean loopFlag = false;
     private YiXinParams yiXinParams = new YiXinParams();
+    private byte[] readData;
+    private String status;
 
     public YiXin(Context context) {
         this.mContext = context;
@@ -363,13 +365,17 @@ public class YiXin extends IUHFServiceAdapter implements OnSpdInventoryListener 
         //默认指定标签区域为epc 起始地址32  长度96
         String result = getDeriver().Read_Data_Tag(passwd, yiXinParams.bank, yiXinParams.ads,
                 yiXinParams.len, yiXinParams.epcData, area, addr, count);
+        status = result;
+        SpdReadData spdReadData = new SpdReadData();
         if (result != null) {
-            SpdReadData spdReadData = new SpdReadData();
             spdReadData.setReadData(DataConversionUtils.hexStringToByteArray(result));
             spdReadData.setDataLen(DataConversionUtils.hexStringToByteArray(result).length);
+            spdReadData.setStatus(0);
+            this.readData = spdReadData.getReadData();
             readCallBack(spdReadData);
             return 0;
         } else {
+            spdReadData.setStatus(-1);
             return -1;
         }
     }
@@ -477,8 +483,8 @@ public class YiXin extends IUHFServiceAdapter implements OnSpdInventoryListener 
     }
 
     @Override
-    public int yixinSetNewEpc(String PwdWr, int len, byte[] data) {
-        int ret = getDeriver().Write_Epc_Data(PwdWr, 2, len, StringUtils.byteToHexString(data, data.length));
+    public int setNewEpc(String password, int len, byte[] epc) {
+        int ret = getDeriver().Write_Epc_Data(password, 2, len, StringUtils.byteToHexString(epc, epc.length));
         if (ret == 0) {
             return 0;
         } else {

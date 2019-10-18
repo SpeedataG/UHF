@@ -218,6 +218,16 @@ public interface IUHFService {
      */
     int getInvMode(int type);
 
+    /**
+     * 设置新的epc
+     *
+     * @param password 密码
+     * @param len      新的epc长度
+     * @param epc      新的epc
+     * @return
+     */
+    int setNewEpc(String password, int len, byte[] epc);
+
     //***** 飞利信接口 *****************************************************************//
 
     /**
@@ -225,7 +235,7 @@ public interface IUHFService {
      *
      * @param mode 1-高性能盘点 2-低功耗盘点
      */
-    void setInvMode(int mode);
+    void switchInvMode(int mode);
 
     /**
      * 设置低功耗时间调度计划
@@ -465,16 +475,6 @@ public interface IUHFService {
      */
     int yixinFilterEpc(int bank, int ads, int len, String data, Boolean save);
 
-    /**
-     * 一芯 单独设置epc接口
-     *
-     * @param PwdWr 密码
-     * @param len   长度
-     * @param data
-     * @return
-     */
-    int yixinSetNewEpc(String PwdWr, int len, byte[] data);
-
 
     //*****************坤瑞sm7认证接口************
 
@@ -539,6 +539,14 @@ public interface IUHFService {
 
     int inventory_stop();
 
+    /**
+     * @param area
+     * @param addr
+     * @param count
+     * @param passwd
+     * @return
+     * @deprecated Please use {@link #readArea(int, int, int, String)} instead.
+     */
     byte[] read_area(int area, int addr, int count, String passwd);
 
     String read_area(int area, String str_addr, String str_count, String str_passwd);

@@ -108,11 +108,6 @@ public class ReadTagDialog extends Dialog implements
                 @Override
                 public void run() {
                     int readArea = iuhfService.readArea(whichChoose, addr, count, strPasswd);
-//                    if ("yixin".equals(model)) {
-//                        readArea = iuhfService.yixinReadArea(strPasswd, currentTagEpc, whichChoose, addr, count);
-//                    } else {
-//                        readArea = iuhfService.readArea(whichChoose, addr, count, strPasswd);
-//                    }
                     if (readArea != 0) {
                         handler.sendMessage(handler.obtainMessage(1, mContext.getResources().getString(R.string.param_error)));
                     }

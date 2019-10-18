@@ -122,12 +122,7 @@ public class LockTagDialog extends Dialog implements
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    int reval = -1;
-                    if ("yixin".equals(model)) {
-                        reval = iuhfService.yixinSetLock(style_nr, ps, current_tag_epc, area_nr+1);
-                    } else {
-                        reval = iuhfService.setLock(style_nr, area_nr, ps);
-                    }
+                    int reval = iuhfService.setLock(style_nr, area_nr, ps);
                     if (reval != 0) {
                         handler.sendMessage(handler.obtainMessage(1, mContext.getResources().getString(R.string.param_error)));
                     }

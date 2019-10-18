@@ -131,7 +131,12 @@ public class IUHFServiceAdapter implements IUHFService {
     }
 
     @Override
-    public void setInvMode(int mode) {
+    public int setNewEpc(String password, int len, byte[] epc) {
+        return -1;
+    }
+
+    @Override
+    public void switchInvMode(int mode) {
 
     }
 
@@ -307,11 +312,6 @@ public class IUHFServiceAdapter implements IUHFService {
 
     @Override
     public int yixinFilterEpc(int bank, int ads, int len, String data, Boolean save) {
-        return -1;
-    }
-
-    @Override
-    public int yixinSetNewEpc(String PwdWr, int len, byte[] data) {
         return -1;
     }
 

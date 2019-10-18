@@ -52,6 +52,8 @@ public class XinLianQilian extends IUHFServiceAdapter {
     private Context mContext;
     private ReadBean mRead;
     private DeviceControlSpd newUHFDeviceControl;
+    private byte[] readData;
+    private Reader.READER_ERR status;
 
     public XinLianQilian(Context mContext) {
         this.mContext = mContext;
@@ -432,6 +434,7 @@ public class XinLianQilian extends IUHFServiceAdapter {
             }
             Reader.READER_ERR er = Reader.READER_ERR.MT_OK_ERR;
             int trycount = 3;
+
             do {
                 er = Mreader.GetTagData(Rparams.opant,
                         (char) area, addr, count,
@@ -443,12 +446,14 @@ public class XinLianQilian extends IUHFServiceAdapter {
                 }
             } while (er != Reader.READER_ERR.MT_OK_ERR);
             Log.d(TAG, "read_area: end");
+            status = er;
             SpdReadData spdReadData = new SpdReadData();
             if (er == Reader.READER_ERR.MT_OK_ERR) {
                 spdReadData.setReadData(rdata);
                 spdReadData.setDataLen(rdata.length);
                 spdReadData.setStatus(0);
                 readCallBack(spdReadData);
+                this.readData = rdata;
             } else if (er == Reader.READER_ERR.MT_IO_ERR) {
                 spdReadData.setReadData(new byte[]{(byte) 0xFF, 0x01, (byte) 0xEE});
                 spdReadData.setStatus(1);
@@ -807,6 +812,37 @@ public class XinLianQilian extends IUHFServiceAdapter {
             // TODO Auto-generated catch block
             return -1;
         }
+    }
+
+    @Override
+    public int setNewEpc(String password, int len, byte[] epc) {
+        if (len > 31) {
+            return -3;
+        }
+        if (len * 2 < epc.length) {
+            return -3;
+        }
+        readArea(IUHFService.EPC_A, 1, 1, password);
+        while (status != Reader.READER_ERR.MT_OK_ERR) {
+            if (readData != null) {
+                break;
+            }
+        }
+        if (readData == null) {
+            return -5;
+        }
+        readData[0] = (byte) ((readData[0] & 0x7) | (len << 3));
+        byte[] f = new byte[2 + len * 2];
+        try {
+            System.arraycopy(readData, 0, f, 0, 2);
+            System.arraycopy(epc, 0, f, 2, len * 2);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+        SystemClock.sleep(500);
+        readData = null;
+        return writeArea(IUHFService.EPC_A, 1, f.length / 2, password, f);
     }
 
     @Override

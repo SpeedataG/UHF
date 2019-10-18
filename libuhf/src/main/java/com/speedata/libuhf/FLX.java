@@ -58,6 +58,8 @@ public class FLX extends IUHFServiceAdapter implements OnInventoryListener, OnRe
     public static final int InvSizeType = 2;
     private int type = 0;
     private int mode = 1;
+    private byte[] readData;
+    private int status = -1;
 
     public FLX(Context mContext, int type) {
         this.mContext = mContext;
@@ -165,11 +167,13 @@ public class FLX extends IUHFServiceAdapter implements OnInventoryListener, OnRe
             spdReadData.setEPCData(resultData);
             spdReadData.setEPCLen(rw_params.EPCLen);
             Log.d("ZM", "读卡状态: " + rw_params.status);
+            this.status = rw_params.status;
             if (rw_params.status == 0) {
                 byte[] readResultData = new byte[rw_params.DataLen];
                 byte[] readData = rw_params.ReadData;
                 System.arraycopy(readData, 0, readResultData, 0, rw_params.DataLen);
                 spdReadData.setReadData(readResultData);
+                this.readData = readResultData;
             } else {
                 spdReadData.setReadData(null);
             }
@@ -760,7 +764,38 @@ public class FLX extends IUHFServiceAdapter implements OnInventoryListener, OnRe
     }
 
     @Override
-    public void setInvMode(int mode) {
+    public int setNewEpc(String password, int len, byte[] epc) {
+        if (len > 31) {
+            return -3;
+        }
+        if (len * 2 < epc.length) {
+            return -3;
+        }
+        readArea(IUHFService.EPC_A, 1, 1, password);
+        while (status != 0) {
+            if (readData != null) {
+                break;
+            }
+        }
+        if (readData == null) {
+            return -5;
+        }
+        readData[0] = (byte) ((readData[0] & 0x7) | (len << 3));
+        byte[] f = new byte[2 + len * 2];
+        try {
+            System.arraycopy(readData, 0, f, 0, 2);
+            System.arraycopy(epc, 0, f, 2, len * 2);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+        SystemClock.sleep(500);
+        readData = null;
+        return writeArea(IUHFService.EPC_A, 1, f.length / 2, password, f);
+    }
+
+    @Override
+    public void switchInvMode(int mode) {
         this.mode = mode;
     }
 
