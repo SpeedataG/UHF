@@ -228,21 +228,20 @@ public interface IUHFService {
      */
     int setNewEpc(String password, int len, byte[] epc);
 
-    //***** 飞利信接口 *****************************************************************//
-
     /**
-     * 飞利信设置盘点模式
+     * 设置盘点模式
      *
      * @param mode 1-高性能盘点 2-低功耗盘点
+     * @return 0成功 -1失败
      */
-    void switchInvMode(int mode);
+    int switchInvMode(int mode);
 
     /**
      * 设置低功耗时间调度计划
      *
      * @param invOnTime  持续工作时间
      * @param invOffTime 休息时间
-     * @return -
+     * @return -0成功 非0失败
      */
     int setLowpowerScheduler(int invOnTime, int invOffTime);
 
@@ -255,6 +254,8 @@ public interface IUHFService {
      */
     int[] getLowpowerScheduler();
 
+    //***** 飞利信接口 *****************************************************************//
+
     /**
      * 设置驻留时间
      *
@@ -264,7 +265,9 @@ public interface IUHFService {
     int setDwellTime(int dwellTime);
 
     /**
-     * @return
+     * 获取驻留时间
+     *
+     * @return -1失败
      */
     int getDwellTime();
 
@@ -357,7 +360,7 @@ public interface IUHFService {
      * @param target    是否翻转 0启用 1禁止
      * @param threshold 阀值 0~255
      * @return <p> 0设置成功
-     * -1 startQ  minQ  maxQ threshold取值范围不对
+     * -1 startQ  minQ  maxQ 取值范围不对
      * -2 Q值范围设置错误 最小不能大于最大
      * -3 不在阀值0～255的取值范围内，无效阀值
      * -4 不在重试次数0～10的取值范围内，无效重试次数
@@ -371,7 +374,7 @@ public interface IUHFService {
      * @param target   是否翻转 0启用 1禁止
      * @param repeat   是否重复 0启用 1禁止
      * @return 0设置成功
-     * -1 startQ  minQ  maxQ threshold取值范围不对
+     * -1 qValue取值范围不对
      * -4 不在重试次数0～10的取值范围内，无效重试次数
      * 其他值 查询厂商错误码
      */
@@ -415,50 +418,6 @@ public interface IUHFService {
     int setGen2Code(int code);
 
     int setGen2Tari(int tari);
-
-    /**
-     * 设置盘点超时时间
-     *
-     * @param readTime 毫秒
-     * @return -
-     */
-    int setReadTime(int readTime);
-
-    /**
-     * 获取盘点超时时间
-     *
-     * @return -
-     */
-    int getReadTime();
-
-    /**
-     * 设置盘点时间间隔
-     *
-     * @param sleep 毫秒
-     * @return -
-     */
-    int setSleep(int sleep);
-
-    /**
-     * 获取盘点间隔时间
-     *
-     * @return -
-     */
-    int getSleep();
-
-    /**
-     * 开启快速模式
-     *
-     * @return 0成功 -1失败
-     */
-    int startFastMode();
-
-    /**
-     * 关闭快速模式
-     *
-     * @return 0成功 -1失败
-     */
-    int stopFastMode();
 
     //***** 一芯接口 ******************************************************************//
 

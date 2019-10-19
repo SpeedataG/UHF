@@ -999,51 +999,50 @@ public class XinLianQilian extends IUHFServiceAdapter {
             if (er == Reader.READER_ERR.MT_OK_ERR) {
                 res[0] = val1[0] + 1;
             } else {
-                res[0] = -1;
+                return null;
             }
 
             er = Mreader.ParamGet(Reader.Mtr_Param.MTR_PARAM_POTL_GEN2_TARGET, val2);
             if (er == Reader.READER_ERR.MT_OK_ERR) {
                 res[1] = val2[0];
             } else {
-                res[1] = -1;
+                return null;
             }
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            res = null;
+            return null;
         }
         return res;
     }
 
     @Override
-    public int startFastMode() {
-        try {
-            int[] uants = Rparams.uants;
-            Reader.READER_ERR er = Mreader.AsyncStartReading(uants, Rparams.uants.length, 0);
-            if (er == Reader.READER_ERR.MT_OK_ERR) {
-                nostop = true;
-                return 0;
-            } else {
+    public int switchInvMode(int mode) {
+        if (mode == 1) {
+            try {
+                int[] uants = Rparams.uants;
+                Reader.READER_ERR er = Mreader.AsyncStartReading(uants, Rparams.uants.length, 0);
+                if (er == Reader.READER_ERR.MT_OK_ERR) {
+                    nostop = true;
+                    return 0;
+                } else {
+                    return -1;
+                }
+            } catch (Exception e) {
                 return -1;
             }
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    @Override
-    public int stopFastMode() {
-        try {
-            Reader.READER_ERR er = Mreader.AsyncStopReading();
-            if (er == Reader.READER_ERR.MT_OK_ERR) {
-                nostop = false;
-                return 0;
-            } else {
+        } else {
+            try {
+                Reader.READER_ERR er = Mreader.AsyncStopReading();
+                if (er == Reader.READER_ERR.MT_OK_ERR) {
+                    nostop = false;
+                    return 0;
+                } else {
+                    return -1;
+                }
+            } catch (Exception e) {
                 return -1;
             }
-        } catch (Exception e) {
-            return -1;
         }
     }
 
@@ -1055,27 +1054,12 @@ public class XinLianQilian extends IUHFServiceAdapter {
     }
 
     @Override
-    public int setReadTime(int readTime) {
-        Rparams.readtime = readTime;
-        return 0;
+    public int[] getLowpowerScheduler() {
+        int[] a = new int[2];
+        a[0] = Rparams.readtime;
+        a[1] = Rparams.sleep;
+        return a;
     }
-
-    @Override
-    public int getReadTime() {
-        return Rparams.readtime;
-    }
-
-    @Override
-    public int setSleep(int sleep) {
-        Rparams.sleep = sleep;
-        return 0;
-    }
-
-    @Override
-    public int getSleep() {
-        return Rparams.sleep;
-    }
-
 
     //选中要进行操作的 epc 标签
     @Override

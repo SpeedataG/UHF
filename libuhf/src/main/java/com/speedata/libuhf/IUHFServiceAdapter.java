@@ -136,8 +136,8 @@ public class IUHFServiceAdapter implements IUHFService {
     }
 
     @Override
-    public void switchInvMode(int mode) {
-
+    public int switchInvMode(int mode) {
+        return -1;
     }
 
     @Override
@@ -277,36 +277,6 @@ public class IUHFServiceAdapter implements IUHFService {
 
     @Override
     public int setGen2Tari(int tari) {
-        return -1;
-    }
-
-    @Override
-    public int setReadTime(int readTime) {
-        return -1;
-    }
-
-    @Override
-    public int getReadTime() {
-        return -1;
-    }
-
-    @Override
-    public int setSleep(int sleep) {
-        return -1;
-    }
-
-    @Override
-    public int getSleep() {
-        return -1;
-    }
-
-    @Override
-    public int startFastMode() {
-        return -1;
-    }
-
-    @Override
-    public int stopFastMode() {
         return -1;
     }
 

@@ -795,8 +795,9 @@ public class FLX extends IUHFServiceAdapter implements OnInventoryListener, OnRe
     }
 
     @Override
-    public void switchInvMode(int mode) {
+    public int switchInvMode(int mode) {
         this.mode = mode;
+        return 0;
     }
 
     @Override
