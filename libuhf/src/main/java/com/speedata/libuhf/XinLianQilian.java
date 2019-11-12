@@ -127,7 +127,7 @@ public class XinLianQilian extends IUHFServiceAdapter {
         } else {
             String xinghao = SystemProperties.get("ro.product.model");
             if ("SD60RT".equalsIgnoreCase(xinghao) || "MST-II-YN".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || "SD55L".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
-                    || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "ESUR-H600".equals(xinghao)) {
+                    || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "ESUR-H600".equals(xinghao) || "smo_b2000".equals(xinghao)) {
                 try {
 //                    deviceControl = new UHFDeviceControl(UHFDeviceControl.PowerType.NEW_MAIN, 86);
                     deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.EXPAND, 9, 14);
@@ -1490,8 +1490,8 @@ public class XinLianQilian extends IUHFServiceAdapter {
             invpro.add("GEN2");
             uants = new int[1];
             uants[0] = 1;
-            sleep = 50;
-            readtime = 100;
+            sleep = 0;
+            readtime = 50;
             optime = 1000;
             opro = "GEN2";
             checkant = 1;

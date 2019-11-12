@@ -97,7 +97,7 @@ public class YiXin extends IUHFServiceAdapter implements OnSpdInventoryListener 
         } else {
             String xinghao = SystemProperties.get("ro.product.model");
             if ("SD60RT".equalsIgnoreCase(xinghao) || "MST-II-YN".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || "SD55L".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
-                    || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "ESUR-H600".equals(xinghao)) {
+                    || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "ESUR-H600".equals(xinghao) || "smo_b2000".equals(xinghao)) {
                 try {
                     pw = new DeviceControlSpd(DeviceControlSpd.PowerType.EXPAND, 9, 14);
                 } catch (IOException e) {
@@ -197,7 +197,7 @@ public class YiXin extends IUHFServiceAdapter implements OnSpdInventoryListener 
         String xinghao = SystemProperties.get("ro.product.model");
         if ("SD60RT".equalsIgnoreCase(xinghao) || "MST-II-YN".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
                 || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "SD100T".equals(xinghao) || "X47".equalsIgnoreCase(xinghao)
-                || "ESUR-H600".equals(xinghao)) {
+                || "ESUR-H600".equals(xinghao) || "smo_b2000".equals(xinghao)) {
             result = getDeriver().initRFID(SERIALPORT_SD60);
         } else if (xinghao.equals("SD55PTT")) {
             result = getDeriver().initRFID(SERIALPORT1);

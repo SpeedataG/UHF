@@ -385,7 +385,7 @@ public class UHFManager {
                 String xinghao = SystemProperties.get("ro.product.model");
                 Log.d("ZM", "Build.MODEL: " + xinghao);
                 if ("SD60RT".equalsIgnoreCase(xinghao) || "MST-II-YN".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || "SD55L".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
-                        || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "ESUR-H600".equals(xinghao)) {
+                        || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "ESUR-H600".equals(xinghao)|| "smo_b2000".equals(xinghao)) {
                     powerOn(DeviceControlSpd.PowerType.EXPAND, 9, 14);
 
                 } else if (xinghao.equals("SD55PTT")) {
@@ -460,7 +460,7 @@ public class UHFManager {
 //        String xinghao = Build.MODEL;
         String xinghao = SystemProperties.get("ro.product.model");
         if ("SD60RT".equalsIgnoreCase(xinghao) || "MST-II-YN".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
-                || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "ESUR-H600".equals(xinghao)) {
+                || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "ESUR-H600".equals(xinghao) || "smo_b2000".equals(xinghao)) {
             port = "/dev/ttyMT0";
         } else if (xinghao.equals("SD55PTT")) {
             port = "/dev/ttyMT1";
@@ -483,7 +483,7 @@ public class UHFManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        byte[] bytes = new byte[1024];
+        byte[] bytes = new byte[128];
 
         //判断是不是R2000
         serialPort.clearPortBuf(fd);
@@ -494,7 +494,7 @@ public class UHFManager {
             e.printStackTrace();
         }
         try {
-            bytes = serialPort.ReadSerial(fd, 1024);
+            bytes = serialPort.ReadSerial(fd, 128);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -533,7 +533,7 @@ public class UHFManager {
                 String hexStr = Integer.toHexString(bytes[9] & 0xFF);
                 serialPort.CloseSerial(fd);
                 powerOff();
-                if ("A0".equalsIgnoreCase(hexStr)||"A1".equalsIgnoreCase(hexStr)){
+                if ("A0".equalsIgnoreCase(hexStr) || "A1".equalsIgnoreCase(hexStr)) {
                     return FACTORY_XINLIAN_R2K;
                 }
                 return FACTORY_XINLIAN;
