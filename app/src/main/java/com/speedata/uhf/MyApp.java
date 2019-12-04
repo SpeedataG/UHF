@@ -66,9 +66,8 @@ public class MyApp extends Application {
             Log.d("UHFService", "iuhfService初始化: " + iuhfService);
             if (iuhfService != null) {
                 int i = 0;
-                i = iuhfService.setReadTime(50);
+                i = iuhfService.setLowpowerScheduler(50, 0);
                 Log.d("zzc:", "===isFirstInit===setReadTime:" + i);
-                i = iuhfService.setSleep(0);
                 Log.d("zzc:", "===isFirstInit===setSleep:" + i);
             }
         } catch (Exception e) {

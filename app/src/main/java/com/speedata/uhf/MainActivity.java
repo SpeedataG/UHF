@@ -208,6 +208,8 @@ public class MainActivity extends Activity implements OnClickListener {
      */
     @SuppressLint("SetTextI18n")
     private boolean openDev() {
+        long time = System.currentTimeMillis();
+        Log.e("zzc", "openDev");
         if (iuhfService.openDev() != 0) {
             Toast.makeText(this, "Open serialport failed", Toast.LENGTH_SHORT).show();
             new AlertDialog.Builder(this).setTitle(R.string.DIA_ALERT).setMessage(R.string.DEV_OPEN_ERR).setPositiveButton(R.string.DIA_CHECK, new DialogInterface.OnClickListener() {
@@ -219,6 +221,7 @@ public class MainActivity extends Activity implements OnClickListener {
             }).show();
             return true;
         }
+        Log.e("zzc", "openDev===" + (System.currentTimeMillis() - time));
         return false;
     }
 

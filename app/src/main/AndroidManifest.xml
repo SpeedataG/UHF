@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     coreApp="true"
     package="com.speedata.uhf">
-   <!-- android:sharedUserId="android.uid.system">-->
+    <!--android:sharedUserId="android.uid.system">-->
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!--在新更新需要的权限-->

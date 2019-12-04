@@ -1,5 +1,6 @@
 package com.speedata.uhf.dialog;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -96,6 +97,7 @@ public class InventorySettingDialog extends Dialog implements View.OnClickListen
         initData();
     }
 
+    @SuppressLint("SetTextI18n")
     private void initData() {
         String model = SharedXmlUtil.getInstance(mContext).read("model", "");
         if ("r2k".equals(model)) {
@@ -114,8 +116,8 @@ public class InventorySettingDialog extends Dialog implements View.OnClickListen
             } else {
                 btnFastMode.setText(mContext.getResources().getString(R.string.btn_start_fast));
             }
-            etReadTime.setText("" + MyApp.getInstance().getIuhfService().getReadTime());
-            etSleepTime.setText("" + MyApp.getInstance().getIuhfService().getSleep());
+            etReadTime.setText("" + MyApp.getInstance().getIuhfService().getLowpowerScheduler()[0]);
+            etSleepTime.setText("" + MyApp.getInstance().getIuhfService().getLowpowerScheduler()[1]);
         }
     }
 
@@ -349,7 +351,7 @@ public class InventorySettingDialog extends Dialog implements View.OnClickListen
                 if (!MyApp.isFastMode) {
                     MyApp.getInstance().getIuhfService().setQueryTagGroup(0, 1, 0);
                     //没有启用,启用，改变标志位
-                    result = MyApp.getInstance().getIuhfService().startFastMode();
+                    result = MyApp.getInstance().getIuhfService().switchInvMode(1);
                     if (result == 0) {
                         MyApp.isFastMode = true;
                         btnFastMode.setText(mContext.getResources().getString(R.string.btn_stop_fast));
@@ -360,7 +362,7 @@ public class InventorySettingDialog extends Dialog implements View.OnClickListen
 
                 } else {
                     //已经启用了，需要停止，改变标志位
-                    result = MyApp.getInstance().getIuhfService().stopFastMode();
+                    result = MyApp.getInstance().getIuhfService().switchInvMode(2);
                     if (result == 0) {
                         MyApp.isFastMode = false;
                         btnFastMode.setText(mContext.getResources().getString(R.string.btn_start_fast));
@@ -385,7 +387,7 @@ public class InventorySettingDialog extends Dialog implements View.OnClickListen
                 }
                 break;
             case R.id.set_dwell_time:
-                if ("r2k".equals(UHFManager.getUHFModel())){
+                if ("r2k".equals(UHFManager.getUHFModel())) {
                     String dwellTime = etDwellTime.getText().toString();
                     if (dwellTime.isEmpty()) {
                         Toast.makeText(mContext, mContext.getResources().getString(R.string.param_not_null), Toast.LENGTH_SHORT).show();
