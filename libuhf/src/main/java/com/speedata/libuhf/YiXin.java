@@ -7,7 +7,6 @@ import android.os.SystemProperties;
 import android.serialport.DeviceControlSpd;
 import android.util.Log;
 
-import com.rscja.utility.StringUtility;
 import com.speedata.libuhf.bean.SpdInventoryData;
 import com.speedata.libuhf.bean.SpdReadData;
 import com.speedata.libuhf.bean.SpdWriteData;
@@ -297,7 +296,7 @@ public class YiXin extends IUHFServiceAdapter implements OnSpdInventoryListener 
             while (loopFlag) {
                 String[] strEpc1 = {getDeriver().GetBufData()};
                 String strEpc = strEpc1[0];
-                if (!StringUtility.isEmpty(strEpc)) {
+                if (strEpc != null && !strEpc.isEmpty()) {
                     int Hb = 0;
                     int Lb = 0;
                     int rssi = 0;
