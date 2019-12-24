@@ -22,8 +22,8 @@ import com.speedata.libuhf.utils.ConfigUtils;
 import com.speedata.libuhf.utils.ReadBean;
 import com.speedata.libuhf.utils.SharedXmlUtil;
 import com.speedata.libuhf.utils.StringUtils;
-import com.uhf.api.cls.ErrInfo;
-import com.uhf.api.cls.Reader;
+import com.uhf.speedatagapi.cls.ErrInfo;
+import com.uhf.speedatagapi.cls.Reader;
 
 import java.io.BufferedReader;
 import java.io.File;
