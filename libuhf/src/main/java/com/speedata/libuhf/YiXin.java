@@ -108,6 +108,12 @@ public class YiXin extends IUHFServiceAdapter implements OnSpdInventoryListener 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            } else if ("SN50".equals(xinghao) || "SD50".equals(xinghao) || "R550".equals(xinghao)) {
+                try {
+                    pw = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 75);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             } else if (xinghao.contains("SD55") || xinghao.contains("R66") || xinghao.contains("A56")) {
                 if (ConfigUtils.getApiVersion() > 23) {
                     try {
@@ -168,12 +174,9 @@ public class YiXin extends IUHFServiceAdapter implements OnSpdInventoryListener 
             } else if ("SD100T".equals(xinghao) || "X47".equalsIgnoreCase(xinghao)) {
                 try {
                     pw = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 52, 89, 71);
-                    Log.e("UHFService", "==PowerOnDevice()==成功==52, 89, 71");
                 } catch (IOException e) {
-                    Log.e("UHFService", "==PowerOnDevice()==失败==");
                     e.printStackTrace();
                 }
-
             } else {
                 try {
                     pw = new DeviceControlSpd(DeviceControlSpd.PowerType.MAIN, 94);
@@ -200,6 +203,8 @@ public class YiXin extends IUHFServiceAdapter implements OnSpdInventoryListener 
             result = getDeriver().initRFID(SERIALPORT_SD60);
         } else if (xinghao.equals("SD55PTT")) {
             result = getDeriver().initRFID(SERIALPORT1);
+        } else if ("SN50".equals(xinghao) || "SD50".equals(xinghao) || "R550".equals(xinghao)) {
+            result = getDeriver().initRFID(SERIALPORT0);
         } else if (xinghao.contains("SD55") || xinghao.contains("R66") || xinghao.contains("A56")) {
             if (ConfigUtils.getApiVersion() > 23) {
                 result = getDeriver().initRFID(SERIALPORT0);

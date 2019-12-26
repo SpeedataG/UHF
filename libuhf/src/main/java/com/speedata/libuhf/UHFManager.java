@@ -381,11 +381,10 @@ public class UHFManager {
             if (Build.VERSION.RELEASE.equals("4.4.2")) {
                 powerOn(DeviceControlSpd.PowerType.MAIN, 64);
             } else {
-//                String xinghao = Build.MODEL;
                 String xinghao = SystemProperties.get("ro.product.model");
                 Log.d("ZM", "Build.MODEL: " + xinghao);
                 if ("SD60RT".equalsIgnoreCase(xinghao) || "MST-II-YN".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || "SD55L".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
-                        || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "ESUR-H600".equals(xinghao)|| "smo_b2000".equals(xinghao)) {
+                        || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "ESUR-H600".equals(xinghao) || "smo_b2000".equals(xinghao)) {
                     powerOn(DeviceControlSpd.PowerType.EXPAND, 9, 14);
 
                 } else if (xinghao.equals("SD55PTT")) {
@@ -396,6 +395,8 @@ public class UHFManager {
                     } else {
                         powerOn(DeviceControlSpd.PowerType.MAIN, 128);
                     }
+                } else if ("SD50".equals(xinghao) || "SN50".equals(xinghao) || "R550".equals(xinghao)) {
+                    powerOn(DeviceControlSpd.PowerType.NEW_MAIN, 75);
                 } else if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")
                         || xinghao.equals("Biowolf LE") || xinghao.equals("FC-PK80")
                         || xinghao.equals("FC-K80") || xinghao.equals("T80") || xinghao.contains("80")) {
@@ -421,7 +422,6 @@ public class UHFManager {
                     }
                 } else if (xinghao.equals("SD100T") || xinghao.equals("X47")) {
                     powerOn(DeviceControlSpd.PowerType.NEW_MAIN, 52, 89, 71);
-
                 } else {
                     powerOn(DeviceControlSpd.PowerType.MAIN, 94);
                 }
@@ -457,13 +457,14 @@ public class UHFManager {
         String factory = "";
         SerialPortSpd serialPort = new SerialPortSpd();
         String port = "/dev/ttyMT0";
-//        String xinghao = Build.MODEL;
         String xinghao = SystemProperties.get("ro.product.model");
         if ("SD60RT".equalsIgnoreCase(xinghao) || "MST-II-YN".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
                 || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "ESUR-H600".equals(xinghao) || "smo_b2000".equals(xinghao)) {
             port = "/dev/ttyMT0";
         } else if (xinghao.equals("SD55PTT")) {
             port = "/dev/ttyMT1";
+        } else if ("SD50".equals(xinghao) || "SN50".equals(xinghao) || "R550".equals(xinghao)) {
+            port = "/dev/ttyMT0";
         } else if (xinghao.contains("SD55") || xinghao.contains("R66") || xinghao.contains("A56")) {
             if (ConfigUtils.getApiVersion() > 23) {
                 port = "/dev/ttyMT0";

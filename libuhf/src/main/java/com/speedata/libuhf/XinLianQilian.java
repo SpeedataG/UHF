@@ -165,6 +165,20 @@ public class XinLianQilian extends IUHFServiceAdapter {
                 } else {
                     return -1;
                 }
+            } else if ("SD50".equals(xinghao) || "SN50".equals(xinghao) || "R550".equals(xinghao)) {
+                try {
+                    deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 75);
+                    deviceControl.PowerOnDevice();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Reader.READER_ERR er = Mreader.InitReader_Notype(SERIALPORT0, 1);
+                if (er == Reader.READER_ERR.MT_OK_ERR) {
+                    antportc = 1;
+                    return 0;
+                } else {
+                    return -1;
+                }
             } else if (xinghao.contains("SD55") || xinghao.contains("R66") || xinghao.contains("A56")) {
                 if (ConfigUtils.getApiVersion() > 23) {
                     try {
