@@ -369,6 +369,7 @@ public class XinLianQilian extends IUHFServiceAdapter {
     private void inventoryCallBack(SpdInventoryData inventoryData) {
         if (inventoryData != null && getOnInventoryListener() != null) {
             getOnInventoryListener().getInventoryData(inventoryData);
+            getOnInventoryListener().onInventoryStatus(0);
         }
 
     }
@@ -462,102 +463,125 @@ public class XinLianQilian extends IUHFServiceAdapter {
             Log.d(TAG, "read_area: end");
             status = er;
             SpdReadData spdReadData = new SpdReadData();
+            int errorCode;
             if (er == Reader.READER_ERR.MT_OK_ERR) {
+                errorCode = 0;
                 spdReadData.setReadData(rdata);
                 spdReadData.setDataLen(rdata.length);
                 spdReadData.setStatus(0);
                 readCallBack(spdReadData);
                 this.readData = rdata;
             } else if (er == Reader.READER_ERR.MT_IO_ERR) {
+                errorCode = 1;
                 spdReadData.setReadData(new byte[]{(byte) 0xFF, 0x01, (byte) 0xEE});
                 spdReadData.setStatus(1);
                 readCallBack(spdReadData);
             } else if (er == Reader.READER_ERR.MT_INTERNAL_DEV_ERR) {
+                errorCode = 2;
                 spdReadData.setReadData(new byte[]{(byte) 0xFF, 0x02, (byte) 0xEE});
                 spdReadData.setStatus(2);
                 readCallBack(spdReadData);
             } else if (er == Reader.READER_ERR.MT_CMD_FAILED_ERR) {
+                errorCode = 3;
                 spdReadData.setReadData(new byte[]{(byte) 0xFF, 0x03, (byte) 0xEE});
                 spdReadData.setStatus(3);
                 readCallBack(spdReadData);
             } else if (er == Reader.READER_ERR.MT_CMD_NO_TAG_ERR) {
+                errorCode = 4;
                 spdReadData.setReadData(new byte[]{(byte) 0xFF, 0x04, (byte) 0xEE});
                 spdReadData.setStatus(4);
                 readCallBack(spdReadData);
             } else if (er == Reader.READER_ERR.MT_M5E_FATAL_ERR) {
+                errorCode = 5;
                 spdReadData.setReadData(new byte[]{(byte) 0xFF, 0x05, (byte) 0xEE});
                 spdReadData.setStatus(5);
                 readCallBack(spdReadData);
             } else if (er == Reader.READER_ERR.MT_OP_NOT_SUPPORTED) {
+                errorCode = 6;
                 spdReadData.setReadData(new byte[]{(byte) 0xFF, 0x06, (byte) 0xEE});
                 spdReadData.setStatus(6);
                 readCallBack(spdReadData);
             } else if (er == Reader.READER_ERR.MT_INVALID_PARA) {
+                errorCode = 7;
                 spdReadData.setReadData(new byte[]{(byte) 0xFF, 0x07, (byte) 0xEE});
                 spdReadData.setStatus(7);
                 readCallBack(spdReadData);
             } else if (er == Reader.READER_ERR.MT_INVALID_READER_HANDLE) {
+                errorCode = 8;
                 spdReadData.setReadData(new byte[]{(byte) 0xFF, 0x08, (byte) 0xEE});
                 spdReadData.setStatus(8);
                 readCallBack(spdReadData);
             } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_HIGN_RETURN_LOSS) {
+                errorCode = 9;
                 spdReadData.setReadData(new byte[]{(byte) 0xFF, 0x09, (byte) 0xEE});
                 spdReadData.setStatus(9);
                 readCallBack(spdReadData);
             } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_TOO_MANY_RESET) {
+                errorCode = 10;
                 spdReadData.setReadData(new byte[]{(byte) 0xFF, 0x10, (byte) 0xEE});
                 spdReadData.setStatus(10);
                 readCallBack(spdReadData);
             } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_NO_ANTENNAS) {
+                errorCode = 11;
                 spdReadData.setReadData(new byte[]{(byte) 0xFF, 0x11, (byte) 0xEE});
                 spdReadData.setStatus(11);
                 readCallBack(spdReadData);
             } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_HIGH_TEMPERATURE) {
+                errorCode = 12;
                 spdReadData.setReadData(new byte[]{(byte) 0xFF, 0x12, (byte) 0xEE});
                 spdReadData.setStatus(12);
                 readCallBack(spdReadData);
             } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_READER_DOWN) {
+                errorCode = 13;
                 spdReadData.setReadData(new byte[]{(byte) 0xFF, 0x13, (byte) 0xEE});
                 spdReadData.setStatus(13);
                 readCallBack(spdReadData);
             } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_UNKNOWN_ERR) {
+                errorCode = 14;
                 spdReadData.setReadData(new byte[]{(byte) 0xFF, 0x14, (byte) 0xEE});
                 spdReadData.setStatus(14);
                 readCallBack(spdReadData);
             } else if (er == Reader.READER_ERR.M6E_INIT_FAILED) {
+                errorCode = 15;
                 spdReadData.setReadData(new byte[]{(byte) 0xFF, 0x15, (byte) 0xEE});
                 spdReadData.setStatus(15);
                 readCallBack(spdReadData);
             } else if (er == Reader.READER_ERR.MT_OP_EXECING) {
+                errorCode = 16;
                 spdReadData.setReadData(new byte[]{(byte) 0xFF, 0x16, (byte) 0xEE});
                 spdReadData.setStatus(16);
                 readCallBack(spdReadData);
             } else if (er == Reader.READER_ERR.MT_UNKNOWN_READER_TYPE) {
+                errorCode = 17;
                 spdReadData.setReadData(new byte[]{(byte) 0xFF, 0x17, (byte) 0xEE});
                 spdReadData.setStatus(17);
                 readCallBack(spdReadData);
             } else if (er == Reader.READER_ERR.MT_OP_INVALID) {
+                errorCode = 18;
                 spdReadData.setReadData(new byte[]{(byte) 0xFF, 0x18, (byte) 0xEE});
                 spdReadData.setStatus(18);
                 readCallBack(spdReadData);
             } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_BY_FAILED_RESET_MODLUE) {
+                errorCode = 19;
                 spdReadData.setReadData(new byte[]{(byte) 0xFF, 0x19, (byte) 0xEE});
                 spdReadData.setStatus(19);
                 readCallBack(spdReadData);
             } else if (er == Reader.READER_ERR.MT_MAX_ERR_NUM) {
+                errorCode = 20;
                 spdReadData.setReadData(new byte[]{(byte) 0xFF, 0x20, (byte) 0xEE});
                 spdReadData.setStatus(20);
                 readCallBack(spdReadData);
             } else {
+                errorCode = 20;
                 spdReadData.setReadData(new byte[]{(byte) 0xFF, 0x20, (byte) 0xEE});
                 spdReadData.setStatus(20);
                 readCallBack(spdReadData);
             }
+            return errorCode;
         } catch (Exception e) {
             e.printStackTrace();
             return -1;
         }
-        return 0;
     }
 
     /**
@@ -608,78 +632,101 @@ public class XinLianQilian extends IUHFServiceAdapter {
             } while (er != Reader.READER_ERR.MT_OK_ERR);
             Log.d(TAG, "write_area: end");
             SpdWriteData spdWriteData = new SpdWriteData();
+            int errorCode;
             if (er == Reader.READER_ERR.MT_OK_ERR) {
+                errorCode = 0;
                 spdWriteData.setStatus(0);
                 writeCallBack(spdWriteData);
             } else if (er == Reader.READER_ERR.MT_IO_ERR) {
+                errorCode = 1;
                 spdWriteData.setStatus(1);
                 writeCallBack(spdWriteData);
             } else if (er == Reader.READER_ERR.MT_INTERNAL_DEV_ERR) {
+                errorCode = 2;
                 spdWriteData.setStatus(2);
                 writeCallBack(spdWriteData);
             } else if (er == Reader.READER_ERR.MT_CMD_FAILED_ERR) {
+                errorCode = 3;
                 spdWriteData.setStatus(3);
                 writeCallBack(spdWriteData);
             } else if (er == Reader.READER_ERR.MT_CMD_NO_TAG_ERR) {
+                errorCode = 4;
                 spdWriteData.setStatus(4);
                 writeCallBack(spdWriteData);
             } else if (er == Reader.READER_ERR.MT_M5E_FATAL_ERR) {
+                errorCode = 5;
                 spdWriteData.setStatus(5);
                 writeCallBack(spdWriteData);
             } else if (er == Reader.READER_ERR.MT_OP_NOT_SUPPORTED) {
+                errorCode = 6;
                 spdWriteData.setStatus(6);
                 writeCallBack(spdWriteData);
             } else if (er == Reader.READER_ERR.MT_INVALID_PARA) {
+                errorCode = 7;
                 spdWriteData.setStatus(7);
                 writeCallBack(spdWriteData);
             } else if (er == Reader.READER_ERR.MT_INVALID_READER_HANDLE) {
+                errorCode = 8;
                 spdWriteData.setStatus(8);
                 writeCallBack(spdWriteData);
             } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_HIGN_RETURN_LOSS) {
+                errorCode = 9;
                 spdWriteData.setStatus(9);
                 writeCallBack(spdWriteData);
             } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_TOO_MANY_RESET) {
+                errorCode = 10;
                 spdWriteData.setStatus(10);
                 writeCallBack(spdWriteData);
             } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_NO_ANTENNAS) {
+                errorCode = 11;
                 spdWriteData.setStatus(11);
                 writeCallBack(spdWriteData);
             } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_HIGH_TEMPERATURE) {
+                errorCode = 12;
                 spdWriteData.setStatus(12);
                 writeCallBack(spdWriteData);
             } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_READER_DOWN) {
+                errorCode = 13;
                 spdWriteData.setStatus(13);
                 writeCallBack(spdWriteData);
             } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_ERR_BY_UNKNOWN_ERR) {
+                errorCode = 14;
                 spdWriteData.setStatus(14);
                 writeCallBack(spdWriteData);
             } else if (er == Reader.READER_ERR.M6E_INIT_FAILED) {
+                errorCode = 15;
                 spdWriteData.setStatus(15);
                 writeCallBack(spdWriteData);
             } else if (er == Reader.READER_ERR.MT_OP_EXECING) {
+                errorCode = 16;
                 spdWriteData.setStatus(16);
                 writeCallBack(spdWriteData);
             } else if (er == Reader.READER_ERR.MT_UNKNOWN_READER_TYPE) {
+                errorCode = 17;
                 spdWriteData.setStatus(17);
                 writeCallBack(spdWriteData);
             } else if (er == Reader.READER_ERR.MT_OP_INVALID) {
+                errorCode = 18;
                 spdWriteData.setStatus(18);
                 writeCallBack(spdWriteData);
             } else if (er == Reader.READER_ERR.MT_HARDWARE_ALERT_BY_FAILED_RESET_MODLUE) {
-                spdWriteData.setStatus(18);
+                errorCode = 19;
+                spdWriteData.setStatus(19);
                 writeCallBack(spdWriteData);
             } else if (er == Reader.READER_ERR.MT_MAX_ERR_NUM) {
+                errorCode = 20;
                 spdWriteData.setStatus(20);
                 writeCallBack(spdWriteData);
             } else {
+                errorCode = 20;
                 spdWriteData.setStatus(20);
                 writeCallBack(spdWriteData);
             }
+            return errorCode;
         } catch (Exception e) {
             e.printStackTrace();
             return -1;
         }
-        return 0;
     }
 
 
@@ -1410,6 +1457,9 @@ public class XinLianQilian extends IUHFServiceAdapter {
                         errCode = 20;
                     } else {
                         errCode = 20;
+                    }
+                    if (getOnInventoryListener() != null) {
+                        getOnInventoryListener().onInventoryStatus(errCode);
                     }
                     if (handler_inventer == null) {
                         inventoryCallBack(null);

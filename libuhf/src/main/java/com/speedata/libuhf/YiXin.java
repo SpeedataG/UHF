@@ -292,6 +292,11 @@ public class YiXin extends IUHFServiceAdapter implements OnSpdInventoryListener 
 
     }
 
+    @Override
+    public void onInventoryStatus(int status) {
+
+    }
+
     class TagThread extends Thread {
         TagThread() {
         }
