@@ -369,7 +369,6 @@ public class XinLianQilian extends IUHFServiceAdapter {
     private void inventoryCallBack(SpdInventoryData inventoryData) {
         if (inventoryData != null && getOnInventoryListener() != null) {
             getOnInventoryListener().getInventoryData(inventoryData);
-            getOnInventoryListener().onInventoryStatus(0);
         }
 
     }
