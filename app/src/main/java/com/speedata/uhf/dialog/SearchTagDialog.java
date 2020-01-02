@@ -124,6 +124,11 @@ public class SearchTagDialog extends Dialog implements
                 Log.d("zzc:", "OnSpdInventoryListener 盘点回调");
                 handler.sendMessage(handler.obtainMessage(1, var1));
             }
+
+            @Override
+            public void onInventoryStatus(int status) {
+
+            }
         });
 
         file = new File(CHARGING_PATH);

@@ -384,7 +384,7 @@ public class UHFManager {
                 String xinghao = SystemProperties.get("ro.product.model");
                 Log.d("ZM", "Build.MODEL: " + xinghao);
                 if ("SD60RT".equalsIgnoreCase(xinghao) || "MST-II-YN".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || "SD55L".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
-                        || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "ESUR-H600".equals(xinghao) || "smo_b2000".equals(xinghao)) {
+                        || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "ESUR-H600".equals(xinghao) || "ST60E".equalsIgnoreCase(xinghao) || "smo_b2000".equals(xinghao)) {
                     powerOn(DeviceControlSpd.PowerType.EXPAND, 9, 14);
 
                 } else if (xinghao.equals("SD55PTT")) {
@@ -459,7 +459,7 @@ public class UHFManager {
         String port = "/dev/ttyMT0";
         String xinghao = SystemProperties.get("ro.product.model");
         if ("SD60RT".equalsIgnoreCase(xinghao) || "MST-II-YN".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
-                || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "ESUR-H600".equals(xinghao) || "smo_b2000".equals(xinghao)) {
+                || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "ESUR-H600".equals(xinghao) || "ST60E".equalsIgnoreCase(xinghao) || "smo_b2000".equals(xinghao)) {
             port = "/dev/ttyMT0";
         } else if (xinghao.equals("SD55PTT")) {
             port = "/dev/ttyMT1";
