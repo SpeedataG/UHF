@@ -65,6 +65,11 @@ public class MyService extends Service {
                                     soundPool.play(soundId, 1, 1, 0, 0, 1);
                                 }
                             }
+
+                            @Override
+                            public void onInventoryStatus(int status) {
+
+                            }
                         });
                         Log.e(TAG, "===inventoryStart==power== " + iuhfService.getAntennaPower());
                         iuhfService.inventoryStart();
@@ -81,6 +86,11 @@ public class MyService extends Service {
 
                                 Log.d(TAG, "===setOnInventoryListener=== " + var1.getEpc());
                                 soundPool.play(soundId, 1, 1, 0, 0, 1);
+
+                            }
+
+                            @Override
+                            public void onInventoryStatus(int status) {
 
                             }
                         });

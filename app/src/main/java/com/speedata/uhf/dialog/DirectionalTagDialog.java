@@ -99,6 +99,11 @@ public class DirectionalTagDialog extends Dialog implements
                 }
 
             }
+
+            @Override
+            public void onInventoryStatus(int status) {
+
+            }
         });
     }
 

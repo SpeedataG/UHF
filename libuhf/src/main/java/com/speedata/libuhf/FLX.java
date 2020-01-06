@@ -777,12 +777,19 @@ public class FLX extends IUHFServiceAdapter implements OnInventoryListener, OnRe
         if (len * 2 < epc.length) {
             return -3;
         }
+        status = -1;
         readArea(IUHFService.EPC_A, 1, 1, password);
-        while (status != 0) {
+        Log.d("ZM", "读卡状态: " + status);
+        int i = 0;
+        while (status != 0 && i < 10) {
             if (readData != null) {
                 break;
             }
+            i++;
+            SystemClock.sleep(100);
         }
+        Log.d("ZM", "读卡状态: " + status);
+        Log.d("ZM", "readData: " + readData);
         if (readData == null) {
             return -5;
         }
