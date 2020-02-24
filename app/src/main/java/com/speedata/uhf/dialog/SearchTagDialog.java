@@ -31,6 +31,7 @@ import com.speedata.libuhf.interfaces.OnSpdInventoryListener;
 import com.speedata.libuhf.utils.SharedXmlUtil;
 import com.speedata.uhf.MainActivity;
 import com.speedata.uhf.MsgEvent;
+import com.speedata.uhf.MyApp;
 import com.speedata.uhf.R;
 import com.speedata.uhf.excel.EPCBean;
 import com.speedata.uhf.libutils.excel.ExcelUtils;
@@ -160,7 +161,7 @@ public class SearchTagDialog extends Dialog implements
                     }
                     if (j == firm.size()) {
                         firm.add(new EpcDataBase(var1.epc, 1,
-                                var1.rssi, var1.tid));
+                                var1.rssi, var1.tid, var1.bid, var1.u8Tid));
                         if (cbb.isChecked()) {
                             soundPool.play(soundId, 1, 1, 0, 0, 1);
                         }
@@ -317,6 +318,8 @@ public class SearchTagDialog extends Dialog implements
         int valid;
         String rssi;
         String tidUser;
+        String bid;
+        String u8Tid;
 
         EpcDataBase(String e, int v, String rssi, String tidUser) {
             // TODO Auto-generated constructor stub
@@ -324,6 +327,16 @@ public class SearchTagDialog extends Dialog implements
             valid = v;
             this.rssi = rssi;
             this.tidUser = tidUser;
+        }
+
+        EpcDataBase(String e, int v, String rssi, String tidUser, String bid, String u8Tid) {
+            // TODO Auto-generated constructor stub
+            epc = e;
+            valid = v;
+            this.rssi = rssi;
+            this.tidUser = tidUser;
+            this.bid = bid;
+            this.u8Tid = u8Tid;
         }
 
         public String getRssi() {
@@ -337,6 +350,16 @@ public class SearchTagDialog extends Dialog implements
         @NonNull
         @Override
         public String toString() {
+            if (MyApp.nxpu8 == 3) {
+                return "EPC:" + epc + "\n"
+                        + "(" + "COUNT:" + valid + ")" + " RSSI:" + rssi + "\n"
+                        + "BID:" + bid + "\n";
+            } else if (MyApp.nxpu8 == 4) {
+                return "EPC:" + epc + "\n"
+                        + "(" + "COUNT:" + valid + ")" + " RSSI:" + rssi + "\n"
+                        + "TID:" + u8Tid + "\n"
+                        + "BID:" + bid + "\n";
+            }
             if (TextUtils.isEmpty(tidUser)) {
                 return "EPC:" + epc + "\n"
                         + "(" + "COUNT:" + valid + ")" + " RSSI:" + rssi + "\n";

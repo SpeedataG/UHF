@@ -38,6 +38,7 @@ public class MyApp extends Application {
      * 是否启动快速模式
      */
     public static boolean isFastMode = false;
+    public static int nxpu8 = 0;
 
     @Override
     public void onCreate() {

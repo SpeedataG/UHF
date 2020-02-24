@@ -281,6 +281,11 @@ public class IUHFServiceAdapter implements IUHFService {
     }
 
     @Override
+    public int setNxpu8(int mode) {
+        return 0;
+    }
+
+    @Override
     public int yixinFilterEpc(int bank, int ads, int len, String data, Boolean save) {
         return -1;
     }

@@ -8,15 +8,27 @@ import android.os.Parcelable;
  */
 
 public class SpdInventoryData implements Parcelable {
+
     public SpdInventoryData(String n_tid, String n_epc, String rssi) {
         tid = n_tid;
         epc = n_epc;
         this.rssi = rssi;
+        this.bid = "";
+        this.u8Tid = "";
+    }
+    public SpdInventoryData(String n_tid, String n_epc, String rssi, String bid, String u8Tid) {
+        tid = n_tid;
+        epc = n_epc;
+        this.rssi = rssi;
+        this.bid = bid;
+        this.u8Tid = u8Tid;
     }
 
     public String tid;
     public String epc;
     public String rssi;
+    public String bid;
+    public String u8Tid;
 
 
     protected SpdInventoryData(Parcel in) {
@@ -83,5 +95,21 @@ public class SpdInventoryData implements Parcelable {
 
     public void setRssi(String rssi) {
         this.rssi = rssi;
+    }
+
+    public String getBid() {
+        return bid;
+    }
+
+    public void setBid(String bid) {
+        this.bid = bid;
+    }
+
+    public String getU8Tid() {
+        return u8Tid;
+    }
+
+    public void setU8Tid(String u8Tid) {
+        this.u8Tid = u8Tid;
     }
 }

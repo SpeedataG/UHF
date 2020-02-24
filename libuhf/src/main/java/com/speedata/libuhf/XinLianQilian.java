@@ -31,7 +31,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static android.content.ContentValues.TAG;
 
@@ -1322,6 +1324,89 @@ public class XinLianQilian extends IUHFServiceAdapter {
     }
 
     @Override
+    public int setNxpu8(int mode) {
+//设置使能或禁用u8特殊盘点功能(set eanble or disenable inventory u8 tag functions)
+        //*
+        Reader.NXP_U8_InventoryModePara u8para = Mreader.new NXP_U8_InventoryModePara();
+
+        u8para.Mode[0] = 0;
+        Rparams.nxpu8 = 0;
+
+        Reader.READER_ERR er = Mreader.ParamSet(
+                Reader.Mtr_Param.MTR_PARAM_TAG_FILTER, null);
+        if (er == Reader.READER_ERR.MT_OK_ERR) {
+
+        }
+
+
+        er = Mreader.ParamSet(
+                Reader.Mtr_Param.MTR_PARAM_TAG_EMBEDEDDATA, null);
+        if (er == Reader.READER_ERR.MT_OK_ERR) {
+
+        }
+
+        if (mode == 0) {
+        } else if (mode == 1) {
+
+            Reader.TagFilter_ST tfst = Mreader.new TagFilter_ST();
+
+            tfst.fdata = new byte[1];
+            tfst.fdata[0] = (byte) 0x80;
+            tfst.bank = 1;
+            tfst.flen = 1;
+            tfst.startaddr = 0x204;
+            tfst.isInvert = 0;
+            er = Mreader.ParamSet(
+                    Reader.Mtr_Param.MTR_PARAM_TAG_FILTER, tfst);
+
+            Reader.EmbededData_ST edst = Mreader.new EmbededData_ST();
+            edst.accesspwd = null;
+
+            edst.bank = 2;
+            edst.startaddr = 0;
+            edst.bytecnt = 12;
+
+            er = Mreader.ParamSet(
+                    Reader.Mtr_Param.MTR_PARAM_TAG_EMBEDEDDATA, edst);
+            if (er == Reader.READER_ERR.MT_OK_ERR) {
+            }
+
+            u8para.Mode[0] = 1;
+            Rparams.nxpu8 = 1;
+        } else if (mode == 2) {
+            Reader.TagFilter_ST tfst = Mreader.new TagFilter_ST();
+
+            tfst.fdata = new byte[1];
+            tfst.fdata[0] = (byte) 0x80;
+            tfst.bank = 1;
+            tfst.flen = 1;
+            tfst.startaddr = 0x203;
+            tfst.isInvert = 0;
+            er = Mreader.ParamSet(
+                    Reader.Mtr_Param.MTR_PARAM_TAG_FILTER, tfst);
+
+            u8para.Mode[0] = 1;
+            Rparams.nxpu8 = 2;
+        } else if (mode == 3) {
+            Reader.TagFilter_ST tfst = Mreader.new TagFilter_ST();
+
+            tfst.fdata = new byte[1];
+            tfst.fdata[0] = (byte) 0x80;
+            tfst.bank = 1;
+            tfst.flen = 1;
+            tfst.startaddr = 0x204;
+            tfst.isInvert = 0;
+            er = Mreader.ParamSet(
+                    Reader.Mtr_Param.MTR_PARAM_TAG_FILTER, tfst);
+            u8para.Mode[0] = 1;
+            Rparams.nxpu8 = 3;
+        }
+        Mreader.CustomCmd(0, Reader.CustomCmdType.NXP_U8_InventoryMode, u8para, null);
+        //*/
+        return Rparams.nxpu8;
+    }
+
+    @Override
     public int getInvMode(int type) {
         try {
             Reader.EmbededData_ST edst2 = Mreader.new EmbededData_ST();
@@ -1393,6 +1478,7 @@ public class XinLianQilian extends IUHFServiceAdapter {
                                 String rssi = String.valueOf(tfs.RSSI);
                                 ArrayList<SpdInventoryData> cx = new ArrayList<SpdInventoryData>();
                                 SpdInventoryData tagData = new SpdInventoryData(strDataTemp, strEPCTemp, rssi);
+                                TagsBufferResh(Reader.bytes_Hexstr(tfs.EpcId), tagData);
                                 if (handler_inventer == null) {
                                     Log.d(TAG, "run: 4444444444==inventoryCallBack");
                                     inventoryCallBack(tagData);
@@ -1465,11 +1551,52 @@ public class XinLianQilian extends IUHFServiceAdapter {
                     } else {
                         handler_inventer.sendMessage(handler_inventer.obtainMessage(2, errCode));
                     }
-                    inventoryStop();
                 }
             }
         }
     };
+
+    /**
+     * 刷新标签缓冲，更新标签列表信息，根据是否u8标签，是否附加数据唯一，天线唯一来列表
+     *
+     * @param EPC
+     * @param tagData
+     */
+    private void TagsBufferResh(String EPC, SpdInventoryData tagData) {
+
+        String epcstr = EPC;
+        String u8tid = "", bid = "";
+        if (Rparams.nxpu8 == 1) {
+            bid = epcstr.substring(epcstr.length() - 4);
+            epcstr = epcstr.substring(0, epcstr.length() - 4);
+        } else if (Rparams.nxpu8 == 2) {
+            u8tid = epcstr.substring(epcstr.length() - 24);
+            epcstr = epcstr.substring(0, epcstr.length() - 24);
+        } else if (Rparams.nxpu8 == 3) {
+            bid = epcstr.substring(epcstr.length() - 4);
+            epcstr = epcstr.substring(0, epcstr.length() - 4);
+        }
+
+        if (epcstr.length() < 24) {
+            epcstr = String.format("%-24s", epcstr);
+        }
+
+        if (tagData.getTid() != null) {
+            if (Rparams.nxpu8 == 1) {
+                u8tid = tagData.getTid();
+            }
+        }
+
+//        if (Rparams.nxpu8 != 0) {
+//            char[] out2 = new char[4];
+//            Mreader.Hex2Str(tfs.Res, 2, out2);
+//            rfu = String.valueOf(out2);
+//        }
+        tagData.setEpc(epcstr);
+        tagData.setBid(bid);
+        tagData.setU8Tid(u8tid);
+
+    }
 
     //********************************************老版接口（不再维护）******************************************
 
@@ -1546,6 +1673,7 @@ public class XinLianQilian extends IUHFServiceAdapter {
 
         public String password;
         public int optime;
+        public int nxpu8;
 
         public ReaderParams() {
             opant = 1;
@@ -1589,6 +1717,7 @@ public class XinLianQilian extends IUHFServiceAdapter {
             iso6bdel = 0;
             iso6bblf = 0;
             option = 0;
+            nxpu8 = 0;
         }
     }
 }

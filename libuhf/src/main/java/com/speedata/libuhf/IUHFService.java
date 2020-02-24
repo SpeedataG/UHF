@@ -419,6 +419,8 @@ public interface IUHFService {
 
     int setGen2Tari(int tari);
 
+    int setNxpu8(int mode);
+
     //***** 一芯接口 ******************************************************************//
 
     /**

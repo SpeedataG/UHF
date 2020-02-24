@@ -14,8 +14,10 @@ import android.widget.TextView;
 
 import com.speedata.libuhf.FLX;
 import com.speedata.libuhf.IUHFService;
+import com.speedata.libuhf.UHFManager;
 import com.speedata.libuhf.utils.SharedXmlUtil;
 import com.speedata.libuhf.utils.StringUtils;
+import com.speedata.uhf.MyApp;
 import com.speedata.uhf.R;
 
 /**
@@ -87,6 +89,12 @@ public class InvSetDialog extends Dialog implements android.view.View.OnClickLis
 
         });
 
+        if (MyApp.nxpu8 >= 3) {
+            mode.setSelection(MyApp.nxpu8);
+        }else {
+            int curmode = iuhfService.getInvMode(0);
+            mode.setSelection(curmode);
+        }
 //        int curmode = iuhfService.getInvMode(FLX.InvModeType);
 //        int curaddr = iuhfService.getInvMode(FLX.InvAddrType);
 //        int cursize = iuhfService.getInvMode(FLX.InvSizeType);
@@ -102,17 +110,30 @@ public class InvSetDialog extends Dialog implements android.view.View.OnClickLis
         if (v == ok) {
             int w = mode.getSelectedItemPosition();
             Log.w("r2000_native", "select item " + w);
+            String model = UHFManager.getUHFModel();
+            MyApp.nxpu8 = w;
             if (w == 3) {
                 //读取U8标签代码epc+bid
-                iuhfService.mask(1, 516, 1, StringUtils.stringToByte("80"));
-                SharedXmlUtil.getInstance(context).write("U8", true);
+                if ("r2k".equals(model)) {
+                    iuhfService.mask(1, 516, 1, StringUtils.stringToByte("80"));
+                    SharedXmlUtil.getInstance(context).write("U8", true);
+                } else {
+                    iuhfService.setNxpu8(3);
+                }
+
             } else if (w == 4) {
                 //读取U8标签代码epc+bid+tid
-                iuhfService.mask(1, 516, 1, StringUtils.stringToByte("80"));
-                iuhfService.setInvMode(1, 0, 6);
-                SharedXmlUtil.getInstance(context).write("U8", true);
+                if ("r2k".equals(model)) {
+                    iuhfService.mask(1, 516, 1, StringUtils.stringToByte("80"));
+                    iuhfService.setInvMode(1, 0, 6);
+                    SharedXmlUtil.getInstance(context).write("U8", true);
+                } else {
+                    iuhfService.setNxpu8(1);
+                }
+
             } else {
                 iuhfService.cancelMask();
+                iuhfService.setNxpu8(0);
                 SharedXmlUtil.getInstance(context).write("U8", false);
 //                int caddr = 0, csize = 0;
                 int caddr = 0, csize = 6;
@@ -138,8 +159,12 @@ public class InvSetDialog extends Dialog implements android.view.View.OnClickLis
             dismiss();
         } else if (v == cancel) {
 //            dismiss();
-            int curmode = iuhfService.getInvMode(0);
-            mode.setSelection(curmode);
+            if (MyApp.nxpu8 >= 3) {
+                mode.setSelection(MyApp.nxpu8);
+            }else {
+                int curmode = iuhfService.getInvMode(0);
+                mode.setSelection(curmode);
+            }
         }
     }
 }
