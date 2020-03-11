@@ -40,6 +40,7 @@ public interface IUHFService {
     String SERIALPORT = "/dev/ttyMT2";
     String SERIALPORT_SD100 = "/dev/ttyHSL2";
     String SERIALPORT_SD60 = "/dev/ttyMT0";
+    String SERIALPORT7 = "/dev/ttyMT7";
     String POWERCTL = "/sys/class/misc/mtgpio/pin";
 
     //*************************************************共用接口*********************************************************

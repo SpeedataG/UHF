@@ -383,6 +383,12 @@ public class UHFManager {
             } else {
                 String xinghao = SystemProperties.get("ro.product.model");
                 Log.d("ZM", "Build.MODEL: " + xinghao);
+                if ("SC200T".equals(xinghao) || "iPick".equals(xinghao)) {
+                    factory = getModel();
+                    SharedXmlUtil.getInstance(mContext).write("model", factory);
+                    Log.d("ZM", String.valueOf(System.currentTimeMillis()));
+                    return;
+                }
                 if ("SD60RT".equalsIgnoreCase(xinghao) || "MST-II-YN".equalsIgnoreCase(xinghao) || "SD60".equalsIgnoreCase(xinghao) || "SD55L".equalsIgnoreCase(xinghao) || xinghao.contains("SC60")
                         || xinghao.contains("DXD60RT") || xinghao.contains("C6000") || "ESUR-H600".equals(xinghao) || "ST60E".equalsIgnoreCase(xinghao) || "smo_b2000".equals(xinghao)) {
                     powerOn(DeviceControlSpd.PowerType.EXPAND, 9, 14);
@@ -471,10 +477,12 @@ public class UHFManager {
             } else {
                 port = "/dev/ttyMT2";
             }
-        } else if (xinghao.equalsIgnoreCase("SD100")) {
+        } else if ("SD100".equalsIgnoreCase(xinghao)) {
             port = "/dev/ttyHSL2";
-        } else if (xinghao.equalsIgnoreCase("SD100T") || xinghao.equalsIgnoreCase("X47")) {
+        } else if ("SD100T".equalsIgnoreCase(xinghao) || "X47".equalsIgnoreCase(xinghao)) {
             port = "/dev/ttyMT0";
+        } else if ("SC200T".equalsIgnoreCase(xinghao) || "iPick".equalsIgnoreCase(xinghao)) {
+            port = "/dev/ttyMT7";
         } else {
             port = "/dev/ttyMT2";
         }
@@ -606,6 +614,10 @@ public class UHFManager {
 
     private static void powerOff() {
         try {
+            String xinghao = SystemProperties.get("ro.product.model");
+            if ("SC200T".equalsIgnoreCase(xinghao)||"iPick".equalsIgnoreCase(xinghao)){
+                return;
+            }
             if (SystemProperties.get("ro.product.model").contains("SD100")) {
                 pw.gtPower("uhf_close");
                 pw.gtPower("close");

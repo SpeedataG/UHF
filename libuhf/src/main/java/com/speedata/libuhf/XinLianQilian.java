@@ -296,6 +296,14 @@ public class XinLianQilian extends IUHFServiceAdapter {
                     return -1;
                 }
 
+            } else if ("SC200T".equalsIgnoreCase(xinghao) || "iPick".equalsIgnoreCase(xinghao)) {
+                Reader.READER_ERR er = Mreader.InitReader_Notype(SERIALPORT7, 1);
+                if (er == Reader.READER_ERR.MT_OK_ERR) {
+                    antportc = 1;
+                    return 0;
+                } else {
+                    return -1;
+                }
             } else {
                 try {
                     deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.MAIN, 94);
@@ -334,6 +342,10 @@ public class XinLianQilian extends IUHFServiceAdapter {
         } else {
             try {
                 if (deviceControl != null) {
+                    String xinghao = SystemProperties.get("ro.product.model");
+                    if ("SC200T".equalsIgnoreCase(xinghao) || "iPick".equalsIgnoreCase(xinghao)) {
+                        return;
+                    }
                     if (SystemProperties.get("ro.product.model").contains("SD100")) {
                         deviceControl.gtPower("uhf_close");
                         deviceControl.gtPower("close");
@@ -1493,12 +1505,14 @@ public class XinLianQilian extends IUHFServiceAdapter {
                             }
                         }
                     }
+                    inSearch = true;
                     Log.d(TAG, "run:5555555555555==next");
                     if (handler != null) {
                         handler.postDelayed(this, Rparams.sleep);
                     }
                 } else {
                     Log.d(TAG, "run: err");
+                    inSearch = false;
                     int errCode = -1;
                     if (er == Reader.READER_ERR.MT_IO_ERR) {
                         errCode = 1;
