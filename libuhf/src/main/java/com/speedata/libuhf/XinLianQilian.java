@@ -1502,6 +1502,8 @@ public class XinLianQilian extends IUHFServiceAdapter {
                                     handler_inventer.sendMessage(msg);
                                 }
                                 cx.clear();
+                            }else {
+                                break;
                             }
                         }
                     }

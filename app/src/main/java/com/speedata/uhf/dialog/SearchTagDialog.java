@@ -128,7 +128,7 @@ public class SearchTagDialog extends Dialog implements
 
             @Override
             public void onInventoryStatus(int status) {
-
+                iuhfService.inventoryStart();
             }
         });
 
