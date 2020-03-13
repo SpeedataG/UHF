@@ -15,8 +15,10 @@ import android.util.Log;
 import com.speedata.libuhf.interfaces.OnSpdBanMsgListener;
 import com.speedata.libuhf.utils.CommonUtils;
 import com.speedata.libuhf.utils.ConfigUtils;
+import com.speedata.libuhf.utils.DataConversionUtils;
 import com.speedata.libuhf.utils.ReadBean;
 import com.speedata.libuhf.utils.SharedXmlUtil;
+import com.speedata.libuhf.utils.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -195,7 +197,6 @@ public class UHFManager {
                             if (!"Unknow".equals(mtTemp)) {
                                 mtTemperature = Double.parseDouble(mtTemp);
                             }
-                            Log.d("zzc:", "cpuTemp: mt6356tsbuck温度:" + mtTemperature);
                             if (mtTemperature >= TemperatureLevel) {
                                 stopUseUHFByTemp();
                             }
@@ -203,7 +204,6 @@ public class UHFManager {
                             InputStream battTempFile = new FileInputStream("sys/class/power_supply/battery/batt_temp");
                             String battTempFileStr = convertStreamToString(battTempFile);
                             double t = Integer.parseInt(battTempFileStr) / 10.0;
-                            Log.d("zzc:", "battTemp 温度: " + t + " 一直检测：");
                             if (t >= battTemperatureLevel) {
                                 stopUseUHFByTemp();
                             }
@@ -325,14 +325,15 @@ public class UHFManager {
 
 
     private static boolean judgeModel() {
-        if (ConfigUtils.isConfigFileExists() && !CommonUtils.subDeviceType().contains("55")) {
-            mRead = ConfigUtils.readConfig(mContext);
-            factory = mRead.getUhf().getModule();
-            SharedXmlUtil.getInstance(mContext).write("model", factory);
-        } else {
-            //沒有配置文件判断模块
-            noXmlJudgeModule();
-        }
+        noXmlJudgeModule();
+//        if (ConfigUtils.isConfigFileExists() && !CommonUtils.subDeviceType().contains("55")) {
+//            mRead = ConfigUtils.readConfig(mContext);
+//            factory = mRead.getUhf().getModule();
+//            SharedXmlUtil.getInstance(mContext).write("model", factory);
+//        } else {
+//            //沒有配置文件判断模块
+//            noXmlJudgeModule();
+//        }
 
         boolean initResult = true;
         switch (factory) {
@@ -488,6 +489,7 @@ public class UHFManager {
         }
         try {
             serialPort.OpenSerial(port, 115200);
+//            serialPort.OpenSerial(port, 9600);
             fd = serialPort.getFd();
         } catch (IOException e) {
             e.printStackTrace();
@@ -540,8 +542,30 @@ public class UHFManager {
             Log.d("ZM", "判断是不是旗联-芯联 length: " + length);
             if (length == 27) {
                 String hexStr = Integer.toHexString(bytes[9] & 0xFF);
+//
+//                serialPort.clearPortBuf(fd);
+//                serialPort.WriteSerialByte(fd, new byte[]{(byte) 0xFF, 0x14, (byte) 0xAA, 0x4D, 0x6F, 0x64, 0x75, 0x6C, 0x65, 0x74, 0x65,
+//                        0x63, 0x68, (byte) 0xAA, 0x40, 0x06, 0x01, 0x00, 0x00, 0x25, (byte) 0x80, (byte) 0x96, (byte) 0xBB, (byte) 0x90, 0x76});
+//                try {
+//                    Thread.sleep(100);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                try {
+//                    bytes = serialPort.ReadSerial(fd, 30);
+//
+//                } catch (UnsupportedEncodingException e) {
+//                    e.printStackTrace();
+//                }
                 serialPort.CloseSerial(fd);
                 powerOff();
+//                String r = "FF0EAA00004D6F64756C6574656368AA400601C35F";
+//                if (bytes != null) {
+//                    if (!bytesToHexString(bytes).equals(r)) {
+//                        return FACTORY_XINLIAN_R2K + "-失败";
+//                    }
+//                }
                 if ("A0".equalsIgnoreCase(hexStr) || "A1".equalsIgnoreCase(hexStr)) {
                     return FACTORY_XINLIAN_R2K;
                 }
@@ -615,7 +639,7 @@ public class UHFManager {
     private static void powerOff() {
         try {
             String xinghao = SystemProperties.get("ro.product.model");
-            if ("SC200T".equalsIgnoreCase(xinghao)||"iPick".equalsIgnoreCase(xinghao)){
+            if ("SC200T".equalsIgnoreCase(xinghao) || "iPick".equalsIgnoreCase(xinghao)) {
                 return;
             }
             if (SystemProperties.get("ro.product.model").contains("SD100")) {
