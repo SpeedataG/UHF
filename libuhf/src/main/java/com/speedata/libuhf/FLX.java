@@ -730,13 +730,31 @@ public class FLX extends IUHFServiceAdapter implements OnInventoryListener, OnRe
     }
 
     @Override
-    public int getDynamicAlgorithm(DynamicQParams dynamicQParams) {
-        return getLinkage().Radio_GetSingulationAlgorithmDyParameters(dynamicQParams);
+    public int getDynamicAlgorithm(com.speedata.libuhf.bean.DynamicQParams dynamicQParams) {
+        DynamicQParams dynamicQParams1 = new DynamicQParams();
+        int res = getLinkage().Radio_GetSingulationAlgorithmDyParameters(dynamicQParams1);
+        if (res == 0) {
+            dynamicQParams.setValue(dynamicQParams1.startQValue,
+                    dynamicQParams1.minQValue,
+                    dynamicQParams1.maxQValue,
+                    dynamicQParams1.retryCount,
+                    dynamicQParams1.toggleTarget,
+                    dynamicQParams1.thresholdMultiplier);
+        }
+        return res;
     }
 
     @Override
-    public int getFixedAlgorithm(FixedQParams fixedQParams) {
-        return getLinkage().Radio_GetSingulationAlgorithmFixedParameters(fixedQParams);
+    public int getFixedAlgorithm(com.speedata.libuhf.bean.FixedQParams fixedQParams) {
+        FixedQParams fixedQParams1 = new FixedQParams();
+        int res = getLinkage().Radio_GetSingulationAlgorithmFixedParameters(fixedQParams1);
+        if (res == 0) {
+            fixedQParams.setValue(fixedQParams1.qValue,
+                    fixedQParams1.retryCount,
+                    fixedQParams1.toggleTarget,
+                    fixedQParams1.repeatUntiNoTags);
+        }
+        return res;
     }
 
 //    @Override
