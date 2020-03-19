@@ -1287,9 +1287,9 @@ public class XinLianQilian extends IUHFServiceAdapter {
                     case RG_PRC:
                         return 0;
                     case RG_NA:
-                        return 2;
+                        return 1;
                     case RG_EU3:
-                        return 3;
+                        return 2;
                     default:
                         return -1;
                 }
