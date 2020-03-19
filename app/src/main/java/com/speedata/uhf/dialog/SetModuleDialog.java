@@ -26,7 +26,7 @@ import java.text.DecimalFormat;
 public class SetModuleDialog extends Dialog implements View.OnClickListener {
 
     //其他模块频段
-    private final String[] freq_area_item = {"840-845", "920-925", "902-928", "865-868", "..."};
+    private final String[] freq_area_item = {"840-845", "902-928", "865-868", "..."};
     private final String[] yixin_freq_area_item = {"中国1", "中国2", "欧洲", "美国", "韩国", "日本", "..."};
     //R2000模块频段
     private final String[] r2k_freq_area_item = {"840-845", "920-925", "902-928",
@@ -120,16 +120,14 @@ public class SetModuleDialog extends Dialog implements View.OnClickListener {
             }
 
         } else {
-            if (re == IUHFService.REGION_CHINA_920_925) {
-                lf.setSelection(1, true);
-            } else if (re == IUHFService.REGION_CHINA_840_845) {
+            if (re == IUHFService.REGION_CHINA_840_845) {
                 lf.setSelection(0, true);
             } else if (re == IUHFService.REGION_CHINA_902_928) {
-                lf.setSelection(2, true);
+                lf.setSelection(1, true);
             } else if (re == IUHFService.REGION_EURO_865_868) {
-                lf.setSelection(3, true);
+                lf.setSelection(2, true);
             } else {
-                lf.setSelection(4, true);
+                lf.setSelection(3, true);
                 status.setText(R.string.set_read_fail);
                 Log.e("r2000_kt45", "read region setting read failed");
             }

@@ -1252,12 +1252,9 @@ public class XinLianQilian extends IUHFServiceAdapter {
                     rre = Reader.Region_Conf.RG_PRC;
                     break;
                 case 1:
-                    rre = Reader.Region_Conf.RG_NONE;
-                    break;
-                case 2:
                     rre = Reader.Region_Conf.RG_NA;
                     break;
-                case 3:
+                case 2:
                     rre = Reader.Region_Conf.RG_EU3;
                     break;
                 default:
