@@ -351,7 +351,7 @@ public class FLX extends IUHFServiceAdapter implements OnInventoryListener, OnRe
             }
         }
         try {
-            if (!SystemProperties.get("ro.product.model").contains("SD100") || "SD100T".equals(SystemProperties.get("ro.product.model"))) {
+            if (!SystemProperties.get("ro.product.model").equals("SD100")) {
                 pw.PowerOffDevice();
                 pw.PowerOnDevice();
             }
@@ -406,7 +406,7 @@ public class FLX extends IUHFServiceAdapter implements OnInventoryListener, OnRe
                 if ("SD100T".equals(SystemProperties.get("ro.product.model"))) {
                     pw.PowerOffDevice();
                     Log.d("UHF", "closeDev");
-                } else if (SystemProperties.get("ro.product.model").contains("SD100")) {
+                } else if (SystemProperties.get("ro.product.model").equals("SD100")) {
                     pw.gtPower("uhf_close");
                     pw.gtPower("close");
                 } else {

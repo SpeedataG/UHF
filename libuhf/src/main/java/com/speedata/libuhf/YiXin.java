@@ -186,7 +186,7 @@ public class YiXin extends IUHFServiceAdapter implements OnSpdInventoryListener 
             }
         }
         try {
-            if (!SystemProperties.get("ro.product.model").contains("SD100") || "SD100T".equals(SystemProperties.get("ro.product.model"))) {
+            if (!SystemProperties.get("ro.product.model").equals("SD100")) {
                 pw.PowerOffDevice();
                 pw.PowerOnDevice();
             }
@@ -211,7 +211,7 @@ public class YiXin extends IUHFServiceAdapter implements OnSpdInventoryListener 
             } else {
                 result = getDeriver().initRFID(SERIALPORT);
             }
-        } else if (xinghao.contains("SD100")) {
+        } else if (xinghao.equals("SD100")) {
             SystemClock.sleep(240);
             result = getDeriver().initRFID(SERIALPORT_SD100);
         } else {
@@ -256,7 +256,7 @@ public class YiXin extends IUHFServiceAdapter implements OnSpdInventoryListener 
                 if ("SD100T".equals(SystemProperties.get("ro.product.model"))) {
                     pw.PowerOffDevice();
                     Log.d("UHF", "closeDev");
-                } else if (SystemProperties.get("ro.product.model").contains("SD100")) {
+                } else if (SystemProperties.get("ro.product.model").equals("SD100")) {
                     pw.gtPower("uhf_close");
                     pw.gtPower("close");
                 } else {

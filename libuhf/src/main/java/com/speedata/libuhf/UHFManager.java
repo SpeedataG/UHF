@@ -642,7 +642,7 @@ public class UHFManager {
             if ("SC200T".equalsIgnoreCase(xinghao) || "iPick".equalsIgnoreCase(xinghao)) {
                 return;
             }
-            if (SystemProperties.get("ro.product.model").contains("SD100")) {
+            if (SystemProperties.get("ro.product.model").equals("SD100")) {
                 pw.gtPower("uhf_close");
                 pw.gtPower("close");
             } else {
