@@ -346,7 +346,7 @@ public class XinLianQilian extends IUHFServiceAdapter {
                     if ("SC200T".equalsIgnoreCase(xinghao) || "iPick".equalsIgnoreCase(xinghao)) {
                         return;
                     }
-                    if (SystemProperties.get("ro.product.model").contains("SD100")) {
+                    if (SystemProperties.get("ro.product.model").equals("SD100")) {
                         deviceControl.gtPower("uhf_close");
                         deviceControl.gtPower("close");
                     } else {
@@ -1507,7 +1507,6 @@ public class XinLianQilian extends IUHFServiceAdapter {
                             }
                         }
                     }
-                    inSearch = true;
                     Log.d(TAG, "run:5555555555555==next");
                     if (handler != null) {
                         handler.postDelayed(this, Rparams.sleep);
