@@ -30,6 +30,11 @@ public class SpdInventoryData implements Parcelable {
     public String bid;
     public String u8Tid;
 
+    public int frequency;
+    public byte[] pc = new byte[2];
+    public int readCnt;
+
+
 
     protected SpdInventoryData(Parcel in) {
         tid = in.readString();
@@ -111,5 +116,29 @@ public class SpdInventoryData implements Parcelable {
 
     public void setU8Tid(String u8Tid) {
         this.u8Tid = u8Tid;
+    }
+
+    public int getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(int frequency) {
+        this.frequency = frequency;
+    }
+
+    public byte[] getPc() {
+        return pc;
+    }
+
+    public void setPc(byte[] pc) {
+        this.pc = pc;
+    }
+
+    public int getReadCnt() {
+        return readCnt;
+    }
+
+    public void setReadCnt(int readCnt) {
+        this.readCnt = readCnt;
     }
 }

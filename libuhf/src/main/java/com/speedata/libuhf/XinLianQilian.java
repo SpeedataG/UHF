@@ -1487,7 +1487,10 @@ public class XinLianQilian extends IUHFServiceAdapter {
                                 String rssi = String.valueOf(tfs.RSSI);
                                 ArrayList<SpdInventoryData> cx = new ArrayList<SpdInventoryData>();
                                 SpdInventoryData tagData = new SpdInventoryData(strDataTemp, strEPCTemp, rssi);
-                                TagsBufferResh(Reader.bytes_Hexstr(tfs.EpcId), tagData);
+                                tagData.setFrequency(tfs.Frequency);
+                                tagData.setPc(tfs.PC);
+                                tagData.setReadCnt(tfs.ReadCnt);
+                                tagsBufferResh(Reader.bytes_Hexstr(tfs.EpcId), tagData);
                                 if (handler_inventer == null) {
                                     Log.d(TAG, "run: 4444444444==inventoryCallBack");
                                     inventoryCallBack(tagData);
@@ -1499,7 +1502,7 @@ public class XinLianQilian extends IUHFServiceAdapter {
                                     handler_inventer.sendMessage(msg);
                                 }
                                 cx.clear();
-                            }else {
+                            } else {
                                 break;
                             }
                         }
@@ -1574,7 +1577,7 @@ public class XinLianQilian extends IUHFServiceAdapter {
      * @param EPC
      * @param tagData
      */
-    private void TagsBufferResh(String EPC, SpdInventoryData tagData) {
+    private void tagsBufferResh(String EPC, SpdInventoryData tagData) {
 
         String epcstr = EPC;
         String u8tid = "", bid = "";
@@ -1587,6 +1590,8 @@ public class XinLianQilian extends IUHFServiceAdapter {
         } else if (Rparams.nxpu8 == 3) {
             bid = epcstr.substring(epcstr.length() - 4);
             epcstr = epcstr.substring(0, epcstr.length() - 4);
+        }else {
+            return;
         }
 
         if (epcstr.length() < 24) {
@@ -1598,12 +1603,6 @@ public class XinLianQilian extends IUHFServiceAdapter {
                 u8tid = tagData.getTid();
             }
         }
-
-//        if (Rparams.nxpu8 != 0) {
-//            char[] out2 = new char[4];
-//            Mreader.Hex2Str(tfs.Res, 2, out2);
-//            rfu = String.valueOf(out2);
-//        }
         tagData.setEpc(epcstr);
         tagData.setBid(bid);
         tagData.setU8Tid(u8tid);
