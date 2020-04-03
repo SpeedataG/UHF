@@ -442,7 +442,7 @@ public class UHFManager {
             }
 
             try {
-                Thread.sleep(2000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -496,7 +496,6 @@ public class UHFManager {
         }
         try {
             serialPort.OpenSerial(port, 115200);
-//            serialPort.OpenSerial(port, 9600);
             fd = serialPort.getFd();
         } catch (IOException e) {
             e.printStackTrace();
@@ -549,30 +548,8 @@ public class UHFManager {
             Log.d("ZM", "判断是不是旗联-芯联 length: " + length);
             if (length == 27) {
                 String hexStr = Integer.toHexString(bytes[9] & 0xFF);
-
-                serialPort.clearPortBuf(fd);
-                serialPort.WriteSerialByte(fd, new byte[]{(byte) 0xFF, 0x14, (byte) 0xAA, 0x4D, 0x6F, 0x64, 0x75, 0x6C, 0x65, 0x74, 0x65,
-                        0x63, 0x68, (byte) 0xAA, 0x40, 0x06, 0x01, 0x00, 0x00, 0x25, (byte) 0x80, (byte) 0x96, (byte) 0xBB, (byte) 0x90, 0x76});
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                try {
-                    bytes = serialPort.ReadSerial(fd, 30);
-
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
                 serialPort.CloseSerial(fd);
                 powerOff();
-                String r = "FF0EAA00004D6F64756C6574656368AA400601C35F";
-                if (bytes != null) {
-                    if (!bytesToHexString(bytes).equals(r)) {
-                        return FACTORY_XINLIAN_R2K + "-失败";
-                    }
-                }
                 if ("A0".equalsIgnoreCase(hexStr) || "A1".equalsIgnoreCase(hexStr)) {
                     return FACTORY_XINLIAN_R2K;
                 }
