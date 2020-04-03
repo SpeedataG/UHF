@@ -8,6 +8,15 @@ package com.speedata.libuhf.utils;
 
 public class StringUtils {
 
+
+    public static String byteToHex(byte b) {
+        String hex = Integer.toHexString(b & 0xFF);
+        if (hex.length() < 2) {
+            hex = "0" + hex;
+        }
+        return hex;
+    }
+
     public static String byteToHexString(byte[] b, int length) {
         String ret = "";
         for (int i = 0; i < length; i++) {
@@ -83,5 +92,25 @@ public class StringUtils {
             k += 2;
         }
         return byteArray;
+    }
+
+    /**
+     * 截取byte数组
+     *
+     * @param data     原数组
+     * @param startInx 起始下标
+     * @param endInx   结束下标
+     * @return 返回截取后的byte[]
+     */
+    public static byte[] subByteArray(byte[] data, int startInx, int endInx) {
+        byte[] b1 = new byte[endInx - startInx];
+        System.arraycopy(data, startInx, b1, 0, endInx - startInx);
+        return b1;
+    }
+
+    public static int byteArrayToInt(byte[] data) {
+        int res = 0;
+        res = (((data[0] & 0xFF) << 8) | (data[1] & 0xFF));
+        return res;
     }
 }

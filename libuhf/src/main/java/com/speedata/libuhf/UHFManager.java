@@ -59,13 +59,18 @@ public class UHFManager {
      * 芯联
      */
     private static byte[] xinlian_cmd = {(byte) 0xFF, 0x00, 0x03, 0x1d, 0x0C};
+    /**
+     * 旗连自制模块
+     */
+    private static byte[] qilian_spd_cmd = {(byte) 0xBB, 0x00, 0x03, 0x00, 0x01, 0x00, 0x04, 0x7E};
 
     public final static String FACTORY_FEILIXIN = "feilixin";
     public final static String FACTORY_XINLIAN = "xinlian";
     public final static String FACTORY_XINLIAN_R2K = "xinlian_r2k";
     public final static String FACTORY_R2000 = "r2k";
     public final static String FACTORY_YIXIN = "yixin";
-    public final static String FACTORY_3992 = "as3992";
+    public final static String FACTORY_QiLianSpd = "qilian_spd";
+    //    public final static String FACTORY_3992 = "as3992";
     private static int fd;
     private static DeviceControlSpd pw;
     @SuppressLint("StaticFieldLeak")
@@ -325,15 +330,14 @@ public class UHFManager {
 
 
     private static boolean judgeModel() {
-        noXmlJudgeModule();
-//        if (ConfigUtils.isConfigFileExists() && !CommonUtils.subDeviceType().contains("55")) {
-//            mRead = ConfigUtils.readConfig(mContext);
-//            factory = mRead.getUhf().getModule();
-//            SharedXmlUtil.getInstance(mContext).write("model", factory);
-//        } else {
-//            //沒有配置文件判断模块
-//            noXmlJudgeModule();
-//        }
+        if (ConfigUtils.isConfigFileExists() && !CommonUtils.subDeviceType().contains("55")) {
+            mRead = ConfigUtils.readConfig(mContext);
+            factory = mRead.getUhf().getModule();
+            SharedXmlUtil.getInstance(mContext).write("model", factory);
+        } else {
+            //沒有配置文件判断模块
+            noXmlJudgeModule();
+        }
 
         boolean initResult = true;
         switch (factory) {
@@ -350,6 +354,9 @@ public class UHFManager {
             case FACTORY_YIXIN:
                 // TODO: 2019/8/26   初始化一芯sdk
                 iuhfService = new YiXin(mContext);
+                break;
+            case FACTORY_QiLianSpd:
+                iuhfService = new QiLianSpd(mContext);
                 break;
             default:
                 initResult = false;
@@ -396,7 +403,7 @@ public class UHFManager {
 
                 } else if (xinghao.equals("SD55PTT")) {
                     powerOn(DeviceControlSpd.PowerType.NEW_MAIN, 8);
-                } else if (xinghao.contains("SD55") || xinghao.contains("R66") || xinghao.contains("A56")) {
+                } else if (xinghao.contains("SD55") || xinghao.contains("R66") || xinghao.contains("A56") || xinghao.contains("iGM80")) {
                     if (ConfigUtils.getApiVersion() > 23) {
                         powerOn(DeviceControlSpd.PowerType.NEW_MAIN, 12);
                     } else {
@@ -472,7 +479,7 @@ public class UHFManager {
             port = "/dev/ttyMT1";
         } else if ("SD50".equals(xinghao) || "SN50".equals(xinghao) || "R550".equals(xinghao)) {
             port = "/dev/ttyMT0";
-        } else if (xinghao.contains("SD55") || xinghao.contains("R66") || xinghao.contains("A56")) {
+        } else if (xinghao.contains("SD55") || xinghao.contains("R66") || xinghao.contains("A56") || xinghao.contains("iGM80")) {
             if (ConfigUtils.getApiVersion() > 23) {
                 port = "/dev/ttyMT0";
             } else {
@@ -542,30 +549,30 @@ public class UHFManager {
             Log.d("ZM", "判断是不是旗联-芯联 length: " + length);
             if (length == 27) {
                 String hexStr = Integer.toHexString(bytes[9] & 0xFF);
-//
-//                serialPort.clearPortBuf(fd);
-//                serialPort.WriteSerialByte(fd, new byte[]{(byte) 0xFF, 0x14, (byte) 0xAA, 0x4D, 0x6F, 0x64, 0x75, 0x6C, 0x65, 0x74, 0x65,
-//                        0x63, 0x68, (byte) 0xAA, 0x40, 0x06, 0x01, 0x00, 0x00, 0x25, (byte) 0x80, (byte) 0x96, (byte) 0xBB, (byte) 0x90, 0x76});
-//                try {
-//                    Thread.sleep(100);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//
-//                try {
-//                    bytes = serialPort.ReadSerial(fd, 30);
-//
-//                } catch (UnsupportedEncodingException e) {
-//                    e.printStackTrace();
-//                }
+
+                serialPort.clearPortBuf(fd);
+                serialPort.WriteSerialByte(fd, new byte[]{(byte) 0xFF, 0x14, (byte) 0xAA, 0x4D, 0x6F, 0x64, 0x75, 0x6C, 0x65, 0x74, 0x65,
+                        0x63, 0x68, (byte) 0xAA, 0x40, 0x06, 0x01, 0x00, 0x00, 0x25, (byte) 0x80, (byte) 0x96, (byte) 0xBB, (byte) 0x90, 0x76});
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    bytes = serialPort.ReadSerial(fd, 30);
+
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
                 serialPort.CloseSerial(fd);
                 powerOff();
-//                String r = "FF0EAA00004D6F64756C6574656368AA400601C35F";
-//                if (bytes != null) {
-//                    if (!bytesToHexString(bytes).equals(r)) {
-//                        return FACTORY_XINLIAN_R2K + "-失败";
-//                    }
-//                }
+                String r = "FF0EAA00004D6F64756C6574656368AA400601C35F";
+                if (bytes != null) {
+                    if (!bytesToHexString(bytes).equals(r)) {
+                        return FACTORY_XINLIAN_R2K + "-失败";
+                    }
+                }
                 if ("A0".equalsIgnoreCase(hexStr) || "A1".equalsIgnoreCase(hexStr)) {
                     return FACTORY_XINLIAN_R2K;
                 }
@@ -594,6 +601,34 @@ public class UHFManager {
                 powerOff();
                 return FACTORY_FEILIXIN;
             }
+        }
+
+        //判断是不是qilian_spd
+        serialPort.clearPortBuf(fd);
+        serialPort.WriteSerialByte(fd, qilian_spd_cmd);
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        try {
+            bytes = serialPort.ReadSerial(fd, 128);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        if (bytes != null) {
+            factory = bytesToHexString(bytes);
+            Log.d("ZM", "判断是不是旗连自制模块: " + factory);
+            StringBuilder str = new StringBuilder();
+            byte[] m = new byte[bytes[4]];
+            System.arraycopy(bytes, 6, m, 0, bytes[4]);
+            for (byte b : m) {
+                str.append((char) b);
+            }
+            Log.d("ZM", "zzc:硬件型号：" + str.toString());
+            serialPort.CloseSerial(fd);
+            powerOff();
+            return FACTORY_QiLianSpd;
         }
 
         serialPort.CloseSerial(fd);

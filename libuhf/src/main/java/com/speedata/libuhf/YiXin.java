@@ -114,7 +114,7 @@ public class YiXin extends IUHFServiceAdapter implements OnSpdInventoryListener 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            } else if (xinghao.contains("SD55") || xinghao.contains("R66") || xinghao.contains("A56")) {
+            } else if (xinghao.contains("SD55") || xinghao.contains("R66") || xinghao.contains("A56") || xinghao.contains("iGM80")) {
                 if (ConfigUtils.getApiVersion() > 23) {
                     try {
                         pw = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 12);
@@ -205,7 +205,7 @@ public class YiXin extends IUHFServiceAdapter implements OnSpdInventoryListener 
             result = getDeriver().initRFID(SERIALPORT1);
         } else if ("SN50".equals(xinghao) || "SD50".equals(xinghao) || "R550".equals(xinghao)) {
             result = getDeriver().initRFID(SERIALPORT0);
-        } else if (xinghao.contains("SD55") || xinghao.contains("R66") || xinghao.contains("A56")) {
+        } else if (xinghao.contains("SD55") || xinghao.contains("R66") || xinghao.contains("A56") || xinghao.contains("iGM80")) {
             if (ConfigUtils.getApiVersion() > 23) {
                 result = getDeriver().initRFID(SERIALPORT0);
             } else {
