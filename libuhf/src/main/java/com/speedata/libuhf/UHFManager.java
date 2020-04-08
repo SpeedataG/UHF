@@ -410,7 +410,7 @@ public class UHFManager {
                         powerOn(DeviceControlSpd.PowerType.MAIN, 128);
                     }
                 } else if ("SD50".equals(xinghao) || "SN50".equals(xinghao) || "R550".equals(xinghao)) {
-                    powerOn(DeviceControlSpd.PowerType.NEW_MAIN, 75);
+                    powerOn(DeviceControlSpd.PowerType.NEW_MAIN, 74, 75);
                 } else if (xinghao.equals("KT80") || xinghao.equals("W6") || xinghao.equals("N80")
                         || xinghao.equals("Biowolf LE") || xinghao.equals("FC-PK80")
                         || xinghao.equals("FC-K80") || xinghao.equals("T80") || xinghao.contains("80")) {

@@ -120,7 +120,7 @@ public class QiLianSpd extends IUHFServiceAdapter {
                 }
             } else if ("SN50".equals(xinghao) || "SD50".equals(xinghao) || "R550".equals(xinghao)) {
                 try {
-                    deviceControlSpd = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 75);
+                    deviceControlSpd = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 74,75);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

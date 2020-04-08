@@ -169,7 +169,7 @@ public class XinLianQilian extends IUHFServiceAdapter {
                 }
             } else if ("SD50".equals(xinghao) || "SN50".equals(xinghao) || "R550".equals(xinghao)) {
                 try {
-                    deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 75);
+                    deviceControl = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 74,75);
                     deviceControl.PowerOnDevice();
                 } catch (IOException e) {
                     e.printStackTrace();
