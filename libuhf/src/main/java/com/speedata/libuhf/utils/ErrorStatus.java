@@ -30,6 +30,7 @@ public class ErrorStatus {
     private static void setCNStatus(int errorCode) {
         switch (errorCode) {
             case -20000:
+            case -9986:
                 STATUS = "内存分配失败";
                 break;
             case -19999:
@@ -86,6 +87,7 @@ public class ErrorStatus {
                 STATUS = "提供的内存空间过小";
                 break;
             case -9997:
+            case 18:
                 STATUS = "一般错误";
                 break;
             case -9996:
@@ -104,21 +106,21 @@ public class ErrorStatus {
                 STATUS = "射频读写器初始化失败";
                 break;
             case -9991:
+            case 7:
                 STATUS = "参数不可用";
                 break;
             case -9990:
                 STATUS = "没有可用的射频读写器";
                 break;
             case -9989:
+            case 8:
                 STATUS = "未初始化";
                 break;
             case -9987:
                 STATUS = "操作取消";
                 break;
-            case -9986:
-                STATUS = "内存分配失败";
-                break;
             case -9985:
+            case 16:
                 STATUS = "设备忙，设备正在执行前一操作";
                 break;
             case -9984:
@@ -148,8 +150,47 @@ public class ErrorStatus {
             case -9976:
                 STATUS = "MAC 组件返回错误的值";
                 break;
+            case 1:
+                STATUS = "IO端口错误";
+                break;
+            case 2:
+                STATUS = "设备内部错误";
+                break;
             case 3:
                 STATUS = "指令失败";
+                break;
+            case 5:
+                STATUS = "m5e致命错误";
+                break;
+            case 6:
+                STATUS = "不支持的操作";
+                break;
+            case 9:
+                STATUS = "回波过高";
+                break;
+            case 10:
+                STATUS = "重启过多";
+                break;
+            case 11:
+                STATUS = "未接天线";
+                break;
+            case 12:
+                STATUS = "温度过高";
+                break;
+            case 13:
+                STATUS = "读写器已经宕机";
+                break;
+            case 14:
+                STATUS = "未知错误硬件警告";
+                break;
+            case 15:
+                STATUS = "m6e初始化失败";
+                break;
+            case 19:
+                STATUS = "重置模块硬件警告";
+                break;
+            case 20:
+                STATUS = "未知错误";
                 break;
             default:
                 STATUS = errorCode + "";
@@ -160,6 +201,7 @@ public class ErrorStatus {
     private static void setENStatus(int errorCode) {
         switch (errorCode) {
             case -20000:
+            case -9986:
                 STATUS = "Memory allocation failed";
                 break;
             case -19999:
@@ -216,6 +258,7 @@ public class ErrorStatus {
                 STATUS = "The memory space provided is too small";
                 break;
             case -9997:
+            case 18:
                 STATUS = "General error";
                 break;
             case -9996:
@@ -234,21 +277,21 @@ public class ErrorStatus {
                 STATUS = "Rf reader initialization failed";
                 break;
             case -9991:
+            case 7:
                 STATUS = "Parameter unavailable";
                 break;
             case -9990:
                 STATUS = "No rf reader is available";
                 break;
             case -9989:
+            case 8:
                 STATUS = "uninitialized";
                 break;
             case -9987:
                 STATUS = "Operation cancelled";
                 break;
-            case -9986:
-                STATUS = "Memory allocation failed";
-                break;
             case -9985:
+            case 16:
                 STATUS = "Device is busy";
                 break;
             case -9984:
@@ -278,8 +321,47 @@ public class ErrorStatus {
             case -9976:
                 STATUS = "The MAC component returned the wrong value";
                 break;
+            case 1:
+                STATUS = "IO port error";
+                break;
+            case 2:
+                STATUS = "Equipment internal error";
+                break;
             case 3:
                 STATUS = "Instruction failure";
+                break;
+            case 5:
+                STATUS = "M5e fatal error";
+                break;
+            case 6:
+                STATUS = "Unsupported operations";
+                break;
+            case 9:
+                STATUS = "Echo is too high";
+                break;
+            case 10:
+                STATUS = "Restart the too much";
+                break;
+            case 11:
+                STATUS = "No antenna";
+                break;
+            case 12:
+                STATUS = "The temperature is too high";
+                break;
+            case 13:
+                STATUS = "The reader is down";
+                break;
+            case 14:
+                STATUS = "Unknown error hardware warning";
+                break;
+            case 15:
+                STATUS = "m6e Initialization failure";
+                break;
+            case 19:
+                STATUS = "Reset module hardware warnings";
+                break;
+            case 20:
+                STATUS = "An unknown error";
                 break;
             default:
                 STATUS = errorCode + "";

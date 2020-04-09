@@ -216,14 +216,14 @@ public class SearchTagDialog extends Dialog implements
                 inSearch = false;
                 this.setCancelable(true);
                 iuhfService.inventoryStop();
-                try {
-                    writer = new BufferedWriter(new FileWriter(file, false));
-                    writer.write("otgoff");
-                    writer.flush();
-                    writer.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    writer = new BufferedWriter(new FileWriter(file, false));
+//                    writer.write("otgoff");
+//                    writer.flush();
+//                    writer.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
                 action.setText(R.string.Start_Search_Btn);
                 cancel.setEnabled(true);
                 export.setEnabled(true);
@@ -237,14 +237,14 @@ public class SearchTagDialog extends Dialog implements
                 //取消掩码
                 iuhfService.selectCard(1, "", false);
                 EventBus.getDefault().post(new MsgEvent("CancelSelectCard", ""));
-                try {
-                    writer = new BufferedWriter(new FileWriter(file, false));
-                    writer.write("otgon");
-                    writer.flush();
-                    writer.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    writer = new BufferedWriter(new FileWriter(file, false));
+//                    writer.write("otgon");
+//                    writer.flush();
+//                    writer.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
                 SystemClock.sleep(10);
                 iuhfService.inventoryStart();
                 Log.d("zzc:", "inventoryStart 开始盘点");
