@@ -13,6 +13,7 @@ import android.util.Log;
 import com.magicrf.uhfreaderlib.reader.UhfReader;
 import com.magicrf.uhfreaderlib.readerInterface.CommendManager;
 import com.speedata.libuhf.bean.SpdInventoryData;
+import com.speedata.libuhf.bean.SpdReadData;
 import com.speedata.libuhf.interfaces.OnSpdInventoryListener;
 import com.speedata.libuhf.interfaces.OnSpdReadListener;
 import com.speedata.libuhf.interfaces.OnSpdWriteListener;
@@ -30,6 +31,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.IllegalFormatCodePointException;
 import java.util.List;
 
@@ -43,7 +45,6 @@ public class QiLianSpd extends IUHFServiceAdapter {
     private ReaderParams Rparams = new ReaderParams();
     private DeviceControlSpd newUHFDeviceControl;
     private DeviceControlSpd deviceControlSpd;
-    private SerialPortSpd serialPortSpd;
     private Handler handler = null;
 
     UhfReader uhfReader;
@@ -67,8 +68,7 @@ public class QiLianSpd extends IUHFServiceAdapter {
             try {
                 newUHFDeviceControl = new DeviceControlSpd(powerType, intArray);
                 newUHFDeviceControl.PowerOnDevice();
-                serialPortSpd = new SerialPortSpd();
-                serialPortSpd.OpenSerial(mRead.getUhf().getSerialPort(), 115200);
+                UhfReader.setPortPath(mRead.getUhf().getSerialPort());
                 uhfReader = UhfReader.getInstance();
                 return 0;
             } catch (IOException e) {
@@ -120,7 +120,7 @@ public class QiLianSpd extends IUHFServiceAdapter {
                 }
             } else if ("SN50".equals(xinghao) || "SD50".equals(xinghao) || "R550".equals(xinghao)) {
                 try {
-                    deviceControlSpd = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 74,75);
+                    deviceControlSpd = new DeviceControlSpd(DeviceControlSpd.PowerType.NEW_MAIN, 74, 75);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -230,15 +230,9 @@ public class QiLianSpd extends IUHFServiceAdapter {
         } else {
             port = "/dev/ttyMT2";
         }
+        UhfReader.setPortPath(port);
         uhfReader = UhfReader.getInstance();
-        try {
-            serialPortSpd = new SerialPortSpd();
-            serialPortSpd.OpenSerial(port, 115200);
-            return 0;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return -1;
-        }
+        return 0;
     }
 
     /**
@@ -246,8 +240,8 @@ public class QiLianSpd extends IUHFServiceAdapter {
      */
     @Override
     public void closeDev() {
-        if (serialPortSpd != null) {
-            serialPortSpd.CloseSerial(serialPortSpd.getFd());
+        if (uhfReader != null) {
+            uhfReader.close();
         }
         if (ConfigUtils.isConfigFileExists() && !CommonUtils.subDeviceType().contains("55")) {
             try {
@@ -293,23 +287,16 @@ public class QiLianSpd extends IUHFServiceAdapter {
      */
     @Override
     public void inventoryStart() {
-//        if (inSearch) {
-//            return;
-//        }
-//        if (handler == null) {
-//            handler = new Handler();
-//        }
-//        inSearch = true;
-////        cancelSelect();
-//        Log.d(TAG, "inventory_start: inv_thread" + inv_thread);
-//        handler.postDelayed(inv_thread, 0);
-//        Log.d(TAG, "inventory_start: start" + handler);
-        List<byte[]> list = uhfReader.inventoryRealTime();
-        for (byte[] b : list) {
-            String epc = StringUtils.byteToHexString(b, b.length);
-            Log.e(TAG, "inventory_start: start" + StringUtils.byteToHexString(b, b.length));
-            onInventoryListener.getInventoryData(new SpdInventoryData(null, epc, null));
+        if (inSearch) {
+            return;
         }
+        if (handler == null) {
+            handler = new Handler();
+        }
+        inSearch = true;
+        Log.d(TAG, "inventory_start: inv_thread" + inv_thread);
+        handler.postDelayed(inv_thread, 0);
+        Log.d(TAG, "inventory_start: start" + handler);
     }
 
     /**
@@ -322,6 +309,7 @@ public class QiLianSpd extends IUHFServiceAdapter {
         }
         Log.d(TAG, "inventory_stop: start");
         inSearch = false;
+        uhfReader.stopInventoryMulti();
         try {
             if (handler != null) {
                 handler.removeCallbacks(inv_thread);
@@ -333,107 +321,64 @@ public class QiLianSpd extends IUHFServiceAdapter {
         }
     }
 
+    @Override
+    public int selectCard(int bank, String epc, boolean mFlag) {
+        byte[] data = DataConversionUtils.HexString2Bytes(epc);
+        return selectCard(bank, data, mFlag);
+    }
+
+    @Override
+    public int selectCard(int bank, byte[] epc, boolean mFlag) {
+        if (mFlag) {
+            if (bank == 1) {
+                uhfReader.selectEpc(epc);
+            } else {
+                uhfReader.setSelectPara((byte) 0, (byte) 0, (byte) bank, 32, (byte) (epc.length * 8), false, epc);
+            }
+            uhfReader.setSelectMode((byte) 0x00);
+        } else {
+            uhfReader.unSelect();
+        }
+        return 0;
+    }
+
+    @Override
+    public void setOnReadListener(OnSpdReadListener onSpdReadListener) {
+        this.onSpdReadListener = onSpdReadListener;
+    }
+
+    @Override
+    public int readArea(int area, int addr, int count, String passwd) {
+        byte[] password = DataConversionUtils.HexString2Bytes(passwd);
+        byte[] readData = uhfReader.readFrom6C(area, addr, count, password);
+        Log.d(TAG, "readArea:" + Arrays.toString(readData));
+        SpdReadData spdReadData = new SpdReadData();
+        if (readData != null) {
+            spdReadData.setStatus(0);
+            spdReadData.setReadData(readData);
+            spdReadData.setDataLen(readData.length);
+        } else {
+            spdReadData.setStatus(-1);
+        }
+        onSpdReadListener.getReadData(spdReadData);
+        return 0;
+    }
 
     private volatile boolean inSearch = false;
     private Runnable inv_thread = new Runnable() {
         @Override
         public void run() {
-
-//            byte[] cmd = new byte[]{(byte) 0xBB, 0x00, 0x22, 0x00, 0x00, 0x22, 0x7E};
-//            cmd[5] = checkSum(cmd);
-//            Log.d("zzc", "inventoryOnce()===write===" + DataConversionUtils.byteArrayToString(cmd));
-//            write(cmd);
-//            byte[] res = read();
-//            Log.d("zzc", "inventoryOnce()===read===" + DataConversionUtils.byteArrayToString(res));
-//            if (res != null) {
-//                List<byte[]> listByte = new ArrayList<>();
-//                for (int i = 0; i < res.length; i++) {
-//                    if (res[i] == (byte) 0xBB) {
-//                        int head = i;
-//                        while (res[i] != (byte) 0x7E) {
-//                            i++;
-//                        }
-//                        int end = i + 1;
-//                        listByte.add(StringUtils.subByteArray(res, head, end));
-//                    }
-//                }
-//                for (byte[] re : listByte) {
-//                    Log.d("zzc", "inventoryOnce()===listByte===" + DataConversionUtils.byteArrayToString(re));
-//                    if (re[1] == 0x02) {
-//                        if (checkSum(re) == re[re.length - 2]) {
-//                            //校验值正确
-//                            int len = StringUtils.byteArrayToInt(StringUtils.subByteArray(re, 3, 5));
-//                            String rssi = (int) re[5] + "";
-//                            byte[] pc = StringUtils.subByteArray(re, 6, 8);
-//                            byte[] epcByte = StringUtils.subByteArray(re, 8, len + 3);
-//                            byte[] crc = StringUtils.subByteArray(re, len + 3, len + 5);
-//                            String epc = StringUtils.byteToHexString(epcByte, epcByte.length);
-//                            SpdInventoryData spdInventoryData = new SpdInventoryData(null, epc, rssi);
-//                            spdInventoryData.setPc(pc);
-//                            onInventoryListener.getInventoryData(spdInventoryData);
-//                        } else {
-//                            //校验值错误
-////                        onInventoryListener.onInventoryStatus(7);
-//                        }
-//                    }else {
-//                        //响应帧
-////                        onInventoryListener.onInventoryStatus(4);
-//                    }
-//
-//                }
-//
-//
-//            } else {
-////                onInventoryListener.onInventoryStatus(4);
-//            }
+            List<byte[]> list = uhfReader.inventoryMulti();
+            for (int i = 0; i < list.size(); i++) {
+                String epc = StringUtils.byteToHexString(list.get(i), list.get(i).length);
+                Log.e(TAG, "inventory_start: start" + epc);
+                onInventoryListener.getInventoryData(new SpdInventoryData(null, epc, null));
+            }
             if (handler != null) {
                 handler.postDelayed(this, Rparams.sleep);
             }
         }
     };
-
-    /**
-     * 校验和
-     *
-     * @param data 去掉第一个和最后两个
-     * @return
-     */
-    public byte checkSum(byte[] data) {
-        byte crc = 0;
-        for (int i = 1; i < data.length - 2; ++i) {
-            crc += data[i];
-        }
-        return crc;
-    }
-
-    public void write(byte[] data) {
-        if (serialPortSpd != null) {
-            int fd = serialPortSpd.getFd();
-            int res = serialPortSpd.WriteSerialByte(fd, data);
-            Log.d("zzc", "write()---" + res);
-        }
-    }
-
-    public byte[] read() {
-        byte[] result = null;
-        int index = 0;
-        if (serialPortSpd != null) {
-            while (index < 10) {
-                try {
-                    Thread.sleep(50);
-                    result = serialPortSpd.ReadSerial(serialPortSpd.getFd(), 1024);
-                    Log.d("zzc", "res---" + DataConversionUtils.byteArrayToString(result));
-                    if (result != null) {
-                        return result;
-                    }
-                } catch (UnsupportedEncodingException | InterruptedException e) {
-                    e.printStackTrace();
-                }
-                index++;
-            }
-        }
-        return result;
-    }
 
     private class ReaderParams {
         public int sleep;
