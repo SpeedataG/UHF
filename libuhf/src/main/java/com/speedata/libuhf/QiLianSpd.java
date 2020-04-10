@@ -14,6 +14,7 @@ import com.magicrf.uhfreaderlib.reader.UhfReader;
 import com.magicrf.uhfreaderlib.readerInterface.CommendManager;
 import com.speedata.libuhf.bean.SpdInventoryData;
 import com.speedata.libuhf.bean.SpdReadData;
+import com.speedata.libuhf.bean.SpdWriteData;
 import com.speedata.libuhf.interfaces.OnSpdInventoryListener;
 import com.speedata.libuhf.interfaces.OnSpdReadListener;
 import com.speedata.libuhf.interfaces.OnSpdWriteListener;
@@ -362,6 +363,52 @@ public class QiLianSpd extends IUHFServiceAdapter {
         }
         onSpdReadListener.getReadData(spdReadData);
         return 0;
+    }
+
+    @Override
+    public int writeArea(int area, int addr, int count, String passwd, byte[] content) {
+        byte[] password = DataConversionUtils.HexString2Bytes(passwd);
+        boolean res = uhfReader.writeTo6C(password, area, addr, count, content);
+        int i = res ? 0 : -1;
+        SpdWriteData spdWriteData = new SpdWriteData();
+        spdWriteData.setStatus(i);
+        onSpdWriteListener.getWriteData(spdWriteData);
+        return i;
+    }
+
+    @Override
+    public int setLock(int type, int area, String passwd) {
+        byte[] password = DataConversionUtils.HexString2Bytes(passwd);
+        boolean res = uhfReader.lock6C(password, area, type);
+        int i = res ? 0 : -1;
+        SpdWriteData spdWriteData = new SpdWriteData();
+        spdWriteData.setStatus(i);
+        onSpdWriteListener.getWriteData(spdWriteData);
+        return i;
+    }
+
+    @Override
+    public int setKill(String accessPassword, String killPassword) {
+        byte[] password = DataConversionUtils.HexString2Bytes(killPassword);
+        boolean res = uhfReader.kill6C(password);
+        return res ? 0 : -1;
+    }
+
+    @Override
+    public int setFreqRegion(int region) {
+        boolean res = uhfReader.setFrequency(region);
+        return res ? 0 : -1;
+    }
+
+    @Override
+    public int getFreqRegion() {
+        return uhfReader.getFrequency();
+    }
+
+    @Override
+    public int setAntennaPower(int power) {
+        boolean res = uhfReader.setOutputPower(power * 100);
+        return res ? 0 : -1;
     }
 
     private volatile boolean inSearch = false;
