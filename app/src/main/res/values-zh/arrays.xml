@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="way">
+        <item>Reserved</item>
+        <item>EPC</item>
+        <item>TID</item>
+        <item>USER</item>
+    </string-array>
+    <string-array name="r2k_freq">
+        <item>840_845</item>
+        <item>920_925</item>
+        <item>902_928</item>
+        <item>865_868</item>
+    </string-array>
+    <string-array name="freq">
+        <item>840_845</item>
+        <item>902_928</item>
+        <item>865_868</item>
+    </string-array>
+    <string-array name="yi_xin_freq">
+        <item>中国1</item>
+        <item>中国2</item>
+        <item>欧洲</item>
+        <item>美国</item>
+        <item>韩国</item>
+        <item>日本</item>
+    </string-array>
+
+
+    <string-array name="arr_Q">
+        <item>自动</item>
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+    </string-array>
+
+    <string-array name="arr_gen2_target">
+        <item>A</item>
+        <item>B</item>
+        <item>A-B</item>
+        <item>B-A</item>
+    </string-array>
+
+    <string-array name="inv_con">
+        <item>仅EPC</item>
+        <item>EPC+TID</item>
+        <item>EPC+USER</item>
+    </string-array>
+
+    <string-array name="pix">
+        <item>换行</item>
+        <item>空格</item>
+        <item>回车换行</item>
+        <item>无</item>
+    </string-array>
+
+</resources>

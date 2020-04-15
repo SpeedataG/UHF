@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/card_title_shape"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingLeft="14dp">
+
+    <ImageView
+        android:id="@+id/set_title_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:background="@drawable/bg_image_gray_select"
+        android:padding="4dp"
+        android:src="@drawable/exit_ico" />
+
+    <TextView
+        android:id="@+id/set_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_marginLeft="20dp"
+        android:gravity="center_vertical"
+        android:text="@string/Set_Btn_set"
+        android:textColor="@color/text_white"
+        android:textSize="22sp" />
+</LinearLayout>

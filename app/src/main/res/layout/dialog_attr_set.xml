@@ -1,0 +1,565 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <RelativeLayout
+        android:id="@+id/relative_layout"
+        android:layout_width="280dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="0dp"
+        android:background="@color/text_white">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="8dp"
+                        android:text="@string/set_password"
+                        android:textColor="@color/commom_text_color"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="70dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/init_password"
+                            android:textColor="@color/text_set_dark"
+                            android:textSize="14sp" />
+
+                        <EditText
+                            android:id="@+id/et_pwdset_init"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:hint="@string/init_password_hint"
+                            android:paddingLeft="8dp"
+                            android:paddingRight="8dp"
+                            android:text="@string/VALUE_ZERO"
+                            android:textColor="@color/text_set_dark"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="70dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/Item_Pswd_Type"
+                            android:textColor="@color/text_set_dark"
+                            android:textSize="14sp" />
+
+                        <RadioGroup
+                            android:id="@+id/pwd_set_rg"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <RadioButton
+                                android:id="@+id/rbtn_pwd_kill"
+                                android:layout_width="80dp"
+                                android:layout_height="20dp"
+                                android:layout_marginLeft="8dp"
+                                android:background="@drawable/btn_bg_blue_select"
+                                android:button="@null"
+                                android:checked="true"
+                                android:gravity="center"
+                                android:text="@string/kill_password"
+                                android:textColor="@color/btn_blue"
+                                android:textSize="14sp" />
+
+                            <RadioButton
+                                android:id="@+id/rbtn_pwd_acc"
+                                android:layout_width="80dp"
+                                android:layout_height="20dp"
+                                android:layout_marginLeft="8dp"
+                                android:background="@drawable/btn_bg_blue_select"
+                                android:button="@null"
+                                android:gravity="center"
+                                android:text="@string/access_password"
+                                android:textColor="@color/btn_blue"
+                                android:textSize="14sp" />
+                        </RadioGroup>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="70dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/new_password"
+                            android:textColor="@color/text_set_dark"
+                            android:textSize="14sp" />
+
+                        <EditText
+                            android:id="@+id/et_pwdset_new"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:hint="@string/new_password_hint"
+                            android:paddingLeft="8dp"
+                            android:paddingRight="8dp"
+                            android:textColor="@color/text_set_dark"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp">
+
+                        <Button
+                            android:id="@+id/btn_pwd_ok"
+                            android:layout_width="wrap_content"
+                            android:layout_height="30dp"
+                            android:layout_margin="5dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/btn_b_g_select"
+                            android:text="@string/DIA_CHECK"
+                            android:textColor="@color/text_white"
+                            android:textSize="16sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="8dp"
+                        android:text="@string/set_epc"
+                        android:textColor="@color/commom_text_color"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="70dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/init_password"
+                            android:textColor="@color/text_set_dark"
+                            android:textSize="14sp" />
+
+                        <EditText
+                            android:id="@+id/editText_epc_passwd"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:hint="@string/init_password_hint"
+                            android:paddingLeft="8dp"
+                            android:paddingRight="8dp"
+                            android:text="@string/VALUE_ZERO"
+                            android:textColor="@color/text_set_dark"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="70dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/set_epc_length"
+                            android:textColor="@color/text_set_dark"
+                            android:textSize="14sp" />
+
+                        <EditText
+                            android:id="@+id/editText_epc_epclength"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:hint="@string/set_epc_length_hint"
+                            android:paddingLeft="8dp"
+                            android:paddingRight="8dp"
+                            android:textColor="@color/text_set_dark"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="70dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/Item_New_EPC"
+                            android:textColor="@color/text_set_dark"
+                            android:textSize="14sp" />
+
+                        <EditText
+                            android:id="@+id/editText_epc_newepc"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:hint="@string/input_new_epc_hint"
+                            android:paddingLeft="8dp"
+                            android:paddingRight="8dp"
+                            android:textColor="@color/text_set_dark"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp">
+
+                        <Button
+                            android:id="@+id/btn_epc_ok"
+                            android:layout_width="wrap_content"
+                            android:layout_height="30dp"
+                            android:layout_margin="5dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/btn_b_g_select"
+                            android:text="@string/DIA_CHECK"
+                            android:textColor="@color/text_white"
+                            android:textSize="16sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="8dp"
+                        android:text="@string/set_lock"
+                        android:textColor="@color/commom_text_color"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="8dp"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="70dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/save_space"
+                            android:textColor="@color/text_set_dark"
+                            android:textSize="14sp" />
+
+                        <RadioGroup
+                            android:id="@+id/space_rg1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <RadioButton
+                                android:id="@+id/rbtn_kill"
+                                android:layout_width="80dp"
+                                android:layout_height="20dp"
+                                android:layout_marginLeft="8dp"
+                                android:background="@drawable/btn_bg_blue_select"
+                                android:button="@null"
+                                android:checked="true"
+                                android:gravity="center"
+                                android:text="@string/kill_password"
+                                android:textColor="@color/btn_blue"
+                                android:textSize="14sp" />
+
+                            <RadioButton
+                                android:id="@+id/rbtn_acc"
+                                android:layout_width="80dp"
+                                android:layout_height="20dp"
+                                android:layout_marginLeft="8dp"
+                                android:background="@drawable/btn_bg_blue_select"
+                                android:button="@null"
+                                android:gravity="center"
+                                android:text="@string/access_password"
+                                android:textColor="@color/btn_blue"
+                                android:textSize="14sp" />
+                        </RadioGroup>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:gravity="center_vertical">
+
+                        <RadioGroup
+                            android:id="@+id/space_rg2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <RadioButton
+                                android:id="@+id/rbtn_epc"
+                                android:layout_width="60dp"
+                                android:layout_height="20dp"
+                                android:background="@drawable/btn_bg_blue_select"
+                                android:button="@null"
+                                android:gravity="center"
+                                android:text="@string/lock_epc"
+                                android:textColor="@color/btn_blue"
+                                android:textSize="14sp" />
+
+                            <RadioButton
+                                android:id="@+id/rbtn_tid"
+                                android:layout_width="60dp"
+                                android:layout_height="20dp"
+                                android:layout_marginLeft="8dp"
+                                android:background="@drawable/btn_bg_blue_select"
+                                android:button="@null"
+                                android:gravity="center"
+                                android:text="@string/lock_tid"
+                                android:textColor="@color/btn_blue"
+                                android:textSize="14sp" />
+
+                            <RadioButton
+                                android:id="@+id/rbtn_user"
+                                android:layout_width="70dp"
+                                android:layout_height="20dp"
+                                android:layout_marginLeft="8dp"
+                                android:background="@drawable/btn_bg_blue_select"
+                                android:button="@null"
+                                android:gravity="center"
+                                android:text="@string/lock_user"
+                                android:textColor="@color/btn_blue"
+                                android:textSize="14sp" />
+                        </RadioGroup>
+
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="8dp"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="70dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/lock_type"
+                            android:textColor="@color/text_set_dark"
+                            android:textSize="14sp" />
+
+                        <RadioGroup
+                            android:id="@+id/type_rg1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <RadioButton
+                                android:id="@+id/type_unlock"
+                                android:layout_width="80dp"
+                                android:layout_height="20dp"
+                                android:layout_marginLeft="8dp"
+                                android:background="@drawable/btn_bg_blue_select"
+                                android:button="@null"
+                                android:checked="true"
+                                android:gravity="center"
+                                android:text="@string/unlock_pwd_type"
+                                android:textColor="@color/btn_blue"
+                                android:textSize="14sp" />
+
+                            <RadioButton
+                                android:id="@+id/type_lock"
+                                android:layout_width="80dp"
+                                android:layout_height="20dp"
+                                android:layout_marginLeft="8dp"
+                                android:background="@drawable/btn_bg_blue_select"
+                                android:button="@null"
+                                android:gravity="center"
+                                android:text="@string/lock_pwd_type"
+                                android:textColor="@color/btn_blue"
+                                android:textSize="14sp" />
+                        </RadioGroup>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:gravity="center_vertical">
+
+                        <RadioGroup
+                            android:id="@+id/type_rg2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <RadioButton
+                                android:id="@+id/type_perma_unlock"
+                                android:layout_width="100dp"
+                                android:layout_height="20dp"
+                                android:background="@drawable/btn_bg_blue_select"
+                                android:button="@null"
+                                android:gravity="center"
+                                android:text="@string/permaunlock_pwd_type"
+                                android:textColor="@color/btn_blue"
+                                android:textSize="14sp" />
+
+                            <RadioButton
+                                android:id="@+id/type_perma_lock"
+                                android:layout_width="90dp"
+                                android:layout_height="20dp"
+                                android:layout_marginLeft="8dp"
+                                android:background="@drawable/btn_bg_blue_select"
+                                android:button="@null"
+                                android:gravity="center"
+                                android:text="@string/permalock_pwd_type"
+                                android:textColor="@color/btn_blue"
+                                android:textSize="14sp" />
+
+                        </RadioGroup>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="70dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/init_password"
+                            android:textColor="@color/text_set_dark"
+                            android:textSize="14sp" />
+
+                        <EditText
+                            android:id="@+id/et_lock_pwd"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:hint="@string/init_password_hint"
+                            android:paddingLeft="8dp"
+                            android:paddingRight="8dp"
+                            android:text="@string/VALUE_ZERO"
+                            android:textColor="@color/text_set_dark"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp">
+
+                        <Button
+                            android:id="@+id/btn_lock_ok"
+                            android:layout_width="wrap_content"
+                            android:layout_height="30dp"
+                            android:layout_margin="5dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/btn_b_g_select"
+                            android:text="@string/DIA_CHECK"
+                            android:textColor="@color/text_white"
+                            android:textSize="16sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp">
+
+                    <Button
+                        android:id="@+id/btn_reset"
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_select"
+                        android:text="@string/reset"
+                        android:textColor="@color/text_white"
+                        android:textSize="18sp" />
+
+                    <Button
+                        android:id="@+id/btn_back"
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_b_g_select"
+                        android:text="@string/btn_bk"
+                        android:textColor="@color/text_white"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </RelativeLayout>
+</RelativeLayout>

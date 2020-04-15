@@ -38,10 +38,10 @@ public class ExcelUtils<T> implements Serializable {
     String wirteExcelPath = Environment.getExternalStorageDirectory() + "/testExcel.xls";
     boolean FONT_BOLD = false;//设置标题字体是否为斜体，默认不是
     int FONT_TIMES = 10;//设置字体大小，默认为10
-    jxl.format.Colour FONT_COLOR = Colour.BLACK;//设置标题字体颜色,默认黑色
-    jxl.format.Colour BACKGROND_COLOR = Colour.WHITE;//设置标题背景颜色,默认白色
-    jxl.format.Alignment FONT_ALIGNMENT = Alignment.CENTRE;//设置字体左右显示模式,默认左右居中
-    jxl.format.VerticalAlignment FONT_VERTICAL = VerticalAlignment.CENTRE;//默认上下居中
+    Colour FONT_COLOR = Colour.BLACK;//设置标题字体颜色,默认黑色
+    Colour BACKGROND_COLOR = Colour.WHITE;//设置标题背景颜色,默认白色
+    Alignment FONT_ALIGNMENT = Alignment.CENTRE;//设置字体左右显示模式,默认左右居中
+    VerticalAlignment FONT_VERTICAL = VerticalAlignment.CENTRE;//默认上下居中
 
     /**
      * 单实例

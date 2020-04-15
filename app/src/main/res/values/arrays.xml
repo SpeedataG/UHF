@@ -1,8 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string-array name="way">
+        <item>Reserved</item>
+        <item>EPC</item>
+        <item>TID</item>
+        <item>USER</item>
+    </string-array>
+
+    <!--R2000模块频段-->
+    <string-array name="r2k_freq">
+        <item>840_845</item>
+        <item>920_925</item>
+        <item>902_928</item>
+        <item>865_868</item>
+    </string-array>
+    <!--其他模块频段-->
+    <string-array name="freq">
+        <item>840_845</item>
+        <item>902_928</item>
+        <item>865_868</item>
+    </string-array>
+    <string-array name="yi_xin_freq">
+        <item>China 1</item>
+        <item>China 2</item>
+        <item>Europe</item>
+        <item>America</item>
+        <item>Korea</item>
+        <item>Japan</item>
+    </string-array>
+
+
     <string-array name="arr_Q">
-        <item>自动</item>
+        <item>Auto</item>
         <item>0</item>
         <item>1</item>
         <item>2</item>
@@ -26,6 +56,17 @@
         <item>B</item>
         <item>A-B</item>
         <item>B-A</item>
+    </string-array>
+    <string-array name="inv_con">
+        <item>Only EPC</item>
+        <item>EPC+TID</item>
+        <item>EPC+USER</item>
+    </string-array>
+    <string-array name="pix">
+        <item>newline</item>
+        <item>space</item>
+        <item>CRLF</item>
+        <item>none</item>
     </string-array>
 
 </resources>
