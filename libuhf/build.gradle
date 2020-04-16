@@ -1,6 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'com.jfrog.bintray'
+
 
 android {
     compileSdkVersion 28
@@ -30,89 +30,6 @@ android {
 
 }
 
-
-
-def siteUrl = 'https://github.com/EchoXBR/speedata' // 项目的主页
-def gitUrl = 'https://github.com/EchoXBR/speedata.git' // Git仓库的url
-group = "com.speedata" //一般填你唯一的包名
-version = "7.7.9"
-install {
-    repositories.mavenInstaller {
-        // This generates POM.xml with proper parameters
-        pom {
-            project {
-                packaging 'aar'
-                name 'UHFLib'
-                // #CONFIG# // project title
-                url siteUrl
-                // Set your license
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id 'echoxbr'
-                        // #CONFIG# // your user id (you can write your nickname)
-                        name 'echoxbr'
-                        // #CONFIG# // your user name
-                        email 'bairu.xu@speedatagroup.com'
-                        // #CONFIG# // your email
-                    }
-                }
-                scm {
-                    connection gitUrl
-                    developerConnection gitUrl
-                    url siteUrl
-                }
-            }
-        }
-    }
-}
-
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-
-task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    // archives javadocJar
-    archives sourcesJar
-}
-
-Properties properties = new Properties()
-boolean isHasFile = false
-if (project.rootProject.file('local.properties') != null) {
-    isHasFile = true
-    properties.load(project.rootProject.file('local.properties').newDataInputStream())
-}
-bintray {
-    user = isHasFile ? properties.getProperty("bintray.user") : System.getenv("bintray.user")
-    key = isHasFile ? properties.getProperty("bintray.apikey") : System.getenv("bintray.apikey")
-    configurations = ['archives']
-    pkg {
-        repo = "Speedata" //repo的name必须与你创建maven仓库时命名的name一致
-        name = "UHF"
-        // #CONFIG# project name in jcenter
-        websiteUrl = siteUrl
-        vcsUrl = gitUrl
-        licenses = ["Apache-2.0"]
-        publish = true
-    }
-}
-
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -125,17 +42,4 @@ dependencies {
     compileOnly 'com.alibaba:fastjson:1.2.54'
 }
 
-//打包
-task buildJar(type: Jar, dependsOn: ['build']) {
-//导出的jar文件名称
-    archiveName = 'uhf_7.7.9.jar'
-//从哪个目录打包jar
-    from('build/intermediates/classes/debug')
-//    from('build/intermediates/javac/debug/compileDebugJavaWithJavac/classes')
-//导出的jar文件的存放目录（未指定则默认存放在buildbs下）
-//去掉不要的类
-    exclude('com/camare/fingger_print/BuildConfig.class')
-    exclude('com/camare/fingger_print/BuildConfig\$*.class')
-    exclude('**/R.class')
-    exclude('**/R\$*.class')
-}
+
