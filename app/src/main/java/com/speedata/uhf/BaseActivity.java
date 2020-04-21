@@ -53,7 +53,8 @@ public class BaseActivity extends Activity {
         //全屏显示  Full screen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //强制为竖屏     Force to vertical screen mode
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+//        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setBuilder();
         if (handler != null) {
             handler.postDelayed(runnable, 50);

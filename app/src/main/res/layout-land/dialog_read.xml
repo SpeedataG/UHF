@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="400dp"
+        android:layout_height="70dp"
+        android:background="@drawable/bg_title_rw"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/Item_Read"
+            android:textColor="@color/text_white"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="400dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_rwcard_shape"
+        android:orientation="vertical"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="@string/read_password"
+                    android:textColor="@color/text_set_dark"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/editText_rp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@null"
+                    android:hint="@string/read_password_hint"
+                    android:padding="5dp"
+                    android:text="@string/VALUE_ZERO"
+                    android:textColor="@color/text_set_dark"
+                    android:textColorHint="@color/text_gray"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="@string/set_addr"
+                    android:textColor="@color/text_set_dark"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/editText_read_addr"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@null"
+                    android:hint="@string/set_addr_hint"
+                    android:inputType="number"
+                    android:padding="5dp"
+                    android:textColor="@color/text_set_dark"
+                    android:textColorHint="@color/text_gray"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp">
+
+            <TextView
+                android:layout_width="70dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/set_count"
+                android:textColor="@color/text_set_dark"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/editText_read_count"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:hint="@string/set_count_hint"
+                android:inputType="number"
+                android:padding="5dp"
+                android:textColor="@color/text_set_dark"
+                android:textColorHint="@color/text_gray"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/textView_read_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:textColor="@color/read_card_info"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:gravity="center_vertical">
+
+            <Button
+                android:id="@+id/btn_read_ok"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@drawable/btn_b_g_select"
+                android:text="@string/Item_Read"
+                android:textColor="@color/text_white"
+                android:textSize="18sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="400dp"
+        android:layout_height="50dp"
+        android:background="@color/transparent"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/iv_read_cancle"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/icon_qx" />
+
+    </LinearLayout>
+
+
+</LinearLayout>
