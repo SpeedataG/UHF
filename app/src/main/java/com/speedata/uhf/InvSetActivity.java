@@ -10,7 +10,9 @@ import android.os.Looper;
 import android.os.SystemClock;
 import android.os.SystemProperties;
 import android.support.annotation.Nullable;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -69,14 +71,14 @@ public class InvSetActivity extends BaseActivity implements View.OnClickListener
     private EditText etLoopTime;
     private CheckBox checkBoxLoop, checkBoxLongDown, checkBoxFilter, checkBoxFocusShow, checkBoxTid;
     private TableLayout tableLayout5, tableLayout6;
-    private TableRow trSession, trAddress, trBlock;
+    private TableRow trSession, trAddress, trBlock, trCustomPre, trCustomSuf;
     private EditText etReadTime, etSleep;
     private Button setTimeBtn;
     private TextView mVersionTv;
     private RelativeLayout rlFloatSwitch;
     private LinearLayout setTimeLayout2;
     private EditText etCustomAction, etCustomKeyEpc, etCustomKeyTid, etCustomKeyRssi,
-            etAddress, etBlock;
+            etAddress, etBlock, etPrefix, etSuffix;
 
 
     @Override
@@ -111,6 +113,16 @@ public class InvSetActivity extends BaseActivity implements View.OnClickListener
             checkBoxLongDown.setChecked(MyApp.isLongDown);
             if (Build.MODEL.contains("SD55")) {
                 rlFloatSwitch.setVisibility(View.GONE);
+            }
+            if (MyApp.mPrefix == 4) {
+                trCustomPre.setVisibility(View.VISIBLE);
+            } else {
+                trCustomPre.setVisibility(View.GONE);
+            }
+            if (MyApp.mSuffix == 4) {
+                trCustomSuf.setVisibility(View.VISIBLE);
+            } else {
+                trCustomSuf.setVisibility(View.GONE);
             }
         }
         iuhfService = MyApp.getInstance().getIuhfService();
@@ -158,6 +170,7 @@ public class InvSetActivity extends BaseActivity implements View.OnClickListener
         tvPrefix.setText(getResources().getStringArray(R.array.pix)[MyApp.mPrefix]);
         tvSuffix.setText(getResources().getStringArray(R.array.pix)[MyApp.mSuffix]);
         etLoopTime.setText(MyApp.mLoopTime);
+        textChangeListener();
     }
 
     public void initView() {
@@ -259,6 +272,48 @@ public class InvSetActivity extends BaseActivity implements View.OnClickListener
             SharedXmlUtil.getInstance(InvSetActivity.this).write(MyApp.EPC_OR_TID, isChecked);
         });
         checkBoxTid.setChecked(SharedXmlUtil.getInstance(InvSetActivity.this).read(MyApp.EPC_OR_TID, false));
+        etPrefix = findViewById(R.id.et_prefix);
+        etSuffix = findViewById(R.id.et_suffix);
+        trCustomPre = findViewById(R.id.tr_custom_pre);
+        trCustomSuf = findViewById(R.id.tr_custom_suf);
+    }
+
+    private void textChangeListener() {
+        etPrefix.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.d("text", "onTextChanged=" + s.toString());
+                String prefix = s.toString();
+                SharedXmlUtil.getInstance(InvSetActivity.this).write("custom_prefix", prefix);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        etSuffix.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String suffix = s.toString();
+                SharedXmlUtil.getInstance(InvSetActivity.this).write("custom_suffix", suffix);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
     private void getFreq() {
@@ -748,6 +803,11 @@ public class InvSetActivity extends BaseActivity implements View.OnClickListener
                     //选择的前缀列表位置
                     MyApp.mPrefix = bundle.getInt("position");
                     tvPrefix.setText(fix);
+                    if (MyApp.mPrefix == 4) {
+                        trCustomPre.setVisibility(View.VISIBLE);
+                    } else {
+                        trCustomPre.setVisibility(View.GONE);
+                    }
                 }
                 break;
             case 5:
@@ -758,6 +818,11 @@ public class InvSetActivity extends BaseActivity implements View.OnClickListener
                     //选择的后缀列表位置
                     MyApp.mSuffix = bundle.getInt("position");
                     tvSuffix.setText(fix);
+                    if (MyApp.mSuffix == 4) {
+                        trCustomSuf.setVisibility(View.VISIBLE);
+                    } else {
+                        trCustomSuf.setVisibility(View.GONE);
+                    }
                 }
                 break;
             default:

@@ -67,6 +67,7 @@
         <item>space</item>
         <item>CRLF</item>
         <item>none</item>
+        <item>custom</item>
     </string-array>
 
 </resources>

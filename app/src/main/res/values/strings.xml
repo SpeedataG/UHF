@@ -326,5 +326,7 @@
     <string name="custom_key_epc_hint">epc key value</string>
     <string name="custom_key_tid_hint">tid key value</string>
     <string name="custom_key_rssi_hint">RSSI key value</string>
-
+    <string name="custom_prefix">custom prefix</string>
+    <string name="custom_suffix">custom suffix</string>
+    <string name="custom_fix_string">Please enter a string</string>
 </resources>

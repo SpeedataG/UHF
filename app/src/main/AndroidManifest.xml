@@ -28,7 +28,7 @@
             android:name=".MyService"
             android:enabled="true"
             android:exported="true" />
-
+        <!--android:screenOrientation="portrait"-->
         <activity
             android:name=".NewMainActivity"
             android:screenOrientation="portrait"

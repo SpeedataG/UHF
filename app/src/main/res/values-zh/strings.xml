@@ -322,4 +322,7 @@
     <string name="custom_key_epc_hint">epc键值</string>
     <string name="custom_key_tid_hint">tid键值</string>
     <string name="custom_key_rssi_hint">rssi键值</string>
+    <string name="custom_prefix">自定义前缀</string>
+    <string name="custom_suffix">自定义后缀</string>
+    <string name="custom_fix_string">请输入字符串</string>
 </resources>

@@ -332,38 +332,43 @@ public class MyService extends Service {
         if (SharedXmlUtil.getInstance(MyService.this).read(MyApp.EPC_OR_TID, false)) {
             epc = var1.getTid();
         }
+        String prefix;
+        String suffix;
         switch (MyApp.mPrefix) {
             case 0:
-                epc = "\n" + epc;
+                prefix = "\n";
                 break;
             case 1:
-                epc = " " + epc;
+                prefix = " ";
                 break;
             case 2:
-                epc = "\r\n" + epc;
+                prefix = "\r\n";
                 break;
             case 3:
-                epc = "" + epc;
+                prefix = "";
                 break;
             default:
+                prefix = SharedXmlUtil.getInstance(MyService.this).read("custom_prefix", "");
                 break;
         }
         switch (MyApp.mSuffix) {
             case 0:
-                epc = epc + "\n";
+                suffix = "\n";
                 break;
             case 1:
-                epc = epc + " ";
+                suffix = " ";
                 break;
             case 2:
-                epc = epc + "\r\n";
+                suffix = "\r\n";
                 break;
             case 3:
-                epc = epc + "";
+                suffix = "";
                 break;
             default:
+                suffix = SharedXmlUtil.getInstance(MyService.this).read("custom_suffix", "");
                 break;
         }
+        epc = prefix + epc + suffix;
         Intent intent = new Intent();
         intent.setAction(ACTION_SEND_EPC);
         Bundle bundle = new Bundle();

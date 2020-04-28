@@ -535,11 +535,17 @@ public class NewMainActivity extends BaseActivity implements View.OnClickListene
 
     @Override
     protected void onStop() {
-
-        Log.w("stop", "im stopping");
         if (inSearch) {
             iuhfService.inventoryStop();
             inSearch = false;
+        }
+        try {
+            writer = new BufferedWriter(new FileWriter(file, false));
+            writer.write("otgoff");
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         super.onStop();
     }

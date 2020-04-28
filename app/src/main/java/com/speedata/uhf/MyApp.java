@@ -151,7 +151,7 @@ public class MyApp extends Application {
             i = iuhfService.setQueryTagGroup(0, SharedXmlUtil.getInstance(this).read(MyApp.UHF_SESSION, 0), 0);
             Log.d("zzc:", "===isFirstInit===setQueryTagGroup:" + i);
             SystemClock.sleep(100);
-            i = iuhfService.setInvMode(SharedXmlUtil.getInstance(this).read(MyApp.UHF_INV_CON, 1), 0, 12);
+            i = iuhfService.setInvMode(SharedXmlUtil.getInstance(this).read(MyApp.UHF_INV_CON, 0), 0, 12);
             Log.d("zzc:", "===isFirstInit===setInvMode:" + i);
         }
         if (UHFManager.getUHFModel().contains(UHFManager.FACTORY_XINLIAN)) {

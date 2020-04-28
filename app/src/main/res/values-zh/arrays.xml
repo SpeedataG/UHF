@@ -66,6 +66,7 @@
         <item>空格</item>
         <item>回车换行</item>
         <item>无</item>
+        <item>自定义</item>
     </string-array>
 
 </resources>
