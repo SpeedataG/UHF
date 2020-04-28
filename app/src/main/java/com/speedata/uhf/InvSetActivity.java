@@ -116,11 +116,13 @@ public class InvSetActivity extends BaseActivity implements View.OnClickListener
             }
             if (MyApp.mPrefix == 4) {
                 trCustomPre.setVisibility(View.VISIBLE);
+                etPrefix.setText(SharedXmlUtil.getInstance(this).read("custom_prefix",""));
             } else {
                 trCustomPre.setVisibility(View.GONE);
             }
             if (MyApp.mSuffix == 4) {
                 trCustomSuf.setVisibility(View.VISIBLE);
+                etSuffix.setText(SharedXmlUtil.getInstance(this).read("custom_suffix",""));
             } else {
                 trCustomSuf.setVisibility(View.GONE);
             }
