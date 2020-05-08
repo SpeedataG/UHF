@@ -93,6 +93,7 @@ public class MyService extends Service {
                 initUHF();
                 if (openDev()) {
                     Log.d(TAG, "===亮屏了==上电成功===" + action);
+                    MyApp.getInstance().initParam();
                 }
             }
 
