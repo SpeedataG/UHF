@@ -82,7 +82,11 @@ public class FloatWarnManager {
         @Override
         public void onHide() {
             Log.d(TAG, "onHide");
-            closeFloatWarn();
+            try {
+                closeFloatWarn();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             System.exit(0);
         }
 

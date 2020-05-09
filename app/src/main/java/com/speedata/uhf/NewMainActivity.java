@@ -680,11 +680,6 @@ public class NewMainActivity extends BaseActivity implements View.OnClickListene
             MyApp.getInstance().setIuhfService();
             iuhfService = MyApp.getInstance().getIuhfService();
             if (iuhfService == null) {
-                FloatWarnManager.getInstance(getApplicationContext(), getResources().getString(R.string.dialog_module_none));
-                FloatWarnManager floatWarnManager = FloatWarnManager.getFloatWarnManager();
-                if (floatWarnManager != null) {
-                    FloatWindow.get("FloatWarnTag").show();
-                }
                 return;
             }
             try {

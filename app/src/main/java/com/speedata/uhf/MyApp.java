@@ -18,6 +18,7 @@ import com.speedata.uhf.adapter.UhfInfoBean;
 import com.speedata.uhf.floatball.FloatBallManager;
 import com.speedata.uhf.floatball.FloatListManager;
 import com.speedata.uhf.floatball.FloatWarnManager;
+import com.speedata.uhf.libutils.ToastUtil;
 import com.tencent.bugly.Bugly;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.yhao.floatwindow.FloatWindow;
@@ -123,17 +124,8 @@ public class MyApp extends Application {
             Log.d("UHFService", "iuhfService初始化: " + iuhfService);
         } catch (Exception e) {
             e.printStackTrace();
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    FloatWarnManager.getInstance(getApplicationContext(), getResources().getString(R.string.dialog_module_none));
-                    FloatWarnManager floatWarnManager = FloatWarnManager.getFloatWarnManager();
-                    if (floatWarnManager != null) {
-                        FloatWindow.get("FloatWarnTag").show();
-                    }
-                }
-            });
+            ToastUtil.showLong(getApplicationContext(), getResources().getString(R.string.dialog_module_none));
+            Log.d("UHFService", "iuhfService初始化: 失败");
         }
 
     }

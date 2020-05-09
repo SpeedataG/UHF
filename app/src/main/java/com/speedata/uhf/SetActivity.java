@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -16,6 +17,8 @@ import android.widget.Toast;
 import com.speedata.libuhf.IUHFService;
 import com.speedata.libuhf.UHFManager;
 import com.speedata.libuhf.utils.SharedXmlUtil;
+import com.speedata.uhf.floatball.FloatWarnManager;
+import com.yhao.floatwindow.FloatWindow;
 
 
 /**
@@ -44,14 +47,23 @@ public class SetActivity extends Activity {
                     MyApp.getInstance().setIuhfService();
                     iuhfService = MyApp.getInstance().getIuhfService();
                     if (iuhfService == null) {
+                        Handler handler = new Handler(Looper.getMainLooper());
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                FloatWarnManager.getInstance(getApplicationContext(), getResources().getString(R.string.dialog_module_none));
+                                FloatWarnManager floatWarnManager = FloatWarnManager.getFloatWarnManager();
+                                if (floatWarnManager != null) {
+                                    FloatWindow.get("FloatWarnTag").show();
+                                }
+                            }
+                        });
                         return;
                     }
                     try {
-                        if (iuhfService != null) {
-                            MyApp.isOpenDev = openDev();
-                            if (MyApp.isOpenDev) {
-                                MyApp.getInstance().initParam();
-                            }
+                        MyApp.isOpenDev = openDev();
+                        if (MyApp.isOpenDev) {
+                            MyApp.getInstance().initParam();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
