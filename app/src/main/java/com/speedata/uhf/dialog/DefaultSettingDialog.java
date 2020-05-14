@@ -22,7 +22,7 @@ import com.speedata.uhf.libutils.ToastUtil;
 public class DefaultSettingDialog extends Dialog implements View.OnClickListener {
     private Context mContext;
     private IUHFService iuhfService;
-    private TextView mTvXhMode, mTvDefaultMode, mTvS0Mode, mTvS1Mode;
+    private TextView mTvXhMode, mTvDefaultMode, mTvS0Mode, mTvS1Mode, mTvCustomMode;
     private boolean isSuccess = false;
 
     public DefaultSettingDialog(@NonNull Context context, IUHFService iuhfService) {
@@ -43,6 +43,8 @@ public class DefaultSettingDialog extends Dialog implements View.OnClickListener
         mTvS0Mode.setOnClickListener(this);
         mTvS1Mode = findViewById(R.id.tv_s1_setting);
         mTvS1Mode.setOnClickListener(this);
+        mTvCustomMode = findViewById(R.id.tv_custom_setting);
+        mTvCustomMode.setOnClickListener(this);
         initData();
     }
 
@@ -53,15 +55,18 @@ public class DefaultSettingDialog extends Dialog implements View.OnClickListener
                 mTvDefaultMode.setEnabled(false);
                 mTvS0Mode.setText(mContext.getString(R.string.btn_stop_fast));
                 mTvS1Mode.setText(mContext.getString(R.string.btn_stop_fast));
+                mTvCustomMode.setText(mContext.getString(R.string.btn_stop_fast));
             } else {
                 mTvXhMode.setEnabled(true);
                 mTvDefaultMode.setEnabled(true);
                 mTvS0Mode.setText(mContext.getString(R.string.tv_s0_mode));
                 mTvS1Mode.setText(mContext.getString(R.string.tv_s1_mode));
+                mTvCustomMode.setText(mContext.getString(R.string.tv_custom_mode));
             }
         } else {
             mTvS0Mode.setVisibility(View.GONE);
             mTvS1Mode.setVisibility(View.GONE);
+            mTvCustomMode.setVisibility(View.GONE);
         }
 
     }
@@ -83,6 +88,10 @@ public class DefaultSettingDialog extends Dialog implements View.OnClickListener
                 break;
             case R.id.tv_s1_setting:
                 setS1FastMode();
+                fastTips(isSuccess);
+                break;
+            case R.id.tv_custom_setting:
+                setCustomFastMode();
                 fastTips(isSuccess);
                 break;
             default:
@@ -212,6 +221,34 @@ public class DefaultSettingDialog extends Dialog implements View.OnClickListener
             }
             MyApp.isFastMode = true;
             mTvS1Mode.setText(mContext.getString(R.string.btn_stop_fast));
+        }
+    }
+
+    /**
+     * 自定义快速模式
+     */
+    private void setCustomFastMode() {
+        int i;
+        if (MyApp.isFastMode) {
+            isSuccess = false;
+            i = iuhfService.switchInvMode(2);
+            if (i == 0) {
+                MyApp.isFastMode = false;
+                mTvCustomMode.setText(mContext.getString(R.string.tv_custom_mode));
+            }
+        } else {
+            isSuccess = true;
+            i = iuhfService.setQueryTagGroup(0, 1, 0);
+            if (i != 0) {
+                return;
+            }
+            SystemClock.sleep(100);
+            i = iuhfService.switchInvMode(1);
+            if (i != 0) {
+                return;
+            }
+            MyApp.isFastMode = true;
+            mTvCustomMode.setText(mContext.getString(R.string.btn_stop_fast));
         }
     }
 

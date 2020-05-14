@@ -311,6 +311,7 @@
     <string name="tv_default_mode">远距离模式（默认）</string>
     <string name="tv_s0_mode">s0 快速模式</string>
     <string name="tv_s1_mode">s1 快速模式</string>
+    <string name="tv_custom_mode">自定义快速模式</string>
     <string name="toast_stop_fast_tips">请先关闭快速模式</string>
 
     <string name="btn_set_action">设置自定义广播</string>

@@ -315,6 +315,7 @@
     <string name="tv_default_mode">Remote mode (default)</string>
     <string name="tv_s0_mode">s0 Fast mode</string>
     <string name="tv_s1_mode">s1 Fast mode</string>
+    <string name="tv_custom_mode">Custom fast mode</string>
     <string name="toast_stop_fast_tips">Please turn off fast mode first</string>
 
     <string name="btn_set_action">Set up custom broadcasts</string>

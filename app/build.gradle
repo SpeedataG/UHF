@@ -6,8 +6,8 @@ android {
         applicationId "com.speedata.uhf"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 47
-        versionName "NEW2.5.1"
+        versionCode 48
+        versionName "NEW2.5.2"
         ndk {
             // 设置支持的SO库架构
             abiFilters 'armeabi-v7a', 'arm64-v8a'//'armeabi'//, 'armeabi-v7a'//

@@ -84,4 +84,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_s0_setting" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/tran_gray"
+        app:layout_constraintTop_toBottomOf="@id/tv_s1_setting" />
+
+    <TextView
+        android:id="@+id/tv_custom_setting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_default_item_select"
+        android:gravity="center"
+        android:padding="14dp"
+        android:text="@string/tv_custom_mode"
+        android:textColor="@color/commom_text_color"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_s1_setting" />
+
 </android.support.constraint.ConstraintLayout>
