@@ -240,7 +240,7 @@
     <string name="btn_get_algorithm">GetAlgorithm</string>
     <string name="gen2_target">Target:</string>
     <string name="btn_get_value">GetValue</string>
-    <string name="check_close_server">Turn off uhf backend services</string>
+    <string name="check_close_server">Turn on uhf backend services</string>
     <string name="keep_time">Residence time</string>
     <string name="btn_set_time">set time</string>
     <string name="btn_get_all_time">get time</string>

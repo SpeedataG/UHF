@@ -696,9 +696,9 @@ public class NewMainActivity extends BaseActivity implements View.OnClickListene
             }
             SystemClock.sleep(100);
             Log.d("UHFService", "startService==main==");
-            startService(new Intent(this, MyService.class));
-            SharedXmlUtil.getInstance(this).write("server", true);
-            SystemClock.sleep(1000);
+//            startService(new Intent(this, MyService.class));
+//            SharedXmlUtil.getInstance(this).write("server", true);
+//            SystemClock.sleep(1000);
         }
     }
 }

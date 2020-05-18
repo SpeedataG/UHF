@@ -99,7 +99,7 @@ public class InvSetActivity extends BaseActivity implements View.OnClickListener
         //判断服务是否存在
         isExistServer = SharedXmlUtil.getInstance(this).read("server", false);
         if (!isExistServer) {
-            checkBoxService.setEnabled(false);
+            checkBoxService.setChecked(false);
             tvPrefix.setEnabled(false);
             tvSuffix.setEnabled(false);
             checkBoxLoop.setEnabled(false);
@@ -108,6 +108,7 @@ public class InvSetActivity extends BaseActivity implements View.OnClickListener
             tableLayout6.setVisibility(View.GONE);
             tableLayout5.setVisibility(View.GONE);
         } else {
+            checkBoxService.setChecked(true);
             checkBoxLoop.setChecked(MyApp.isLoop);
             etLoopTime.setEnabled(MyApp.isLoop);
             checkBoxLongDown.setChecked(MyApp.isLongDown);
@@ -116,13 +117,13 @@ public class InvSetActivity extends BaseActivity implements View.OnClickListener
             }
             if (MyApp.mPrefix == 4) {
                 trCustomPre.setVisibility(View.VISIBLE);
-                etPrefix.setText(SharedXmlUtil.getInstance(this).read("custom_prefix",""));
+                etPrefix.setText(SharedXmlUtil.getInstance(this).read("custom_prefix", ""));
             } else {
                 trCustomPre.setVisibility(View.GONE);
             }
             if (MyApp.mSuffix == 4) {
                 trCustomSuf.setVisibility(View.VISIBLE);
-                etSuffix.setText(SharedXmlUtil.getInstance(this).read("custom_suffix",""));
+                etSuffix.setText(SharedXmlUtil.getInstance(this).read("custom_suffix", ""));
             } else {
                 trCustomSuf.setVisibility(View.GONE);
             }
@@ -190,6 +191,47 @@ public class InvSetActivity extends BaseActivity implements View.OnClickListener
         setBackBtn = (Button) findViewById(R.id.btn_set_back);
         setBackBtn.setOnClickListener(this);
         checkBoxService = findViewById(R.id.check_service);
+        checkBoxService.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                startService(new Intent(this, MyService.class));
+                SharedXmlUtil.getInstance(this).write("server", true);
+                tableLayout6.setVisibility(View.VISIBLE);
+                tableLayout5.setVisibility(View.VISIBLE);
+                tvPrefix.setEnabled(true);
+                tvSuffix.setEnabled(true);
+                checkBoxLoop.setEnabled(true);
+                etLoopTime.setEnabled(true);
+                checkBoxLongDown.setEnabled(true);
+                checkBoxLoop.setChecked(MyApp.isLoop);
+                etLoopTime.setEnabled(MyApp.isLoop);
+                checkBoxLongDown.setChecked(MyApp.isLongDown);
+                if (Build.MODEL.contains("SD55")) {
+                    rlFloatSwitch.setVisibility(View.GONE);
+                }
+                if (MyApp.mPrefix == 4) {
+                    trCustomPre.setVisibility(View.VISIBLE);
+                    etPrefix.setText(SharedXmlUtil.getInstance(this).read("custom_prefix", ""));
+                } else {
+                    trCustomPre.setVisibility(View.GONE);
+                }
+                if (MyApp.mSuffix == 4) {
+                    trCustomSuf.setVisibility(View.VISIBLE);
+                    etSuffix.setText(SharedXmlUtil.getInstance(this).read("custom_suffix", ""));
+                } else {
+                    trCustomSuf.setVisibility(View.GONE);
+                }
+            } else {
+                stopService(new Intent(this, MyService.class));
+                SharedXmlUtil.getInstance(this).write("server", false);
+                tvPrefix.setEnabled(false);
+                tvSuffix.setEnabled(false);
+                checkBoxLoop.setEnabled(false);
+                etLoopTime.setEnabled(false);
+                checkBoxLongDown.setEnabled(false);
+                tableLayout6.setVisibility(View.GONE);
+                tableLayout5.setVisibility(View.GONE);
+            }
+        });
         setFreqBtn = findViewById(R.id.btn_set_freq);
         setFreqBtn.setOnClickListener(this);
         setSessionBtn = findViewById(R.id.btn_set_session);
@@ -834,10 +876,10 @@ public class InvSetActivity extends BaseActivity implements View.OnClickListener
 
     @Override
     protected void onDestroy() {
-        if (checkBoxService.isChecked()) {
-            SharedXmlUtil.getInstance(this).write("server", false);
-            stopService(new Intent(this, MyService.class));
-        }
+//        if (checkBoxService.isChecked()) {
+//            SharedXmlUtil.getInstance(this).write("server", false);
+//            stopService(new Intent(this, MyService.class));
+//        }
         super.onDestroy();
     }
 }

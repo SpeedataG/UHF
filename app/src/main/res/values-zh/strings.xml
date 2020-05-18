@@ -235,7 +235,7 @@
     <string name="btn_get_algorithm">获取算法</string>
     <string name="gen2_target">目标：</string>
     <string name="btn_get_value">获取数值</string>
-    <string name="check_close_server">关闭超高频后台服务</string>
+    <string name="check_close_server">打开超高频后台服务</string>
     <string name="keep_time">驻留时间</string>
     <string name="btn_set_time">设置时间</string>
     <string name="btn_get_all_time">获取时间</string>

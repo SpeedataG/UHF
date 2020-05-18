@@ -396,7 +396,7 @@
             </TableLayout>
 
             <TableLayout
-                android:id="@+id/set_tab5"
+                android:id="@+id/set_tab7"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/set_tab4"
@@ -408,8 +408,7 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1">
+                    android:layout_height="wrap_content">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -435,6 +434,18 @@
                         android:textOff=""
                         android:textOn="" />
                 </RelativeLayout>
+            </TableLayout>
+
+            <TableLayout
+                android:id="@+id/set_tab5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/set_tab7"
+                android:layout_marginTop="10dp"
+                android:background="@color/text_white"
+                android:paddingLeft="14dp"
+                android:paddingRight="14dp"
+                android:visibility="visible">
 
                 <RelativeLayout
                     android:id="@+id/rl_float_switch"
