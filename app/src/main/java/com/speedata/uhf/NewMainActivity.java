@@ -36,6 +36,7 @@ import com.speedata.libuhf.UHFManager;
 import com.speedata.libuhf.bean.SpdInventoryData;
 import com.speedata.libuhf.interfaces.OnSpdInventoryListener;
 import com.speedata.libuhf.utils.CommonUtils;
+import com.speedata.libuhf.utils.ErrorStatus;
 import com.speedata.libuhf.utils.SharedXmlUtil;
 import com.speedata.uhf.adapter.UhfCardAdapter;
 import com.speedata.uhf.adapter.UhfCardBean;
@@ -95,6 +96,7 @@ public class NewMainActivity extends BaseActivity implements View.OnClickListene
     private static final String CHARGING_PATH = "/sys/class/misc/bq25601/regdump/";
     private File file;
     private BufferedWriter writer;
+    private int jishu = 0;
 
     public static final String START_SCAN = "com.spd.action.start_uhf";
     public static final String STOP_SCAN = "com.spd.action.stop_uhf";
@@ -272,11 +274,7 @@ public class NewMainActivity extends BaseActivity implements View.OnClickListene
                     }
                 case -1:
                     int status = (int) msg.obj;
-                    if (cn) {
-                        Toast.makeText(NewMainActivity.this, "盘点中断:" + status, Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(NewMainActivity.this, "Inventory interrupt:" + status, Toast.LENGTH_SHORT).show();
-                    }
+                    Toast.makeText(NewMainActivity.this, ErrorStatus.getErrorStatus(NewMainActivity.this, status), Toast.LENGTH_SHORT).show();
                     break;
                 default:
                     break;
@@ -313,8 +311,12 @@ public class NewMainActivity extends BaseActivity implements View.OnClickListene
 
             @Override
             public void onInventoryStatus(int status) {
-                handler.sendMessage(handler.obtainMessage(-1, status));
+                if (jishu % 99 == 0) {
+                    handler.sendMessage(handler.obtainMessage(-1, status));
+                    jishu = 0;
+                }
                 Log.d("UHFService", "盘点失败" + status);
+                jishu++;
                 iuhfService.inventoryStart();
             }
         });

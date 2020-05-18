@@ -84,6 +84,7 @@ public class MyService extends Service {
                 IUHFService iuhfService = MyApp.getInstance().getIuhfService();
                 if (iuhfService != null) {
                     iuhfService.inventoryStop();
+                    MyApp.getInstance().getIuhfService().switchInvMode(0);
                     iuhfService.closeDev();
                     MyApp.isOpenDev = false;
                     Log.d(TAG, "===熄屏下电了===" + action);
@@ -93,7 +94,12 @@ public class MyService extends Service {
                 initUHF();
                 if (openDev()) {
                     Log.d(TAG, "===亮屏了==上电成功===" + action);
-                    MyApp.getInstance().initParam();
+                    if (!MyApp.isFastMode){
+                        MyApp.getInstance().initParam();
+                    }else {
+                        MyApp.getInstance().getIuhfService().switchInvMode(1);
+                    }
+
                 }
             }
 
