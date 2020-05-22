@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 
 import com.speedata.libuhf.IUHFService;
 import com.speedata.libuhf.UHFManager;
+import com.speedata.libuhf.XinLianQilian;
 import com.speedata.uhf.MyApp;
 import com.speedata.uhf.R;
 import com.speedata.uhf.libutils.ToastUtil;
@@ -174,9 +176,12 @@ public class DefaultSettingDialog extends Dialog implements View.OnClickListener
             }
         } else {
             isSuccess = true;
-            i = iuhfService.setAntennaPower(30);
-            if (i != 0) {
-                return;
+            int maxp = iuhfService.getMaxAntennaPower();
+            if (maxp > 0) {
+                i = iuhfService.setAntennaPower(maxp);
+                if (i != 0) {
+                    return;
+                }
             }
             i = iuhfService.setQueryTagGroup(0, 0, 0);
             if (i != 0) {
@@ -206,9 +211,13 @@ public class DefaultSettingDialog extends Dialog implements View.OnClickListener
             }
         } else {
             isSuccess = true;
-            i = iuhfService.setAntennaPower(30);
-            if (i != 0) {
-                return;
+            int maxp = iuhfService.getMaxAntennaPower();
+            Log.d("zzc", "maxp:" + maxp);
+            if (maxp > 0) {
+                i = iuhfService.setAntennaPower(maxp);
+                if (i != 0) {
+                    return;
+                }
             }
             i = iuhfService.setQueryTagGroup(0, 1, 0);
             if (i != 0) {
