@@ -374,11 +374,77 @@
 
             </TableLayout>
 
+
+            <TableLayout
+                android:id="@+id/set_tab8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/set_tab3"
+                android:layout_marginTop="10dp"
+                android:background="@color/text_white"
+                >
+                <TableRow>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp"
+                        android:gravity="center_vertical"
+                        android:padding="14dp"
+                        android:text="@string/check_stop_time"
+                        android:textColor="@color/commom_text_color"
+                        android:textSize="14sp" />
+
+                    <CheckBox
+                        android:id="@+id/check_stop_time"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:checked="false" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp"
+                        android:gravity="center_vertical"
+                        android:padding="14dp"
+                        android:text="@string/set_stop_time"
+                        android:textColor="@color/commom_text_color"
+                        android:textSize="14sp" />
+
+                    <EditText
+                        android:id="@+id/et_stop_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:background="@color/text_white3"
+                        android:gravity="center_vertical"
+                        android:hint="@string/set_stop_time"
+                        android:inputType="number"
+                        android:padding="14dp"
+                        android:textColor="@color/text_set_dark"
+                        android:textColorHint="@color/text_gray"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp"
+                        android:layout_marginRight="20dp"
+                        android:gravity="center_vertical"
+                        android:text="@string/set_loop_s"
+                        android:textColor="@color/commom_text_color"
+                        android:textSize="14sp" />
+
+                </TableRow>
+            </TableLayout>
+
             <TableLayout
                 android:id="@+id/set_tab4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/set_tab3"
+                android:layout_below="@id/set_tab8"
                 android:layout_marginTop="10dp"
                 android:background="@color/text_white"
                 android:paddingStart="14dp"

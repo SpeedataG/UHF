@@ -68,8 +68,8 @@ public class InvSetActivity extends BaseActivity implements View.OnClickListener
     private Boolean isExistServer;
     private Button setFreqBtn, setSessionBtn, setPowerBtn, setInvConBtn;
     private TextView tvPrefix, tvSuffix;
-    private EditText etLoopTime;
-    private CheckBox checkBoxLoop, checkBoxLongDown, checkBoxFilter, checkBoxFocusShow, checkBoxTid;
+    private EditText etLoopTime, etStopTime;
+    private CheckBox checkBoxLoop, checkBoxLongDown, checkBoxFilter, checkBoxFocusShow, checkBoxTid, checkBoxStopTime;
     private TableLayout tableLayout5, tableLayout6;
     private TableRow trSession, trAddress, trBlock, trCustomPre, trCustomSuf;
     private EditText etReadTime, etSleep;
@@ -174,6 +174,9 @@ public class InvSetActivity extends BaseActivity implements View.OnClickListener
         tvSuffix.setText(getResources().getStringArray(R.array.pix)[MyApp.mSuffix]);
         etLoopTime.setText(MyApp.mLoopTime);
         textChangeListener();
+        checkBoxStopTime.setChecked(MyApp.isStopTime);
+        etStopTime.setText(MyApp.mStopTime);
+
     }
 
     public void initView() {
@@ -320,6 +323,12 @@ public class InvSetActivity extends BaseActivity implements View.OnClickListener
         etSuffix = findViewById(R.id.et_suffix);
         trCustomPre = findViewById(R.id.tr_custom_pre);
         trCustomSuf = findViewById(R.id.tr_custom_suf);
+        checkBoxStopTime = findViewById(R.id.check_stop_time);
+        etStopTime = findViewById(R.id.et_stop_time);
+        checkBoxStopTime.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            MyApp.isStopTime = isChecked;
+            etStopTime.setEnabled(isChecked);
+        });
     }
 
     private void textChangeListener() {
@@ -513,6 +522,9 @@ public class InvSetActivity extends BaseActivity implements View.OnClickListener
         MyApp.isLoop = checkBoxLoop.isChecked();
         if (MyApp.isLoop) {
             MyApp.mLoopTime = etLoopTime.getText().toString();
+        }
+        if (MyApp.isStopTime){
+            MyApp.mStopTime = etStopTime.getText().toString();
         }
         MyApp.isLongDown = checkBoxLongDown.isChecked();
         super.onPause();

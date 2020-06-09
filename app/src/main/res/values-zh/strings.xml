@@ -128,6 +128,8 @@
     <string name="btn_ok">确认</string>
     <string name="set_server_prefix">前缀</string>
     <string name="set_server_suffix">后缀</string>
+    <string name="check_stop_time">计时停止</string>
+    <string name="set_stop_time">设置停止时间</string>
     <string name="set_server_loop">循环(配合循环超时使用)</string>
     <string name="set_loop">循环</string>
     <string name="set_server_loop_time">设置循环超时时间</string>

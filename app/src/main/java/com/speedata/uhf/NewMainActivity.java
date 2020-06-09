@@ -238,7 +238,6 @@ public class NewMainActivity extends BaseActivity implements View.OnClickListene
                     if (mTbtnSound.isChecked()) {
                         soundPool.play(soundId, 1, 1, 0, 0, 1);
                     }
-                    Log.e("zzc", "=soundPool.play=====" + (System.currentTimeMillis() - iop));
                     SpdInventoryData var1 = (SpdInventoryData) msg.obj;
                     int j;
                     for (j = 0; j < uhfCardBeanList.size(); j++) {
@@ -252,8 +251,10 @@ public class NewMainActivity extends BaseActivity implements View.OnClickListene
                     if (j == uhfCardBeanList.size()) {
                         uhfCardBeanList.add(new UhfCardBean(var1.epc, 1, var1.rssi, var1.tid));
                     }
+                    Log.e("zzc", "=handleMessage=====" + uhfCardBeanList.size() + " | " + (System.currentTimeMillis() - iop));
                     uhfCardAdapter.notifyDataSetChanged();
-                    updateRateCount();
+//                    SystemClock.sleep(10);
+//                    updateRateCount();
                     break;
 
                 case 2:
@@ -276,6 +277,12 @@ public class NewMainActivity extends BaseActivity implements View.OnClickListene
                     int status = (int) msg.obj;
                     Toast.makeText(NewMainActivity.this, ErrorStatus.getErrorStatus(NewMainActivity.this, status), Toast.LENGTH_SHORT).show();
                     break;
+                case 4:
+                    updateRateCount();
+                    break;
+                case 5:
+                    stopUhf();
+                    break;
                 default:
                     break;
             }
@@ -291,6 +298,13 @@ public class NewMainActivity extends BaseActivity implements View.OnClickListene
         if (iuhfService == null) {
             return;
         }
+        uhfCardBeanList.clear();
+        uhfCardAdapter.notifyDataSetChanged();
+        scant = 0;
+        startCheckingTime = System.currentTimeMillis();
+        isUpdate = true;
+        UpdateRateCountThread updateRateCountThread = new UpdateRateCountThread();
+        updateRateCountThread.start();
         try {
             writer = new BufferedWriter(new FileWriter(file, false));
             writer.write("otgon");
@@ -301,25 +315,6 @@ public class NewMainActivity extends BaseActivity implements View.OnClickListene
         }
         //取消掩码 Cancel the mask
         iuhfService.selectCard(1, "", false);
-        // 盘点回调函数 callback function
-        iuhfService.setOnInventoryListener(new OnSpdInventoryListener() {
-            @Override
-            public void getInventoryData(SpdInventoryData var1) {
-                handler.sendMessage(handler.obtainMessage(1, var1));
-                Log.d("UHFService", "回调");
-            }
-
-            @Override
-            public void onInventoryStatus(int status) {
-                if (jishu % 99 == 0) {
-                    handler.sendMessage(handler.obtainMessage(-1, status));
-                    jishu = 0;
-                }
-                Log.d("UHFService", "盘点失败" + status);
-                jishu++;
-                iuhfService.inventoryStart();
-            }
-        });
         iuhfService.inventoryStart();
         inSearch = true;
         mLlFind.setVisibility(View.GONE);
@@ -327,9 +322,6 @@ public class NewMainActivity extends BaseActivity implements View.OnClickListene
         mTvListMsg.setVisibility(View.VISIBLE);
         mLlListBg.setVisibility(View.GONE);
         mListViewCard.setVisibility(View.VISIBLE);
-        scant = 0;
-        uhfCardBeanList.clear();
-        startCheckingTime = System.currentTimeMillis();
         mFindBtn.setText(R.string.Stop_Search_Btn);
         mIvMenu.setEnabled(false);
         mBtSearch.setEnabled(false);
@@ -338,8 +330,7 @@ public class NewMainActivity extends BaseActivity implements View.OnClickListene
         btnExport.setEnabled(false);
         btnExport.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_gray_shape));
         btnExport.setTextColor(getResources().getColor(R.color.text_gray));
-        uhfCardAdapter.notifyDataSetChanged();
-        updateRateCount();
+//        updateRateCount();
     }
 
     /**
@@ -368,6 +359,7 @@ public class NewMainActivity extends BaseActivity implements View.OnClickListene
         } catch (IOException e) {
             e.printStackTrace();
         }
+        isUpdate = false;
     }
 
 
@@ -470,6 +462,25 @@ public class NewMainActivity extends BaseActivity implements View.OnClickListene
         //初始化声音线程  Initializes the sound thread
         initSoundPool();
         MyApp.isOpenServer = false;
+        // 盘点回调函数 callback function
+        iuhfService.setOnInventoryListener(new OnSpdInventoryListener() {
+            @Override
+            public void getInventoryData(SpdInventoryData var1) {
+                handler.sendMessage(handler.obtainMessage(1, var1));
+                Log.d("UHFService", "回调");
+            }
+
+            @Override
+            public void onInventoryStatus(int status) {
+                if (jishu % 99 == 0) {
+                    handler.sendMessage(handler.obtainMessage(-1, status));
+                    jishu = 0;
+                }
+                Log.d("UHFService", "盘点失败" + status);
+                jishu++;
+                iuhfService.inventoryStart();
+            }
+        });
     }
 
     @Override
@@ -529,6 +540,24 @@ public class NewMainActivity extends BaseActivity implements View.OnClickListene
         totalTime.setText(String.format(getResources().getString(R.string.spend_time) + "%s", String.valueOf(getTimeFromMillisecond(totalTimeCount))));
     }
 
+    private volatile boolean isUpdate = false;
+
+    private class UpdateRateCountThread extends Thread {
+        @Override
+        public void run() {
+            while (isUpdate) {
+                if (MyApp.isStopTime) {
+                    int stopTime = Integer.parseInt(MyApp.mStopTime);
+                    if ((System.currentTimeMillis() - startCheckingTime) >= (stopTime * 1000)) {
+                        handler.sendEmptyMessage(5);
+                    }
+                }
+                handler.sendEmptyMessage(4);
+                SystemClock.sleep(10);
+            }
+        }
+    }
+
     private void sendUpddateService() {
         Intent intent = new Intent();
         intent.setAction("uhf.update");
@@ -538,6 +567,7 @@ public class NewMainActivity extends BaseActivity implements View.OnClickListene
     @Override
     protected void onStop() {
         if (inSearch) {
+            isUpdate = false;
             iuhfService.inventoryStop();
             inSearch = false;
         }
